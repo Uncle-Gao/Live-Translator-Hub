@@ -12,22 +12,33 @@ files:
 mac:
   category: public.app-category.developer-tools
   icon: build/icon.icns
-  arch:
-    - x64
-    - arm64
   target:
     - dmg
     - zip
-  artifactName: "${productName}-${version}-mac.${ext}"
+  artifactName: "${productName}-${version}-mac-${arch}.${ext}"
   hardenedRuntime: false
   gatekeeperAssess: false
   identity: null
+
+win:
+  target:
+    - nsis
+    - zip
+  artifactName: "${productName}-${version}-win-${arch}.${ext}"
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+
+linux:
+  target:
+    - AppImage
+    - deb
+  artifactName: "${productName}-${version}-linux-${arch}.${ext}"
+  category: Development
 
 publish:
   provider: github
   owner: Uncle-Gao
   repo: Live-Translator-Hub
   releaseType: release
-
-win: null
-linux: null
