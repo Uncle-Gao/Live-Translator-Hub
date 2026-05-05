@@ -78,7 +78,7 @@
   "extensionScannerScanning": "Skannar tilläggen...",
   "installStatus": "Installerad",
   "interfaceLang": "Gränssnittsspråk",
-  "localizeHub": "AI Localize Hub",
+  "localizeHub": "AI-lokalisering Hub",
   "localizing": "Lokaliserar...",
   "model": "Modell",
   "modelName": "Modellnamn",
@@ -144,5 +144,15 @@
   "updateLatest": "Du har senaste versionen",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Uppdatering klar, starta om för att installera",
-  "waitingExecution": "Väntar på exekvering..."
+  "waitingExecution": "Väntar på exekvering...",
+  "enableNestedDict": "Slå på ordboksuppslag i nästlade nivåer",
+  "enableRegex": "Aktivera regex-matchning",
+  "enableTranslationBridge": "Tvär-webview-brygga",
+  "injectDictionary": "Injicera ordboksresurser",
+  "installedPluginsList": "Installerade plugins (markera för lokalisering)",
+  "localizePluginWebview": "Lokalisera plugin-webviews (djup)",
+  "noWebviewPlugins": "Inga plugins med webview hittades",
+  "pluginPatched": "Injicerad",
+  "refreshPluginList": "Uppdatera pluginlista",
+  "showLoadingAnimation": "Visa laddningsanimation"
 }

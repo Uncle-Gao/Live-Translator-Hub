@@ -144,5 +144,15 @@
   "updateLatest": "Είστε ενημερωμένοι",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Η ενημέρωση είναι έτοιμη, κάντε επανεκκίνηση για εγκατάσταση",
-  "waitingExecution": "Αναμονή για εκτέλεση..."
+  "waitingExecution": "Αναμονή για εκτέλεση...",
+  "enableNestedDict": "Αναζήτηση σε Ένθετο Λεξικό",
+  "enableRegex": "Ενεργοποίηση Αντιστοίχισης Regex",
+  "enableTranslationBridge": "Cross-Webview Bridge",
+  "injectDictionary": "Εισαγωγή Πόρων Λεξικού",
+  "installedPluginsList": "Εγκατεστημένα Πρόσθετα (επιλέξτε για τοπική προσαρμογή)",
+  "localizePluginWebview": "Τοπική Προσαρμογή Webview Πρόσθετων (Βαθιά)",
+  "noWebviewPlugins": "Δε βρέθηκαν πρόσθετα με Webview",
+  "pluginPatched": "Εγχύθηκε",
+  "refreshPluginList": "Ανανέωση Λίστας Πρόσθετων",
+  "showLoadingAnimation": "Εμφάνιση Κινούμενου Σχεδίου Φόρτωσης"
 }

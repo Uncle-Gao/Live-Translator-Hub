@@ -11,7 +11,7 @@
   "appMissingClaude": "Veuillez installer Claude Desktop",
   "appReady": "Application trouvée",
   "appReadyClaude": "Application trouvée",
-  "appTitle": "Live Translator Hub",
+  "appTitle": "Hub de Traduction en Direct",
   "baseUrl": "URL de base",
   "browseApp": "Parcourir...",
   "claudeApp": "Claude Desktop",
@@ -144,5 +144,15 @@
   "updateLatest": "Vous êtes à jour",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Mise à jour prête, redémarrez pour installer",
-  "waitingExecution": "En attente d'exécution..."
+  "waitingExecution": "En attente d'exécution...",
+  "enableNestedDict": "Recherche de dictionnaire imbriqué",
+  "enableRegex": "Activer la correspondance regex",
+  "enableTranslationBridge": "Pont inter-Webview",
+  "injectDictionary": "Injecter des ressources de dictionnaire",
+  "installedPluginsList": "Plugins installés (cochez pour localiser)",
+  "localizePluginWebview": "Localiser les Webviews des plugins (en profondeur)",
+  "noWebviewPlugins": "Aucun plugin avec Webview trouvé",
+  "pluginPatched": "Injecté",
+  "refreshPluginList": "Actualiser la liste des plugins",
+  "showLoadingAnimation": "Afficher l'animation de chargement"
 }

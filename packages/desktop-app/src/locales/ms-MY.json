@@ -144,5 +144,15 @@
   "updateLatest": "Anda sudah terkini",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Kemas kini sedia, mulakan semula untuk memasang",
-  "waitingExecution": "Menunggu pelaksanaan..."
+  "waitingExecution": "Menunggu pelaksanaan...",
+  "enableNestedDict": "Carian Kamus Bersarang",
+  "enableRegex": "Aktifkan Padanan Regex",
+  "enableTranslationBridge": "Jambatan Rentas-Webview",
+  "injectDictionary": "Suntik Sumber Kamus",
+  "installedPluginsList": "Pemalam Terpasang (tandakan untuk setempatkan)",
+  "localizePluginWebview": "Setempatkan Webview Pemalam (Mendalam)",
+  "noWebviewPlugins": "Tiada pemalam dengan Webview ditemui",
+  "pluginPatched": "Disuntik",
+  "refreshPluginList": "Muat Semula Senarai Pemalam",
+  "showLoadingAnimation": "Tunjukkan Animasi Muatan"
 }

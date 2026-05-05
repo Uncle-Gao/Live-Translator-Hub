@@ -62,7 +62,7 @@
   "dictStatusNotExistsBuiltin": "ไม่พบ (จะใช้พจนานุกรมในตัว)",
   "dictStatusRefresh": "รีเฟรช",
   "dictStatusStartGenerate": "สร้างพจนานุกรม",
-  "dictStatusTitle": "Dictionary Status",
+  "dictStatusTitle": "สถานะพจนานุกรม",
   "dictStatusTranslatingBatch": "กำลังแปลแบตช์ {{current}}/{{total}}",
   "engineLabel": "เครื่องมือ {{name}}",
   "engineNone": "ไม่มี (เฉพาะพจนานุกรมคงที่)",
@@ -144,5 +144,15 @@
   "updateLatest": "คุณใช้เวอร์ชันล่าสุดแล้ว",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "อัปเดตพร้อมแล้ว รีสตาร์ทเพื่อติดตั้ง",
-  "waitingExecution": "รอการดำเนินการ..."
+  "waitingExecution": "รอการดำเนินการ...",
+  "enableNestedDict": "ค้นหาพจนานุกรมแบบซ้อน",
+  "enableRegex": "เปิดใช้งานการจับคู่ Regex",
+  "enableTranslationBridge": "สะพานข้าม Webview",
+  "injectDictionary": "ฉีดทรัพยากรพจนานุกรม",
+  "installedPluginsList": "ปลั๊กอินที่ติดตั้ง (เลือกเพื่อปรับให้เป็นภาษาไทย)",
+  "localizePluginWebview": "ปรับภาษา Webview ของปลั๊กอินแบบลึก",
+  "noWebviewPlugins": "ไม่พบปลั๊กอินที่มี Webview",
+  "pluginPatched": "ถูกฉีดแล้ว",
+  "refreshPluginList": "รีเฟรชรายการปลั๊กอิน",
+  "showLoadingAnimation": "แสดงภาพเคลื่อนไหวกำลังโหลด"
 }

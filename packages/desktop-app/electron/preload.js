@@ -25,7 +25,6 @@ contextBridge.exposeInMainWorld('liveTranslatorAPI', {
 
   // ── Phase 5: Dict generation ──────────────────────────
   generateDict: (opts) => ipcRenderer.invoke('dict:generate', opts),
-  translateHubKeys: (opts) => ipcRenderer.invoke('i18n:translateHubKeys', opts),
   onDictProgress: (cb) => ipcRenderer.on('dict:progress', (_e, v) => cb(v)),
   removeDictProgressListeners: () => ipcRenderer.removeAllListeners('dict:progress'),
 

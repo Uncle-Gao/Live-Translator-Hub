@@ -14,7 +14,7 @@
   "appTitle": "Canlı Çeviri Merkezi",
   "baseUrl": "Temel URL",
   "browseApp": "Gözat...",
-  "claudeApp": "Claude Desktop",
+  "claudeApp": "Claude Masaüstü",
   "claudeEngine": "Claude Motoru",
   "configPanel": "Ayarlar",
   "cursorApp": "Cursor Uygulaması",
@@ -144,5 +144,15 @@
   "updateLatest": "En son sürümü kullanıyorsunuz",
   "updateProgress": "%{{percent}} ({{speed}})",
   "updateReady": "Güncelleme hazır, yüklemek için yeniden başlatın",
-  "waitingExecution": "Yürütme bekleniyor..."
+  "waitingExecution": "Yürütme bekleniyor...",
+  "enableNestedDict": "İç İçe Sözlük Arama",
+  "enableRegex": "Regex Eşleştirmeyi Etkinleştir",
+  "enableTranslationBridge": "Çapraz Webview Köprüsü",
+  "injectDictionary": "Sözlük Kaynaklarını Enjekte Et",
+  "installedPluginsList": "Yüklü Eklentiler (yerelleştirmek için işaretleyin)",
+  "localizePluginWebview": "Eklenti Webview'larını Yerelleştir (Derin)",
+  "noWebviewPlugins": "Webview'ı olan eklenti bulunamadı",
+  "pluginPatched": "Enjekte Edildi",
+  "refreshPluginList": "Eklenti Listesini Yenile",
+  "showLoadingAnimation": "Yükleme Animasyonunu Göster"
 }

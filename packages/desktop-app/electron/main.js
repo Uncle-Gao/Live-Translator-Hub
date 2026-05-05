@@ -436,28 +436,6 @@ ipcMain.handle('dict:status', async (_, { app: targetApp, lang }) => {
   }
 });
 
-ipcMain.handle('i18n:translateHubKeys', async (_, { targetLang, keys, engine, engineConfig }) => {
-  try {
-    const gen = new DictGenerator({
-      engine,
-      lang: targetLang,
-      batchSize: 50,
-      apiConfig: engineConfig,
-    });
-    
-    // 我们利用 DictGenerator 内部的翻译引擎，直接翻译 UI 词条
-    const results = await gen.engine.translateBatch(
-      Object.entries(keys).map(([id, text]) => ({ id, text })),
-      targetLang
-    );
-
-    const translated = {};
-    results.forEach(r => { translated[r.id] = r.translated; });
-    return { ok: true, translated };
-  } catch (err) {
-    return { ok: false, error: err.message };
-  }
-});
 
 // ─── Update IPC ────────────────────────────────────────────────────────────────
 ipcMain.handle('update:check', async () => {

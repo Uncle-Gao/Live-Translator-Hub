@@ -144,5 +144,15 @@
   "updateLatest": "Turite naujausią versiją",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Atnaujinimas paruoštas, paleiskite iš naujo, kad įdiegtumėte",
-  "waitingExecution": "Laukiama vykdymo..."
+  "waitingExecution": "Laukiama vykdymo...",
+  "enableNestedDict": "Įjungti dvikrypčio žodyno paiešką",
+  "enableRegex": "Įjungti reguliariųjų išraiškų atitikimą",
+  "enableTranslationBridge": "Tarpinių peržiūrų tiltas",
+  "injectDictionary": "Įterpti žodyno išteklius",
+  "installedPluginsList": "Įdiegti papildiniai (pažymėkite norėdami lokalizuoti)",
+  "localizePluginWebview": "Lokalizuoti papildinių peržiūras (giliai)",
+  "noWebviewPlugins": "Nerasta papildinių su peržiūra",
+  "pluginPatched": "Įterpta",
+  "refreshPluginList": "Atnaujinti papildinių sąrašą",
+  "showLoadingAnimation": "Rodyti įkėlimo animaciją"
 }

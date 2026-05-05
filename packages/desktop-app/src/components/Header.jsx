@@ -1,10 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { Languages, Wand2 } from 'lucide-react';
-import { clsx } from 'clsx';
+import { Languages } from 'lucide-react';
 import { ALL_LANGUAGES } from '../constants';
 
-const Header = ({ title, handleLocalizeUI, isLocalizing }) => {
-  const { t, i18n } = useTranslation();
+const Header = ({ title }) => {
+  const { i18n } = useTranslation();
 
   return (
     <header className="h-24 flex items-end justify-between px-8 pb-4 border-b border-white/5 bg-[#0B0D10] z-10 flex-shrink-0" style={{ WebkitAppRegion: 'drag' }}>
@@ -30,21 +29,6 @@ const Header = ({ title, handleLocalizeUI, isLocalizing }) => {
           </select>
         </div>
 
-        {i18n.language !== 'en-US' && i18n.language !== 'zh-CN' && (
-          <button
-            onClick={handleLocalizeUI}
-            disabled={isLocalizing}
-            className={clsx(
-              "flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all",
-              isLocalizing 
-                ? "bg-purple-500/20 border-purple-500/40 text-purple-300 animate-pulse cursor-wait"
-                : "bg-purple-500/10 border-purple-500/20 text-purple-400 hover:bg-purple-500/20 hover:border-purple-500/40"
-            )}
-          >
-            <Wand2 className="w-3.5 h-3.5" />
-            {isLocalizing ? t('localizing', 'Localizing...') : t('localizeHub', 'AI Localize Hub')}
-          </button>
-        )}
       </div>
     </header>
   );

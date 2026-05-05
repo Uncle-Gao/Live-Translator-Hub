@@ -78,7 +78,7 @@
   "extensionScannerScanning": "Skanner utvidelser...",
   "installStatus": "Installert",
   "interfaceLang": "Grensesnittspråk",
-  "localizeHub": "AI Localize Hub",
+  "localizeHub": "AI Lokaliseringshub",
   "localizing": "Lokaliserer...",
   "model": "Modell",
   "modelName": "Modellnavn",
@@ -144,5 +144,15 @@
   "updateLatest": "Du har nyeste versjon",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Oppdatering klar, start på nytt for å installere",
-  "waitingExecution": "Venter på utførelse..."
+  "waitingExecution": "Venter på utførelse...",
+  "enableNestedDict": "Oppslag i nøstede ordbøker",
+  "enableRegex": "Aktiver regulære uttrykk",
+  "enableTranslationBridge": "Bro for kryss-webview",
+  "injectDictionary": "Injiser ordbokressurser",
+  "installedPluginsList": "Installerte programtillegg (merk for å lokalisere)",
+  "localizePluginWebview": "Lokaliser programtilleggs-webview (dypt)",
+  "noWebviewPlugins": "Ingen programtillegg med webview funnet",
+  "pluginPatched": "Injisert",
+  "refreshPluginList": "Oppdater programtilleggsliste",
+  "showLoadingAnimation": "Vis lasteanimasjon"
 }

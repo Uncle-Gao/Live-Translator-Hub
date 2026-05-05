@@ -13,13 +13,12 @@ import ClaudePanel from './components/ClaudePanel/index'
 import UpdateNotification from './components/UpdateNotification'
 
 function App() {
-  const { t, i18n } = useTranslation()
-  const { config, loadConfig, loading } = useConfigStore()
+  const { t } = useTranslation()
+  const { loadConfig, loading } = useConfigStore()
   const [activeTab, setActiveTab] = useState('cursor')
   const [cursorStatus, setCursorStatus] = useState(null)
   const [claudeStatus, setClaudeStatus] = useState(null)
   const [showSudoOverlay, setShowSudoOverlay] = useState(false)
-  const [isLocalizing, setIsLocalizing] = useState(false)
   const [updateState, setUpdateState] = useState('idle')
   const [updateInfo, setUpdateInfo] = useState(null)
   const [updateProgress, setUpdateProgress] = useState(null)
@@ -81,41 +80,6 @@ function App() {
     } catch (e) {
       console.error('[Update]', e.message)
       setUpdateState('idle')
-    }
-  }
-
-  const handleLocalizeUI = async () => {
-    if (!window.liveTranslatorAPI?.translateHubKeys) return
-    const keys = i18n.getResourceBundle('en-US', 'translation')
-    if (!keys) return
-
-    setIsLocalizing(true)
-    try {
-      const engine = config.apiKeys.activeId
-      const engineConfig = config.apiKeys.engines?.[engine]
-
-      if (!engine || engine === 'none') {
-        alert('Please configure and select an AI engine in AI Key Manager first.')
-        return
-      }
-
-      const res = await window.liveTranslatorAPI.translateHubKeys({
-        targetLang: i18n.language,
-        keys,
-        engine,
-        engineConfig
-      })
-
-      if (res.ok) {
-        i18n.addResourceBundle(i18n.language, 'translation', res.translated, true, true)
-        i18n.changeLanguage(i18n.language)
-      } else {
-        alert('Translation failed: ' + res.error)
-      }
-    } catch (e) {
-      alert('Error: ' + e.message)
-    } finally {
-      setIsLocalizing(false)
     }
   }
 
@@ -187,11 +151,7 @@ function App() {
           onDismiss={() => setUpdateState('idle')}
         />
 
-        <Header
-          title={getTitle()} 
-          handleLocalizeUI={handleLocalizeUI}
-          isLocalizing={isLocalizing}
-        />
+        <Header title={getTitle()} />
 
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-8 relative z-10 custom-scrollbar" style={{ overscrollBehaviorY: 'auto', WebkitOverflowScrolling: 'touch' }}>
           <AnimatePresence mode="wait">

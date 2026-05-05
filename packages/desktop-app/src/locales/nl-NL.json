@@ -144,5 +144,15 @@
   "updateLatest": "U bent up-to-date",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Update gereed, opnieuw opstarten om te installeren",
-  "waitingExecution": "Wachten op uitvoering..."
+  "waitingExecution": "Wachten op uitvoering...",
+  "enableNestedDict": "Geneste woordenboekopzoekingen",
+  "enableRegex": "Regex Matching inschakelen",
+  "enableTranslationBridge": "Cross-Webview Bridge",
+  "injectDictionary": "Woordenboekbronnen injecteren",
+  "installedPluginsList": "Geïnstalleerde plug-ins (vink aan om te lokaliseren)",
+  "localizePluginWebview": "Plugin Webviews lokaliseren (diep)",
+  "noWebviewPlugins": "Geen plug-ins met Webview gevonden",
+  "pluginPatched": "Geïnjecteerd",
+  "refreshPluginList": "Plug-inlijst vernieuwen",
+  "showLoadingAnimation": "Laadaanimatie tonen"
 }

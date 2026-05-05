@@ -144,5 +144,15 @@
   "updateLatest": "Използвате най-новата версия",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Актуализацията е готова, рестартирайте за инсталиране",
-  "waitingExecution": "Изчакване на изпълнение..."
+  "waitingExecution": "Изчакване на изпълнение...",
+  "enableNestedDict": "Вложено търсене в речник",
+  "enableRegex": "Активиране на съвпадение по регулярен израз",
+  "enableTranslationBridge": "Мост между Webview",
+  "injectDictionary": "Инжектиране на речникови ресурси",
+  "installedPluginsList": "Инсталирани плъгини (отметнете за локализация)",
+  "localizePluginWebview": "Локализиране на Webview на плъгини (задълбочено)",
+  "noWebviewPlugins": "Не са намерени плъгини с Webview",
+  "pluginPatched": "Инжектирано",
+  "refreshPluginList": "Опресняване на списъка с плъгини",
+  "showLoadingAnimation": "Показване на анимация за зареждане"
 }

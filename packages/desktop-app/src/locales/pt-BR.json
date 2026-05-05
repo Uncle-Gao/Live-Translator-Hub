@@ -62,7 +62,7 @@
   "dictStatusNotExistsBuiltin": "Não encontrado (dicionário interno será usado)",
   "dictStatusRefresh": "Atualizar",
   "dictStatusStartGenerate": "Gerar Dicionário",
-  "dictStatusTitle": "Dictionary Status",
+  "dictStatusTitle": "Status do Dicionário",
   "dictStatusTranslatingBatch": "Traduzindo lote {{current}}/{{total}}",
   "engineLabel": "Motor {{name}}",
   "engineNone": "Nenhum (Apenas Dicionário Estático)",
@@ -144,5 +144,15 @@
   "updateLatest": "Você está atualizado",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Atualização pronta, reinicie para instalar",
-  "waitingExecution": "Aguardando execução..."
+  "waitingExecution": "Aguardando execução...",
+  "enableNestedDict": "Busca em Dicionários Aninhados",
+  "enableRegex": "Ativar Correspondência Regex",
+  "enableTranslationBridge": "Ponte Inter-Webview",
+  "injectDictionary": "Injetar Recursos do Dicionário",
+  "installedPluginsList": "Plugins Instalados (marque para localizar)",
+  "localizePluginWebview": "Localizar Webviews de Plugins (Profundo)",
+  "noWebviewPlugins": "Nenhum plugin com Webview encontrado",
+  "pluginPatched": "Injetado",
+  "refreshPluginList": "Atualizar Lista de Plugins",
+  "showLoadingAnimation": "Mostrar Animação de Carregamento"
 }

@@ -56,7 +56,7 @@ const DeployConfig = ({ extensions, selectedPluginIds, onTogglePlugin, onRefresh
       {/* Card-level toggles */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <label className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-2xl cursor-pointer hover:bg-white/[0.08] transition-all group">
-          <span className="text-sm font-medium text-white/60 group-hover:text-white/90">显示加载动画</span>
+          <span className="text-sm font-medium text-white/60 group-hover:text-white/90">{t('showLoadingAnimation', '显示加载动画')}</span>
           <input
             type="checkbox"
             checked={!!cursor.features.enableLoadingAnimation}
@@ -65,7 +65,7 @@ const DeployConfig = ({ extensions, selectedPluginIds, onTogglePlugin, onRefresh
           />
         </label>
         <label className="flex items-center justify-between p-4 bg-purple-500/5 border border-purple-500/10 rounded-2xl cursor-pointer hover:bg-purple-500/10 transition-all group">
-          <span className="text-sm font-medium text-purple-300/80 group-hover:text-purple-200">本地化插件 Webview（深度本地化）</span>
+          <span className="text-sm font-medium text-purple-300/80 group-hover:text-purple-200">{t('localizePluginWebview', '本地化插件 Webview（深度本地化）')}</span>
           <input
             type="checkbox"
             checked={!!cursor.injectWebview}
@@ -80,19 +80,19 @@ const DeployConfig = ({ extensions, selectedPluginIds, onTogglePlugin, onRefresh
         <div className="bg-black/20 border border-purple-500/10 rounded-2xl p-4 space-y-3">
           <div className="flex items-center justify-between">
             <label className="text-[10px] font-bold uppercase tracking-wider text-purple-300/50">
-              已安装插件列表（勾选要本地化的插件）
+              {t('installedPluginsList', '已安装插件列表（勾选要本地化的插件）')}
             </label>
             <button
               onClick={onRefreshExtensions}
               disabled={isScanning}
               className="p-1 hover:bg-white/5 rounded-lg transition-all text-white/20 hover:text-white/60 disabled:opacity-50"
-              title="刷新插件列表"
+              title={t('refreshPluginList', '刷新插件列表')}
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin' : ''}`} />
             </button>
           </div>
           {extensions.length === 0 ? (
-            <p className="text-[11px] text-white/20 italic">未发现含 Webview 的插件</p>
+            <p className="text-[11px] text-white/20 italic">{t('noWebviewPlugins', '未发现含 Webview 的插件')}</p>
           ) : (
             <div className="space-y-1.5">
               {extensions.map(ext => {
@@ -113,7 +113,7 @@ const DeployConfig = ({ extensions, selectedPluginIds, onTogglePlugin, onRefresh
                     </span>
                     <span className="text-[10px] text-white/20 font-mono">v{ext.version}</span>
                     {ext.isPatched && (
-                      <span className="text-[9px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 rounded-full font-bold">已注入</span>
+                      <span className="text-[9px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 rounded-full font-bold">{t('pluginPatched', '已注入')}</span>
                     )}
                   </label>
                 );
@@ -142,7 +142,7 @@ const DeployConfig = ({ extensions, selectedPluginIds, onTogglePlugin, onRefresh
                   ? 'bg-blue-500/5 border-blue-500/20 cursor-not-allowed'
                   : 'bg-white/5 border-white/5 cursor-pointer hover:bg-white/[0.08]'
               }`}>
-                <span className="text-sm font-medium text-white/60 group-hover:text-white/90">注入字典资源</span>
+                <span className="text-sm font-medium text-white/60 group-hover:text-white/90">{t('injectDictionary', '注入字典资源')}</span>
                 <input
                   type="checkbox"
                   checked={cursor.activeId === 'none' ? true : !!cursor.features.enableDictionary}
@@ -152,9 +152,9 @@ const DeployConfig = ({ extensions, selectedPluginIds, onTogglePlugin, onRefresh
                 />
               </label>
               {Object.entries({
-                enableRegex: '启用正则匹配',
-                enableTranslationBridge: '跨 Webview 桥接',
-                enableNestedDict: '嵌套字典寻址',
+                enableRegex: t('enableRegex', '启用正则匹配'),
+                enableTranslationBridge: t('enableTranslationBridge', '跨 Webview 桥接'),
+                enableNestedDict: t('enableNestedDict', '嵌套字典寻址'),
               }).map(([key, label]) => (
                 <label key={key} className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-2xl cursor-pointer hover:bg-white/[0.08] transition-all group">
                   <span className="text-sm font-medium text-white/60 group-hover:text-white/90">{label}</span>

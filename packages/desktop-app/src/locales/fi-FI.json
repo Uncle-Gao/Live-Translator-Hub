@@ -144,5 +144,15 @@
   "updateLatest": "Olet ajan tasalla",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Päivitys valmis, käynnistä uudelleen asentaaksesi",
-  "waitingExecution": "Odotetaan suoritusta..."
+  "waitingExecution": "Odotetaan suoritusta...",
+  "enableNestedDict": "Sisäkkäinen sanakirjahaku",
+  "enableRegex": "Ota Regex-vertailu käyttöön",
+  "enableTranslationBridge": "Cross-Webview -silta",
+  "injectDictionary": "Lisää sanakirjaresursseja",
+  "installedPluginsList": "Asennetut liitännäiset (valitse lokalisoidaksesi)",
+  "localizePluginWebview": "Lokalisoi liitännäisten Webview (syvällinen)",
+  "noWebviewPlugins": "Liitännäisiä, joissa on Webview, ei löytynyt",
+  "pluginPatched": "Lisätty",
+  "refreshPluginList": "Päivitä liitännäisluettelo",
+  "showLoadingAnimation": "Näytä latausanimaatio"
 }

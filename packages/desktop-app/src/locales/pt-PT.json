@@ -144,5 +144,15 @@
   "updateLatest": "Está atualizado",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Atualização pronta, reinicie para instalar",
-  "waitingExecution": "À espera de execução..."
+  "waitingExecution": "À espera de execução...",
+  "enableNestedDict": "Pesquisa em Dicionários Aninhados",
+  "enableRegex": "Ativar Correspondência Regex",
+  "enableTranslationBridge": "Ponte de Webview Cruzada",
+  "injectDictionary": "Injetar Recursos de Dicionário",
+  "installedPluginsList": "Plugins Instalados (marque para localizar)",
+  "localizePluginWebview": "Localizar Webviews de Plugins (Profundo)",
+  "noWebviewPlugins": "Nenhum plugin com Webview encontrado",
+  "pluginPatched": "Injetado",
+  "refreshPluginList": "Atualizar Lista de Plugins",
+  "showLoadingAnimation": "Mostrar Animação de Carregamento"
 }

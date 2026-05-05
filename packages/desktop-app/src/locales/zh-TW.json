@@ -144,5 +144,15 @@
   "updateLatest": "您已是最新版本",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "更新已準備就緒，重新啟動以安裝",
-  "waitingExecution": "等待執行..."
+  "waitingExecution": "等待執行...",
+  "enableNestedDict": "巢狀字典查詢",
+  "enableRegex": "啟用正規表示式比對",
+  "enableTranslationBridge": "跨網頁視圖橋接",
+  "injectDictionary": "注入字典資源",
+  "installedPluginsList": "已安裝的外掛程式（勾選以在地化）",
+  "localizePluginWebview": "在地化外掛程式網頁視圖（深度）",
+  "noWebviewPlugins": "未找到含有網頁視圖的外掛程式",
+  "pluginPatched": "已注入",
+  "refreshPluginList": "重新整理外掛程式清單",
+  "showLoadingAnimation": "顯示載入動畫"
 }

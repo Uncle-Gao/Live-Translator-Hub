@@ -144,5 +144,15 @@
   "updateLatest": "Bạn đang sử dụng phiên bản mới nhất",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Bản cập nhật đã sẵn sàng, khởi động lại để cài đặt",
-  "waitingExecution": "Đang chờ thực thi..."
+  "waitingExecution": "Đang chờ thực thi...",
+  "enableNestedDict": "Tra cứu từ điển lồng nhau",
+  "enableRegex": "Bật khớp mẫu Regex",
+  "enableTranslationBridge": "Cầu nối Webview chéo",
+  "injectDictionary": "Chèn tài nguyên từ điển",
+  "installedPluginsList": "Plugin đã cài đặt (đánh dấu để bản địa hóa)",
+  "localizePluginWebview": "Bản địa hóa Webview plugin (Sâu)",
+  "noWebviewPlugins": "Không tìm thấy plugin nào có Webview",
+  "pluginPatched": "Đã chèn",
+  "refreshPluginList": "Làm mới danh sách plugin",
+  "showLoadingAnimation": "Hiển thị hoạt ảnh tải"
 }

@@ -62,7 +62,7 @@
   "dictStatusNotExistsBuiltin": "Не знайдено (буде використано вбудований словник)",
   "dictStatusRefresh": "Оновити",
   "dictStatusStartGenerate": "Генерувати словник",
-  "dictStatusTitle": "Dictionary Status",
+  "dictStatusTitle": "Стан словника",
   "dictStatusTranslatingBatch": "Переклад пакету {{current}}/{{total}}",
   "engineLabel": "Рушій {{name}}",
   "engineNone": "Відсутній (лише статичний словник)",
@@ -144,5 +144,15 @@
   "updateLatest": "Ви використовуєте останню версію",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Оновлення готове, перезапустіть для встановлення",
-  "waitingExecution": "Очікування виконання..."
+  "waitingExecution": "Очікування виконання...",
+  "enableNestedDict": "Вкладений словник",
+  "enableRegex": "Увімкнути зіставлення Regex",
+  "enableTranslationBridge": "Міст між вебпереглядачами",
+  "injectDictionary": "Впровадити ресурси словника",
+  "installedPluginsList": "Встановлені плагіни (позначте для локалізації)",
+  "localizePluginWebview": "Локалізувати вебперегляди плагінів (глибоко)",
+  "noWebviewPlugins": "Плагінів з вебпереглядом не знайдено",
+  "pluginPatched": "Впроваджено",
+  "refreshPluginList": "Оновити список плагінів",
+  "showLoadingAnimation": "Показувати анімацію завантаження"
 }

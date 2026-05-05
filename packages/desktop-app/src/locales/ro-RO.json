@@ -144,5 +144,15 @@
   "updateLatest": "Sunteți la zi",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Actualizare gata, reporniți pentru a instala",
-  "waitingExecution": "Se așteaptă execuția..."
+  "waitingExecution": "Se așteaptă execuția...",
+  "enableNestedDict": "Căutare în dicționar imbricat",
+  "enableRegex": "Activează potrivirea prin expresii regulate",
+  "enableTranslationBridge": "Punte între vizualizări web",
+  "injectDictionary": "Injectează resursele dicționarului",
+  "installedPluginsList": "Pluginuri instalate (bifați pentru localizare)",
+  "localizePluginWebview": "Localizează vizualizările web ale pluginurilor (avansat)",
+  "noWebviewPlugins": "Nu s-au găsit pluginuri cu vizualizare web",
+  "pluginPatched": "Injectat",
+  "refreshPluginList": "Reîmprospătează lista de pluginuri",
+  "showLoadingAnimation": "Afișează animația de încărcare"
 }

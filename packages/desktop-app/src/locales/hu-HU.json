@@ -144,5 +144,15 @@
   "updateLatest": "Naprakész vagy",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Frissítés kész, indítsa újra a telepítéshez",
-  "waitingExecution": "Végrehajtásra vár..."
+  "waitingExecution": "Végrehajtásra vár...",
+  "enableNestedDict": "Beágyazott szótár keresés",
+  "enableRegex": "Regex egyeztetés engedélyezése",
+  "enableTranslationBridge": "Webview-ek közötti híd",
+  "injectDictionary": "Szótár erőforrások betöltése",
+  "installedPluginsList": "Telepített bővítmények (jelöld be a lokalizáláshoz)",
+  "localizePluginWebview": "Bővítmények webview-jainak lokalizálása (mély)",
+  "noWebviewPlugins": "Nem található webview-val rendelkező bővítmény",
+  "pluginPatched": "Betöltve",
+  "refreshPluginList": "Bővítmény lista frissítése",
+  "showLoadingAnimation": "Betöltő animáció megjelenítése"
 }

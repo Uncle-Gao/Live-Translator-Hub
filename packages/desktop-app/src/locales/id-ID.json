@@ -144,5 +144,15 @@
   "updateLatest": "Anda sudah yang terbaru",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Pembaruan siap, mulai ulang untuk menginstal",
-  "waitingExecution": "Menunggu eksekusi..."
+  "waitingExecution": "Menunggu eksekusi...",
+  "enableNestedDict": "Pencarian Kamus Bertingkat",
+  "enableRegex": "Aktifkan Pencocokan Regex",
+  "enableTranslationBridge": "Jembatan Lintas-Webview",
+  "injectDictionary": "Suntikkan Sumber Daya Kamus",
+  "installedPluginsList": "Plugin Terpasang (centang untuk melokalisasi)",
+  "localizePluginWebview": "Lokalisasi Webview Plugin (Mendalam)",
+  "noWebviewPlugins": "Tidak ada plugin dengan Webview ditemukan",
+  "pluginPatched": "Disuntikkan",
+  "refreshPluginList": "Segarkan Daftar Plugin",
+  "showLoadingAnimation": "Tampilkan Animasi Pemuatan"
 }

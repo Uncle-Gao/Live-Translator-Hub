@@ -82,7 +82,7 @@
   "localizing": "Lokalizuji...",
   "model": "Model",
   "modelName": "Název modelu",
-  "navApiKeys": "AI Key Manager",
+  "navApiKeys": "Správce AI klíčů",
   "navDictGen": "Generátor slovníku",
   "notDetected": "Nezjištěno",
   "notFound": "Nenalezeno",
@@ -144,5 +144,15 @@
   "updateLatest": "Máte nejnovější verzi",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Aktualizace připravena, restartujte pro instalaci",
-  "waitingExecution": "Čekání na provedení..."
+  "waitingExecution": "Čekání na provedení...",
+  "enableNestedDict": "Vnořené vyhledávání ve slovníku",
+  "enableRegex": "Povolit Regex párování",
+  "enableTranslationBridge": "Cross-Webview Bridge",
+  "injectDictionary": "Vložit zdroje slovníku",
+  "installedPluginsList": "Nainstalované pluginy (zaškrtnutím lokalizovat)",
+  "localizePluginWebview": "Lokalizovat plugin Webview (hluboké)",
+  "noWebviewPlugins": "Nebyly nalezeny žádné pluginy s Webview",
+  "pluginPatched": "Vloženo",
+  "refreshPluginList": "Obnovit seznam pluginů",
+  "showLoadingAnimation": "Zobrazit animaci načítání"
 }

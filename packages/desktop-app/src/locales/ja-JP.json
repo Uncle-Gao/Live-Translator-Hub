@@ -11,7 +11,7 @@
   "appMissingClaude": "Claude Desktop をインストールしてください",
   "appReady": "アプリケーションが見つかりました",
   "appReadyClaude": "アプリケーションが見つかりました",
-  "appTitle": "Live Translator Hub",
+  "appTitle": "ライブ翻訳ハブ",
   "baseUrl": "ベースURL",
   "browseApp": "参照...",
   "claudeApp": "Claude Desktop",
@@ -142,7 +142,17 @@
   "updateDownloading": "アップデートをダウンロード中...",
   "updateInstallBtn": "今すぐ再起動",
   "updateLatest": "最新バージョンです",
-  "updateProgress": "{{percent}}% ({{speed}})",
+  "updateProgress": "{{percent}}%（{{speed}}）",
   "updateReady": "アップデートの準備ができました。再起動してインストールします",
-  "waitingExecution": "実行を待機中..."
+  "waitingExecution": "実行を待機中...",
+  "enableNestedDict": "ネスト辞書検索",
+  "enableRegex": "正規表現マッチングを有効化",
+  "enableTranslationBridge": "クロスWebviewブリッジ",
+  "injectDictionary": "辞書リソースを注入",
+  "installedPluginsList": "インストール済みプラグイン（チェックでローカライズ）",
+  "localizePluginWebview": "プラグインWebviewをローカライズ（詳細）",
+  "noWebviewPlugins": "Webviewを持つプラグインは見つかりませんでした",
+  "pluginPatched": "注入済み",
+  "refreshPluginList": "プラグインリストを更新",
+  "showLoadingAnimation": "ローディングアニメーションを表示"
 }

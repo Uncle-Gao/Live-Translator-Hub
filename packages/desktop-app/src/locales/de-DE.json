@@ -1,5 +1,5 @@
 {
-  "advBridge": "Webview Bridge",
+  "advBridge": "Webview-Brücke",
   "advInjectWebview": "Webviews injizieren (Erweiterungen)",
   "advLoading": "Ladeanimation",
   "advNested": "Verschachteltes Wörterbuch",
@@ -144,5 +144,15 @@
   "updateLatest": "Sie sind auf dem neuesten Stand",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Update bereit, starten Sie neu, um zu installieren",
-  "waitingExecution": "Warte auf Ausführung..."
+  "waitingExecution": "Warte auf Ausführung...",
+  "enableNestedDict": "Verschachtelte Wörterbuchsuche",
+  "enableRegex": "Regex-Abgleich aktivieren",
+  "enableTranslationBridge": "Cross-Webview-Brücke",
+  "injectDictionary": "Wörterbuchressourcen einfügen",
+  "installedPluginsList": "Installierte Plugins (ankreuzen für Lokalisierung)",
+  "localizePluginWebview": "Plugin-Webviews lokalisieren (Tiefgehend)",
+  "noWebviewPlugins": "Keine Plugins mit Webview gefunden",
+  "pluginPatched": "Eingefügt",
+  "refreshPluginList": "Plugin-Liste aktualisieren",
+  "showLoadingAnimation": "Ladeanimation anzeigen"
 }

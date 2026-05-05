@@ -144,5 +144,15 @@
   "updateLatest": "최신 버전입니다",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "업데이트 준비 완료, 다시 시작하여 설치",
-  "waitingExecution": "실행 대기 중..."
+  "waitingExecution": "실행 대기 중...",
+  "enableNestedDict": "중첩 사전 조회",
+  "enableRegex": "정규식 일치 활성화",
+  "enableTranslationBridge": "크로스 웹뷰 브리지",
+  "injectDictionary": "사전 리소스 주입",
+  "installedPluginsList": "설치된 플러그인 (체크 시 지역화)",
+  "localizePluginWebview": "플러그인 웹뷰 지역화 (고급)",
+  "noWebviewPlugins": "웹뷰가 있는 플러그인이 없습니다",
+  "pluginPatched": "주입됨",
+  "refreshPluginList": "플러그인 목록 새로고침",
+  "showLoadingAnimation": "로딩 애니메이션 표시"
 }

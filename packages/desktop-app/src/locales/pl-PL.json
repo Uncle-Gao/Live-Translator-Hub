@@ -92,7 +92,7 @@
   "patchedDesc": "Silnik tłumaczenia aktywny",
   "patcherStatus": "Stan wstrzyknięcia",
   "pluginScanner": "Skaner wtyczek Webview",
-  "preset": "Preset",
+  "preset": "Ustawienie wstępne",
   "restoreBtn": "Przywróć oryginał",
   "restoreOfficial": "Przywróć oryginał",
   "runtimeEngine": "Silnik wykonawczy",
@@ -144,5 +144,15 @@
   "updateLatest": "Masz aktualną wersję",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Aktualizacja gotowa, uruchom ponownie, aby zainstalować",
-  "waitingExecution": "Oczekiwanie na wykonanie..."
+  "waitingExecution": "Oczekiwanie na wykonanie...",
+  "enableNestedDict": "Zagnieżdżone wyszukiwanie w słowniku",
+  "enableRegex": "Włącz dopasowanie wyrażeń regularnych",
+  "enableTranslationBridge": "Pomiędzy widokami sieciowymi",
+  "injectDictionary": "Wstrzyknij zasoby słownika",
+  "installedPluginsList": "Zainstalowane wtyczki (zaznacz, aby zlokalizować)",
+  "localizePluginWebview": "Zlokalizuj widoki sieciowe wtyczek (głęboko)",
+  "noWebviewPlugins": "Nie znaleziono wtyczek z widokiem sieciowym",
+  "pluginPatched": "Wstrzyknięto",
+  "refreshPluginList": "Odśwież listę wtyczek",
+  "showLoadingAnimation": "Pokaż animację ładowania"
 }

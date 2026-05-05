@@ -56,7 +56,7 @@ const DeployConfig = () => {
       {/* Card-level toggles */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <label className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-2xl cursor-pointer hover:bg-white/[0.08] transition-all group">
-          <span className="text-sm font-medium text-white/60 group-hover:text-white/90">显示加载动画</span>
+          <span className="text-sm font-medium text-white/60 group-hover:text-white/90">{t('showLoadingAnimation', '显示加载动画')}</span>
           <input
             type="checkbox"
             checked={!!claude.features.enableLoadingAnimation}
@@ -86,7 +86,7 @@ const DeployConfig = () => {
                   ? 'bg-purple-500/5 border-purple-500/20 cursor-not-allowed'
                   : 'bg-white/5 border-white/5 cursor-pointer hover:bg-white/[0.08]'
               }`}>
-                <span className="text-sm font-medium text-white/60 group-hover:text-white/90">注入字典资源</span>
+                <span className="text-sm font-medium text-white/60 group-hover:text-white/90">{t('injectDictionary', '注入字典资源')}</span>
                 <input
                   type="checkbox"
                   checked={claude.activeId === 'none' ? true : !!claude.features.enableDictionary}
@@ -96,9 +96,9 @@ const DeployConfig = () => {
                 />
               </label>
               {Object.entries({
-                enableRegex: '启用正则匹配',
-                enableNestedDict: '嵌套字典寻址',
-                enableTranslationBridge: '跨 Webview 桥接',
+                enableRegex: t('enableRegex', '启用正则匹配'),
+                enableNestedDict: t('enableNestedDict', '嵌套字典寻址'),
+                enableTranslationBridge: t('enableTranslationBridge', '跨 Webview 桥接'),
               }).map(([key, label]) => (
                 <label key={key} className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-2xl cursor-pointer hover:bg-white/[0.08] transition-all group">
                   <span className="text-sm font-medium text-white/60 group-hover:text-white/90">{label}</span>

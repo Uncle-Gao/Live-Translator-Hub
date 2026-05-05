@@ -14,7 +14,7 @@
   "appTitle": "लाइव ट्रांसलेटर हब",
   "baseUrl": "बेस URL",
   "browseApp": "ब्राउज़ करें...",
-  "claudeApp": "Claude Desktop",
+  "claudeApp": "क्लॉड डेस्कटॉप",
   "claudeEngine": "Claude इंजन",
   "configPanel": "सेटिंग्स",
   "cursorApp": "Cursor एप्लिकेशन",
@@ -144,5 +144,15 @@
   "updateLatest": "आप अप-टू-डेट हैं",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "अपडेट तैयार है, इंस्टॉल करने के लिए पुनरारंभ करें",
-  "waitingExecution": "निष्पादन की प्रतीक्षा..."
+  "waitingExecution": "निष्पादन की प्रतीक्षा...",
+  "enableNestedDict": "नेस्टेड डिक्शनरी लुकअप",
+  "enableRegex": "रेगेक्स मैचिंग सक्षम करें",
+  "enableTranslationBridge": "क्रॉस-वेबव्यू ब्रिज",
+  "injectDictionary": "डिक्शनरी संसाधन इंजेक्ट करें",
+  "installedPluginsList": "इंस्टॉल किए गए प्लगइन्स (स्थानीयकरण के लिए चेक करें)",
+  "localizePluginWebview": "प्लगइन वेबव्यू का स्थानीयकरण करें (गहरा)",
+  "noWebviewPlugins": "वेबव्यू वाला कोई प्लगइन नहीं मिला",
+  "pluginPatched": "इंजेक्ट किया गया",
+  "refreshPluginList": "प्लगइन सूची रीफ्रेश करें",
+  "showLoadingAnimation": "लोडिंग एनिमेशन दिखाएं"
 }
