@@ -11,6 +11,8 @@
 Šis projektas yra [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) architektūrinis atnaujinimas – nuo CLI scenarijaus iki GUI su būsenos skydeliu ir realaus laiko žurnalais, sujungiant „Cursor“ ir „Claude“ vertimo galimybes į vieną bendrą platformą.
 
 
+![Ekrano nuotrauka](image.png)
+![Ekrano nuotrauka](image-1.png)
 ## Architektūra
 
 ```

@@ -11,6 +11,8 @@ Live Translator Hub เป็น **แอปพลิเคชันเดสก
 โปรเจกต์นี้เป็นเวอร์ชันอัปเกรดสถาปัตยกรรมของ [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) — จากสคริปต์ CLI สู่ GUI ที่มีแผงสถานะและบันทึกแบบเรียลไทม์ และรวมความสามารถในการแปลภาษาของ Cursor และ Claude เป็นแพลตฟอร์มเดียวกัน
 
 
+![ภาพหน้าจอ](image.png)
+![ภาพหน้าจอ](image-1.png)
 ## สถาปัตยกรรม
 
 ```

@@ -11,6 +11,8 @@ Live Translator Hub, Cursor ve Claude adlı iki AI programlama aracına tek tuş
 Bu proje, [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub)'un mimari yükseltmesidir – CLI betiklerinden durum paneli ve gerçek zamanlı günlük içeren bir GUI'ye evrilmiş ve Cursor ile Claude'un yerelleştirme yeteneklerini tek bir birleşik platformda toplamıştır.
 
 
+![Ekran Görüntüsü](image.png)
+![Ekran Görüntüsü](image-1.png)
 ## Mimari
 
 ```

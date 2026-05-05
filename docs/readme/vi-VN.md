@@ -11,6 +11,8 @@ Live Translator Hub là một **ứng dụng desktop GUI Electron + React**, cun
 Dự án này là phiên bản nâng cấp kiến trúc của [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) — từ một script CLI phát triển thành GUI với bảng trạng thái và nhật ký thời gian thực, đồng thời hợp nhất khả năng Hán hóa của Cursor và Claude thành một nền tảng thống nhất.
 
 
+![Ảnh chụp màn hình](image.png)
+![Ảnh chụp màn hình](image-1.png)
 ## Kiến trúc
 
 ```

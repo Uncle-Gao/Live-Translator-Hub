@@ -11,6 +11,8 @@
 Tento projekt je architektonickým upgradem [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) – přechodem z CLI skriptu na GUI s panelem stavu a živými logy, přičemž spojuje lokalizační schopnosti pro Cursor a Claude do jedné jednotné platformy.
 
 
+![Screenshot](image.png)
+![Screenshot](image-1.png)
 ## Architektura
 
 ```

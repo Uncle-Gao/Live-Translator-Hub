@@ -11,6 +11,8 @@ Live Translator Hub on **Electron + React GUI töölauarakendus**, mis pakub üh
 See projekt on [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) arhitektuuriline uuendus – CLI skriptist arenenud GUI-ks, millel on olekupaneel ja reaalajas logid, ning mis ühendab Cursori ja Claude eestindamise võimalused üheks ühtseks platvormiks.
 
 
+![Ekraanipilt](image.png)
+![Ekraanipilt](image-1.png)
 ## Arhitektuur
 
 ```
