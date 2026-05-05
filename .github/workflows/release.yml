@@ -8,6 +8,7 @@ on:
 jobs:
   release:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: macos-latest
@@ -59,10 +60,19 @@ jobs:
           config: cliff.toml
           args: --latest --strip header -o body.md
 
-      - name: Upload artifacts to release
+      - name: Upload artifacts + changelog (macOS)
+        if: matrix.platform == 'mac'
         uses: softprops/action-gh-release@v2
         with:
-          body_path: ${{ matrix.platform == 'mac' && 'body.md' || '' }}
+          body_path: body.md
+          files: |
+            packages/desktop-app/release/*
+          fail_on_unmatched_files: false
+
+      - name: Upload artifacts (Win/Linux)
+        if: matrix.platform != 'mac'
+        uses: softprops/action-gh-release@v2
+        with:
           files: |
             packages/desktop-app/release/*
           fail_on_unmatched_files: false
