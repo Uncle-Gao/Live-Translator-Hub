@@ -8,10 +8,15 @@ directories:
 files:
   - dist/**/*
   - dist-electron/**/*
+  - build/icon-mac.png
+  - node_modules/@live-translator/**/*
+  - node_modules/sudo-prompt/**/*
+  - node_modules/original-fs/**/*
+  - node_modules/electron-updater/**/*
 
 mac:
   category: public.app-category.developer-tools
-  icon: build/icon.icns
+  icon: build/icon-mac.icns
   target:
     - dmg
     - zip
@@ -21,6 +26,7 @@ mac:
   identity: null
 
 win:
+  icon: build/icon-win.ico
   target:
     - nsis
     - zip
@@ -31,6 +37,7 @@ nsis:
   allowToChangeInstallationDirectory: true
 
 linux:
+  icon: build/icon-linux.png
   target:
     - AppImage
     - deb

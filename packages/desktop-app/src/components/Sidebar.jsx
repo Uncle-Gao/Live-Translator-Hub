@@ -48,9 +48,9 @@ const Sidebar = ({ activeTab, setActiveTab, cursorStatus, claudeStatus, onCheckU
 
   return (
     <aside className="w-64 border-r border-white/5 bg-[#0B0D10] flex flex-col z-20 relative flex-shrink-0">
-      <div className="h-24 flex flex-col justify-end pb-[6px] pl-[14px] pr-6 border-b border-white/5" style={{ WebkitAppRegion: 'drag' }}>
+      <div className="h-24 flex flex-col justify-end pb-2 pl-4 pr-4 border-b border-white/5" style={{ WebkitAppRegion: 'drag' }}>
         <div className="flex items-center gap-2" style={{ WebkitAppRegion: 'no-drag' }}>
-          <img src={appIcon} alt="Live Translator Hub" className="w-11 h-11 object-contain" />
+          <img src={appIcon} alt="Live Translator Hub" className="w-9 h-9 object-contain" />
           <span className="font-bold text-lg tracking-tight text-white select-none">
             Live Translator Hub
           </span>

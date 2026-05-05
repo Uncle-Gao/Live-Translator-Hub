@@ -8,20 +8,26 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    // Strip crossorigin attribute for Electron file:// protocol compatibility
+    {
+      name: 'strip-crossorigin',
+      transformIndexHtml(html) {
+        return html.replace(/\s+crossorigin/g, '');
+      },
+    },
     electron({
       main: {
         entry: 'electron/main.js',
         vite: {
           build: {
-            rollupOptions: {
+            rolldownOptions: {
               external: [
                 'sudo-prompt',
-                'electron',
                 'original-fs',
                 'electron-updater',
-                '@live-translator/patcher-cursor',
                 '@live-translator/patcher-claude',
-                /^node:.*/
+                '@live-translator/patcher-cursor',
+                '@live-translator/dict-generator',
               ]
             }
           }
