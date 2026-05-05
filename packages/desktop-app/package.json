@@ -3,7 +3,7 @@
   "private": true,
   "version": "3.0.0-beta.0",
   "description": "AI-powered UI localization for Cursor and Claude desktop apps",
-  "author": "Uncle-Gao",
+  "author": "Uncle-Gao <login_user1@outlook.com>",
   "homepage": "https://github.com/Uncle-Gao/Live-Translator-Hub",
   "main": "dist-electron/main.js",
   "scripts": {
