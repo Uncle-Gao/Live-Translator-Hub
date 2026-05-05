@@ -156,6 +156,7 @@ function createWindow() {
       contextIsolation: true,
     },
     ...(isMac && { titleBarStyle: 'hidden', trafficLightPosition: { x: 16, y: 20 } }),
+    ...(!isMac && { autoHideMenuBar: true }),
     backgroundColor: '#0B0D10',
   });
 
