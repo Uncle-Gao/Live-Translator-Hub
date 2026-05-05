@@ -12,10 +12,13 @@ jobs:
         include:
           - os: macos-latest
             platform: mac
+            arch-flags: '--x64 --arm64'
           - os: windows-latest
             platform: win
+            arch-flags: '--x64'
           - os: ubuntu-latest
             platform: linux
+            arch-flags: '--x64'
 
     runs-on: ${{ matrix.os }}
     permissions:
@@ -40,8 +43,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build desktop app
-        run: npm run build -w desktop-app
+      - name: Build Vite frontend
+        run: npm run dist -w desktop-app
+
+      - name: Package with electron-builder
+        run: npx electron-builder --config packages/desktop-app/electron-builder.yml ${{ matrix.arch-flags }}
+        working-directory: packages/desktop-app
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
