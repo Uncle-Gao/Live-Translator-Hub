@@ -1,0 +1,25 @@
+{
+  "name": "@live-translator/patcher-cursor",
+  "version": "2.5.0",
+  "description": "Cursor-Live-Translator: AI-Powered Real-time Localization Engine",
+  "main": "index.js",
+  "keywords": [
+    "cursor",
+    "localization",
+    "chinese",
+    "translation",
+    "hacker",
+    "checksum",
+    "patch"
+  ],
+  "author": "Uncle-Gao",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Uncle-Gao/Live-Translator-Hub.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Uncle-Gao/Live-Translator-Hub/issues"
+  },
+  "homepage": "https://github.com/Uncle-Gao/Live-Translator-Hub#readme"
+}

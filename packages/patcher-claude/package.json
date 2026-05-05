@@ -1,0 +1,20 @@
+{
+  "name": "@live-translator/patcher-claude",
+  "version": "2.5.0",
+  "description": "Claude-Live-Translator: AI-Powered Real-time Localization Engine",
+  "main": "index.js",
+  "keywords": [
+    "claude",
+    "localization",
+    "chinese",
+    "translation",
+    "hacker",
+    "checksum",
+    "patch"
+  ],
+  "author": "Uncle-Gao",
+  "license": "MIT",
+  "dependencies": {
+    "sudo-prompt": "^9.2.1"
+  }
+}

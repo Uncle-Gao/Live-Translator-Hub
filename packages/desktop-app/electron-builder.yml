@@ -1,0 +1,33 @@
+appId: com.live-translator.hub
+productName: "Live Translator Hub"
+copyright: "Copyright 2026"
+
+directories:
+  output: release
+
+files:
+  - dist/**/*
+  - dist-electron/**/*
+
+mac:
+  category: public.app-category.developer-tools
+  icon: build/icon.icns
+  arch:
+    - x64
+    - arm64
+  target:
+    - dmg
+    - zip
+  artifactName: "${productName}-${version}-mac.${ext}"
+  hardenedRuntime: false
+  gatekeeperAssess: false
+  identity: null
+
+publish:
+  provider: github
+  owner: Uncle-Gao
+  repo: Live-Translator-Hub
+  releaseType: release
+
+win: null
+linux: null

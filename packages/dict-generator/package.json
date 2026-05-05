@@ -1,0 +1,14 @@
+{
+  "name": "@live-translator/dict-generator",
+  "version": "1.0.0",
+  "description": "AI-driven dictionary auto-generation engine for Live Translator Hub",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test src/**/*.test.js"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {}
+}

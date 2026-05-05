@@ -1,0 +1,49 @@
+{
+  "name": "desktop-app",
+  "private": true,
+  "version": "3.0.0",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && electron-builder --config electron-builder.yml",
+    "build:mac": "vite build && electron-builder --mac --config electron-builder.yml",
+    "dist": "vite build",
+    "pack": "electron-builder --config electron-builder.yml --dir",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@electron/asar": "^3.3.1",
+    "@live-translator/dict-generator": "*",
+    "@live-translator/patcher-claude": "*",
+    "@live-translator/patcher-cursor": "*",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.38.0",
+    "i18next": "^24.0.0",
+    "lucide-react": "^1.14.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-i18next": "^15.0.0",
+    "electron-updater": "^6.3.9",
+    "sudo-prompt": "^9.2.1",
+    "tailwind-merge": "^3.5.0",
+    "zustand": "^5.0.12"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "electron": "^34.0.0",
+    "electron-builder": "^25.1.8",
+    "eslint": "^10.2.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.5.0",
+    "tailwindcss": "^4.0.0",
+    "vite": "^8.0.10",
+    "vite-plugin-electron": "^0.29.0",
+    "vite-plugin-electron-renderer": "^0.14.6"
+  }
+}

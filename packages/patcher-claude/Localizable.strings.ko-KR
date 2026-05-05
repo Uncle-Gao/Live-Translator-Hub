@@ -1,0 +1,73 @@
+"Claude needs Accessibility access so you can attach files" = "Claude가 파일을 첨부할 수 있도록 접근성 권한이 필요합니다.";
+
+"Finishing up" = "마무리 중";
+
+"To capture screenshots, Clod needs permission to record your screen." = "Clod가 스크린샷을 캡처하려면 화면 녹화 권한이 필요합니다.";
+
+"New Chat" = "새 채팅";
+
+"Continue" = "계속";
+
+"Click or drag to take a screenshot" = "클릭하거나 드래그하여 스크린샷 찍기";
+
+"Remove " = "제거 ";
+
+"  to stop." = "  중지하려면.";
+
+"Transcribing..." = "변환 중...";
+
+"Send to new chat" = "새 채팅으로 보내기";
+
+"Quickly share content with Claude" = "Claude와 콘텐츠 빠르게 공유";
+
+"Drag to take a screenshot" = "드래그하여 스크린샷 찍기";
+
+"Keep chatting with Claude about..." = "Claude와 계속 채팅...";
+
+"Screen Recording Permission Required" = "화면 녹화 권한 필요";
+
+"Open System Settings and enable Screen Capture access for Claude." = "시스템 설정을 열고 Claude에 대한 화면 캡처 접근을 활성화하세요.";
+
+"Quick access prompts must be at least 3 characters" = "빠른 접근 프롬프트는 최소 3자 이상이어야 합니다.";
+
+"Send a screenshot of " = "스크린샷 보내기 ";
+
+"Recent" = "최근";
+
+"Turn on screenshots" = "스크린샷 켜기";
+
+"Cowork is taking a moment to cleanly exit. This may take up to a minute." = "Cowork가 깔끔하게 종료하는 중입니다. 최대 1분이 소요될 수 있습니다.";
+
+"Cancel" = "취소";
+
+"Open in main window" = "기본 창에서 열기";
+
+"Send " = "보내기 ";
+
+" to stop" = " 중지하려면";
+
+" from Claude" = "Claude에서";
+
+"Attach a file" = "파일 첨부";
+
+"Claude needs Screen Capture access so you can share screenshots" = "Claude가 스크린샷을 공유할 수 있도록 화면 캡처 권한이 필요합니다.";
+
+"Needs additional permission" = "추가 권한 필요";
+
+"Not currently connected to claude.ai" = "현재 claude.ai에 연결되어 있지 않음";
+
+"Not now" = "나중에";
+
+"Open System Settings and enable Accessibility access for Claude." = "시스템 설정을 열고 Claude에 대한 접근성 접근을 활성화하세요.";
+
+"Pasted Image" = "붙여넣은 이미지";
+
+"Remove" = "제거";
+
+"Speak to Claude, then press " = "Claude에게 말한 후, ";
+
+"Take a screenshot" = "스크린샷 찍기";
+
+"Turn on file sharing" = "파일 공유 켜기";
+
+"What can I help you with today?" = "오늘 무엇을 도와드릴까요?";

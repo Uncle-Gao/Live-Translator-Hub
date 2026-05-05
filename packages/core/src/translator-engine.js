@@ -1,16 +1,25 @@
 /**
- * cursor-live-translator-runtime.js (V2.5.0 - Live Edition)
+ * live-translator-core-runtime.js (Unified Kernel V3)
  * 支持 OpenAI 与 DeepL 双协议的高品质实时翻译引擎。
+ * 由 Feature Flags 驱动，支持 Cursor 和 Claude 等多种环境。
  */
 
 // === 1. 外部注入配置与初始化 ===
-const I18N_TERMS = window.__CURSOR_TERMS__ || {};
-const CONFIG = window.__I18N_CONFIG__ || { apiType: 'none', skip: {} };
+const I18N_TERMS = window.__I18N_TERMS__ || {};
+const CONFIG = window.__I18N_CONFIG__ || { apiType: 'none', skip: {}, features: {} };
+const FEATURES = Object.assign({
+  enableDictionary: true,
+  enableNestedDict: true,
+  enableRegex: true,
+  enableTranslationBridge: true,
+  enableLoadingAnimation: true
+}, CONFIG.features || {});
+
 const SKIP_TAGS = new Set(['SCRIPT', 'STYLE', 'TEXTAREA', 'INPUT', 'CODE', 'PRE', 'KBD', 'SAMP']);
 const SKIP_TITLES = CONFIG.skip?.titles || [];
 const SKIP_URLS = CONFIG.skip?.urls || [];
 const SKIP_SELECTORS = CONFIG.skip?.selectors || [];
-const CACHE_KEY = 'cursor_i18n_v2_pro_cache';
+const CACHE_KEY = 'live_i18n_cache_' + (CONFIG.name ? String(CONFIG.name).replace(/[^a-zA-Z0-9]/g, '_') : 'default');
 const IS_WORKBENCH = window.self === window.top;
 
 // === 2. 缓存体系 ===
@@ -19,17 +28,12 @@ try {
   CACHE = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
 } catch (e) { }
 
-// 一次性重置检查 (V2.5 物理清理)
 if (CONFIG.resetCache) {
   localStorage.removeItem(CACHE_KEY);
   CACHE = {};
   console.log('%c[I18N] 已执行缓存物理重置', 'color:#f59e0b;font-weight:bold');
 }
 
-/**
- * 缓存状态监控器
- * 计算当前 localStorage 占用的字节数并输出到控制台，同时提供百分比预警（基于 5MB 限制）
- */
 function logCacheStatus() {
   if (!IS_WORKBENCH && Object.keys(CACHE).length === 0) return;
   try {
@@ -39,9 +43,9 @@ function logCacheStatus() {
     const limitKB = 5120; // 5MB
     const percent = ((kb / limitKB) * 100).toFixed(2);
 
-    let color = '#10b981'; // 绿色 (正常)
-    if (percent > 80) color = '#ef4444'; // 红色 (危险)
-    else if (percent > 50) color = '#f59e0b'; // 橙色 (警告)
+    let color = '#10b981';
+    if (percent > 80) color = '#ef4444';
+    else if (percent > 50) color = '#f59e0b';
 
     console.log(
       `%c[I18N]${CONFIG.name ? ` [${CONFIG.name}]` : ''}%c 翻译缓存占用: %c${kb} KB / ${limitKB} KB (${percent}%)`,
@@ -59,8 +63,7 @@ const PENDING_JOBS = new Set();
 const IN_FLIGHT_JOBS = new Set();
 let globalBatchTimer = null;
 const REQUEST_INTERVAL = 2000;
-const DEBUG_STYLE = `
-  /* 仅在激活态显示边框 */
+let DEBUG_STYLE = `
   body.i18n-debug-active .i18n-debug-highlight {
     outline: 1px dashed #3b82f6 !important;
     outline-offset: -1px !important;
@@ -75,6 +78,10 @@ const DEBUG_STYLE = `
     border: 1px solid rgba(255,255,255,0.1); max-width: 450px;
     word-break: break-word; line-height: 1.4;
   }
+`;
+
+if (FEATURES.enableLoadingAnimation) {
+  DEBUG_STYLE += `
   .i18n-loading::after {
     content: '';
     display: inline-block;
@@ -93,41 +100,39 @@ const DEBUG_STYLE = `
   @keyframes i18n-spin {
     to { transform: rotate(360deg); }
   }
-`;
-const HAS_CHINESE = /[\u4e00-\u9fa5]/;
-
-/**
- * 核心：多引擎适配转发器
- * 根据用户配置的 AI 类型（如 OpenAI 协议兼容族或 DeepL）分发翻译任务
- * @param {Array<string>} texts - 需要翻译的整条原始长句集合
- */
-async function callOnlineAPI(texts) {
-  if (CONFIG.apiType === 'none') return;
-
-  if (CONFIG.apiType === 'openai' && CONFIG.openai?.apiKey) {
-    await callOpenAI(texts);
-  } else if (CONFIG.apiType === 'deepl' && CONFIG.deepl?.apiKey) {
-    await callDeepL(texts);
-  }
+  `;
 }
 
-/**
- * OpenAI 协议适配
- */
+const HAS_CHINESE = /[\u4e00-\u9fa5]/;
+
+async function callOnlineAPI(texts) {
+  if (CONFIG.apiType === 'none') return;
+  const engine = CONFIG[CONFIG.apiType];
+  if (!engine?.apiKey) return;
+
+  if (CONFIG.apiType === 'openai')    await callOpenAI(texts);
+  else if (CONFIG.apiType === 'anthropic') await callAnthropic(texts);
+  else if (CONFIG.apiType === 'gemini')    await callGemini(texts);
+  else if (CONFIG.apiType === 'deepl')     await callDeepL(texts);
+}
+
 async function callOpenAI(texts) {
-  const prompt = `Translate software UI strings to Simplified Chinese (Faithful, Expressive, Elegant). 
+  const langName = CONFIG.targetLanguage || 'Simplified Chinese';
+  const prompt = `Translate software UI strings to ${langName} (Faithful, Expressive, Elegant).
 Return JSON ONLY with keys as original strings and values as translated strings.
 Strings: ${JSON.stringify(texts)}`;
 
+  const baseURL = CONFIG.openai.baseURL || 'https://api.openai.com/v1';
+
   try {
-    const response = await fetch(CONFIG.openai.endpoint, {
+    const response = await fetch(`${baseURL}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${CONFIG.openai.apiKey}`
       },
       body: JSON.stringify({
-        model: CONFIG.openai.model,
+        model: CONFIG.openai.model || 'gpt-4o-mini',
         messages: [{ role: 'system', content: prompt }],
         response_format: { type: "json_object" },
         max_tokens: 4096,
@@ -136,11 +141,9 @@ Strings: ${JSON.stringify(texts)}`;
     });
 
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content;
     if (!content) throw new Error('Empty AI response');
-
     const result = JSON.parse(content);
     applyTranslations(result);
   } catch (err) {
@@ -148,40 +151,118 @@ Strings: ${JSON.stringify(texts)}`;
   }
 }
 
-/**
- * DeepL 协议适配 (DeepL API 不支持批处理 JSON 直接返回，需循环或特殊处理)
- * 注：DeepL 免费版通常一次请求只能翻译一个，此处为了性能采用分次异步并发
- */
-async function callDeepL(texts) {
-  const results = {};
-  const promises = texts.map(async (text) => {
-    try {
-      const params = new URLSearchParams();
-      params.append('auth_key', CONFIG.deepl.apiKey);
-      params.append('text', text);
-      params.append('target_lang', 'ZH');
+async function callAnthropic(texts) {
+  const langName = CONFIG.targetLanguage || 'Simplified Chinese';
+  const prompt = `Translate software UI strings to ${langName} (Faithful, Expressive, Elegant).
+Return JSON ONLY: {"translations": ["t1", "t2", ...]} with exactly ${texts.length} items.
+Strings: ${JSON.stringify(texts)}`;
 
-      const response = await fetch(CONFIG.deepl.endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params
-      });
-      const data = await response.json();
-      if (data.translations?.[0]?.text) {
-        results[text] = data.translations[0].text;
-      }
-    } catch (e) { }
-  });
+  const baseURL = CONFIG.anthropic.baseURL || 'https://api.anthropic.com';
 
-  await Promise.all(promises);
-  applyTranslations(results);
+  try {
+    const response = await fetch(`${baseURL}/v1/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': CONFIG.anthropic.apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: CONFIG.anthropic.model || 'claude-sonnet-4-6',
+        max_tokens: 4096,
+        system: prompt,
+        messages: [{ role: 'user', content: JSON.stringify(texts) }]
+      })
+    });
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    const raw = data.content?.[0]?.text;
+    if (!raw) throw new Error('Empty AI response');
+    const cleaned = raw.replace(/^```json?\n?/, '').replace(/\n?```$/, '').trim();
+    const parsed = JSON.parse(cleaned);
+    const translations = parsed.translations;
+    if (!Array.isArray(translations)) throw new Error('Missing translations array');
+    const result = {};
+    texts.forEach((t, i) => { result[t] = translations[i]; });
+    applyTranslations(result);
+  } catch (err) {
+    console.error('[I18N] Anthropic Error:', err.message || err);
+  }
 }
 
-/**
- * 翻译结果生效器
- * 将获取到的全新翻译键值对持久化到 localStorage（二级缓存），并触发 DOM 重绘
- * @param {object} newMap - 新的 { '英文原句': '中文翻译' } 字典映射
- */
+async function callGemini(texts) {
+  const langName = CONFIG.targetLanguage || 'Simplified Chinese';
+  const prompt = `You are a professional software UI translator. Translate these ${texts.length} UI strings to ${langName}.
+
+CRITICAL RULES:
+1. Return ONLY a valid JSON object: {"translations": ["t1", "t2", ...]}
+2. The array length MUST exactly match the number of input strings (${texts.length}).
+3. Preserve ALL placeholders: $1, $2, {name}, {{count}}, %s, %d, etc.
+4. Do NOT add explanations or comments.
+
+Input strings:
+${texts.map((t, i) => `${i + 1}. ${JSON.stringify(t)}`).join('\n')}`;
+
+  const baseURL = CONFIG.gemini.baseURL || 'https://generativelanguage.googleapis.com';
+  const model = CONFIG.gemini.model || 'gemini-2.0-flash';
+
+  try {
+    const response = await fetch(`${baseURL}/v1beta/models/${model}:generateContent?key=${encodeURIComponent(CONFIG.gemini.apiKey)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.1, responseMimeType: 'application/json' }
+      })
+    });
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!raw) throw new Error('Empty Gemini response');
+    const cleaned = raw.replace(/^```json?\n?/, '').replace(/\n?```$/, '').trim();
+    const parsed = JSON.parse(cleaned);
+    const translations = parsed.translations;
+    if (!Array.isArray(translations)) throw new Error('Missing translations array');
+    const result = {};
+    texts.forEach((t, i) => { result[t] = translations[i]; });
+    applyTranslations(result);
+  } catch (err) {
+    console.error('[I18N] Gemini Error:', err.message || err);
+  }
+}
+
+async function callDeepL(texts) {
+  const apiKey = CONFIG.deepl.apiKey;
+  const baseURL = CONFIG.deepl.baseURL || (apiKey.endsWith(':fx') ? 'https://api-free.deepl.com/v2/translate' : 'https://api.deepl.com/v2/translate');
+  const targetLangCode = CONFIG.targetLanguageCode || 'ZH';
+
+  const body = new URLSearchParams();
+  body.append('auth_key', apiKey);
+  body.append('target_lang', targetLangCode.toUpperCase());
+  body.append('preserve_formatting', '1');
+  for (const t of texts) body.append('text', t);
+
+  try {
+    const response = await fetch(baseURL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString()
+    });
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    const results = {};
+    if (data.translations) {
+      data.translations.forEach((t, i) => { results[texts[i]] = t.text; });
+    }
+    applyTranslations(results);
+  } catch (err) {
+    console.error('[I18N] DeepL Error:', err.message || err);
+  }
+}
+
 function applyTranslations(newMap) {
   Object.assign(CACHE, newMap);
   for (const k in newMap) {
@@ -193,9 +274,9 @@ function applyTranslations(newMap) {
   } catch (e) {
     console.error('%c[I18N] 写入缓存失败 (可能超 5MB 限制):', 'color:#ef4444;font-weight:bold', e.message);
   }
+  logCacheStatus();
 
-  // 桥接：如果是主窗口，则通知所有 Webview 插件更新缓存
-  if (IS_WORKBENCH) {
+  if (FEATURES.enableTranslationBridge && IS_WORKBENCH) {
     const broadcast = (win) => {
         if (!win || !win.frames) return;
         for (let i = 0; i < win.frames.length; i++) {
@@ -213,17 +294,10 @@ function applyTranslations(newMap) {
   requestAnimationFrame(() => walkAndTranslate(document.body));
 }
 
-/**
- * 在线翻译防抖调度中心
- * 当本地字典未命中时触发。利用 setTimeout 将极短时间内（2000ms）产生的大量零碎断句
- * 合并为一个批次数组后统一发送至 AI，从而极大节省 Token 损耗并减少并发网络请求。
- * @param {string} text - 等待调度的原始长句
- */
 function scheduleTranslation(text) {
   if (I18N_TERMS[text] || CACHE[text] || PENDING_JOBS.has(text) || IN_FLIGHT_JOBS.has(text) || CONFIG.apiType === 'none') return;
 
-  if (!IS_WORKBENCH) {
-    // 桥接：Webview 无法直接联网 (CSP 限制)，向主窗口申请翻译 (直连 top)
+  if (FEATURES.enableTranslationBridge && !IS_WORKBENCH) {
     if (window.top && window.top !== window.self && typeof window.top.postMessage === 'function') {
       PENDING_JOBS.add(text);
       window.top.postMessage({ type: 'I18N_BRIDGE_REQ', text }, '*');
@@ -254,19 +328,13 @@ function scheduleTranslation(text) {
 // === 4. 核心匹配逻辑与正则引擎 ===
 let REGEX_RULES = [];
 
-/**
- * 初始化正则匹配引擎 (M4 特性)
- * 启动时将配置在 dictionary.json 中的字符串形式的正则表达式预编译为 RegExp 对象，
- * 从而在后续高频的 DOM 遍历中极大提升正则测试速度。
- */
 function initRegexRules() {
-  if (!I18N_TERMS.regex) return;
+  if (!FEATURES.enableRegex || !I18N_TERMS.regex) return;
   for (const [pattern, template] of Object.entries(I18N_TERMS.regex)) {
     try { REGEX_RULES.push({ re: new RegExp(pattern), template }); } catch (e) { }
   }
 }
 
-// 递归查找嵌套字典 (由 V2 嵌套结构改版支持)
 function findInNestedDict(dict, key) {
   if (dict[key] && typeof dict[key] === 'string') return dict[key];
   for (const v of Object.values(dict)) {
@@ -282,53 +350,44 @@ function getTranslation(text) {
   const t = text.trim();
   if (!t || t.length < 2) return null;
 
-  // 1. 本地字典直接匹配
-  const direct = findInNestedDict(I18N_TERMS, t);
-  if (direct) return direct;
-
-  // 2. 缓存匹配
-  if (CACHE[t]) return CACHE[t];
-
-  // 3. 正则模式匹配 (M4 核心)
-  for (const rule of REGEX_RULES) {
-    if (rule.re.test(t)) {
-      const result = t.replace(rule.re, rule.template);
-      CACHE[t] = result; // 存入缓存以防重复正则计算
-      return result;
-    }
+  if (FEATURES.enableDictionary) {
+      const direct = FEATURES.enableNestedDict ? findInNestedDict(I18N_TERMS, t) : I18N_TERMS[t];
+      if (direct) return direct;
   }
 
-  // 4. 安全检查：如果已包含中文且无本地配置，则跳过 AI 调度，防止重复翻译
+  if (CACHE[t]) return CACHE[t];
+
+  if (FEATURES.enableRegex) {
+      for (const rule of REGEX_RULES) {
+        if (rule.re.test(t)) {
+          const result = t.replace(rule.re, rule.template);
+          CACHE[t] = result;
+          return result;
+        }
+      }
+  }
+
   if (HAS_CHINESE.test(t)) return null;
 
-  // 5. 调度 AI 翻译
   scheduleTranslation(t);
   return null;
 }
 
-/**
- * 屏蔽检查：判断节点是否处于被屏蔽的区域中
- */
 function isExcluded(node) {
   if (!node) return false;
-  // 检查元素节点及其祖先
   const el = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
   if (!el) return false;
 
-  // 1. 检查选择器 (带安全保护)
   for (const selector of SKIP_SELECTORS) {
     if (!selector || typeof selector !== 'string') continue;
     try {
       if (el.closest(selector)) {
-        // 仅对元素节点在控制台输出提示，避免日志淹没
         if (node.nodeType === Node.ELEMENT_NODE) {
-          console.warn(`[Cursor-Live-Translator] 屏蔽区域匹配成功: ${selector}`, node);
+          console.warn(`[Live-Translator] 屏蔽区域匹配成功: ${selector}`, node);
         }
         return true;
       }
-    } catch (e) {
-      console.error(`[Cursor-Live-Translator] 非法的 CSS 选择器: ${selector}`);
-    }
+    } catch (e) { }
   }
   return false;
 }
@@ -342,12 +401,11 @@ function processNode(node) {
   if (trans && node.textContent !== node.textContent.replace(raw, trans)) {
     if (parent) {
       parent.classList.add('i18n-debug-highlight');
-      parent.classList.remove('i18n-loading');
+      if (FEATURES.enableLoadingAnimation) parent.classList.remove('i18n-loading');
       parent.setAttribute('data-i18n-original', raw);
     }
     node.textContent = node.textContent.replace(raw, trans);
-  } else if (parent && (PENDING_JOBS.has(raw) || IN_FLIGHT_JOBS.has(raw))) {
-    // 异步翻译中，添加动画类
+  } else if (parent && FEATURES.enableLoadingAnimation && (PENDING_JOBS.has(raw) || IN_FLIGHT_JOBS.has(raw))) {
     if (!parent.classList.contains('i18n-loading')) {
       parent.classList.add('i18n-loading');
     }
@@ -360,7 +418,6 @@ function processTitle(el) {
   if (!title) return;
   const target = getTranslation(title.trim());
   if (target && title !== title.replace(title.trim(), target)) {
-    // V2.5: 始终注入标签
     el.classList.add('i18n-debug-highlight');
     el.setAttribute('data-i18n-original-title', title);
     el.setAttribute('title', title.replace(title.trim(), target));
@@ -371,12 +428,6 @@ function processTitle(el) {
 let mutationBuffer = [];
 let rafId = null;
 
-/**
- * 核心：高效 DOM 树递归遍历
- * 仅筛选符合条件的文本节点 (Node_TEXT) 和带有 title 属性的元素节点。
- * 运用原生 TreeWalker API 穿越复杂的网页嵌套结构并批量执行渲染。
- * @param {Node} root - 起始根节点，通常为 document.body 或被 Observer 捕获的变动节点
- */
 function walkAndTranslate(root) {
   if (!root || !root.isConnected) return;
   if (root.nodeType === Node.TEXT_NODE) {
@@ -398,12 +449,6 @@ function handleMutations() {
   nodes.forEach(n => { if (n.isConnected) walkAndTranslate(n); });
 }
 
-/**
- * MutationObserver 全量节点嗅探器
- * 核心作用：当界面 UI 发生任何细微变动（组件加载、AI 生成流式输出文字）时精准切入翻译。
- * 性能优化：利用 requestAnimationFrame (RAF) 将堆积的 DOM 更新统一推迟到下一帧渲染前执行，
- * 避免了因同步重绘造成的“界面白屏抖动/卡顿”。
- */
 const observer = new MutationObserver((mutations) => {
   let hasAct = false;
   for (const m of mutations) {
@@ -419,10 +464,12 @@ const observer = new MutationObserver((mutations) => {
 
 function init() {
   if (SKIP_URLS.some(u => location.href.includes(u)) || SKIP_TITLES.some(t => document.title.includes(t))) return;
+  
+  if (window.__LIVE_I18N_INIT_DONE__) return;
+  window.__LIVE_I18N_INIT_DONE__ = true;
 
   initRegexRules();
 
-  // 始终注入样式和 Tooltip 节点
   const style = document.createElement('style');
   style.textContent = DEBUG_STYLE;
   document.head.appendChild(style);
@@ -431,23 +478,22 @@ function init() {
   tooltip.id = 'i18n-hover-tooltip';
   document.body.appendChild(tooltip);
 
-  // 全平台快捷键监听 (Mac/Win)
   window.addEventListener('keydown', (e) => {
-    // 切换高亮: Cmd/Ctrl + Opt/Alt + Shift + B
     const isToggle = (e.metaKey || e.ctrlKey) && e.altKey && e.shiftKey && e.code === 'KeyB';
     if (isToggle) {
       const newState = !document.body.classList.contains('i18n-debug-active');
       document.body.classList.toggle('i18n-debug-active', newState);
-      if (IS_WORKBENCH) {
-        broadcastMessage({ type: 'I18N_DEBUG_SYNC', state: newState });
-      } else if (window.top && window.top !== window.self) {
-        window.top.postMessage({ type: 'I18N_DEBUG_SYNC', state: newState }, '*');
+      if (FEATURES.enableTranslationBridge) {
+        if (IS_WORKBENCH) {
+          broadcastMessage({ type: 'I18N_DEBUG_SYNC', state: newState });
+        } else if (window.top && window.top !== window.self) {
+          window.top.postMessage({ type: 'I18N_DEBUG_SYNC', state: newState }, '*');
+        }
       }
       console.log('[I18N] 调试模式已同步切换:', newState);
     }
   });
 
-  // 辅助函数：全窗口广播
   function broadcastMessage(data) {
     const broadcast = (win) => {
       if (!win || !win.frames) return;
@@ -462,7 +508,6 @@ function init() {
     broadcast(window);
   }
 
-  // 悬停感应 (仅在高亮模式下按住 Alt/Option 生效)
   document.body.addEventListener('mouseover', (e) => {
     if (!document.body.classList.contains('i18n-debug-active') || !e.altKey) return;
     const target = e.target.closest('.i18n-debug-highlight');
@@ -478,38 +523,39 @@ function init() {
   });
   document.body.addEventListener('mouseout', () => { tooltip.style.display = 'none'; });
 
-  // 桥接协议监听
-  window.addEventListener('message', (e) => {
-    if (!e.data || typeof e.data !== 'object') return;
+  if (FEATURES.enableTranslationBridge) {
+    window.addEventListener('message', (e) => {
+      if (!e.data || typeof e.data !== 'object') return;
 
-    if (e.data.type === 'I18N_DEBUG_SYNC') {
-      const state = !!e.data.state;
-      if (document.body.classList.contains('i18n-debug-active') !== state) {
-        document.body.classList.toggle('i18n-debug-active', state);
-        if (IS_WORKBENCH) broadcastMessage({ type: 'I18N_DEBUG_SYNC', state });
+      if (e.data.type === 'I18N_DEBUG_SYNC') {
+        const state = !!e.data.state;
+        if (document.body.classList.contains('i18n-debug-active') !== state) {
+          document.body.classList.toggle('i18n-debug-active', state);
+          if (IS_WORKBENCH) broadcastMessage({ type: 'I18N_DEBUG_SYNC', state });
+        }
+        return;
       }
-      return;
-    }
 
-    if (IS_WORKBENCH && e.data.type === 'I18N_BRIDGE_REQ') {
-      // 主窗口接收到插件的翻译请求
-      const text = e.data.text;
-      const trans = getTranslation(text);
-      if (trans && e.source) {
-        e.source.postMessage({ type: 'I18N_BRIDGE_PUSH', newMap: { [text]: trans } }, '*');
+      if (IS_WORKBENCH && e.data.type === 'I18N_BRIDGE_REQ') {
+        const text = e.data.text;
+        const trans = getTranslation(text);
+        if (trans && e.source) {
+          e.source.postMessage({ type: 'I18N_BRIDGE_PUSH', newMap: { [text]: trans } }, '*');
+        }
+      } else if (!IS_WORKBENCH && e.data.type === 'I18N_BRIDGE_PUSH') {
+        applyTranslations(e.data.newMap);
       }
-    } else if (!IS_WORKBENCH && e.data.type === 'I18N_BRIDGE_PUSH') {
-      // 插件接收到主窗口下发的翻译结果
-      applyTranslations(e.data.newMap);
-    }
-  });
+    });
+  }
 
   observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['title'] });
   walkAndTranslate(document.body);
   logCacheStatus();
-  console.log(`%c[Cursor-Live-Translator]%c ${CONFIG.name ? `[${CONFIG.name}] ` : ''}动力系统就绪 | V2.5.0 (Eng: ${CONFIG.engineId || CONFIG.apiType})`, 'color:#8b5cf6;font-weight:bold', '');
+  if (IS_WORKBENCH) {
+     console.log(`%c[Live-Translator-Core]%c ${CONFIG.name ? `[${CONFIG.name}] ` : ''}动力系统就绪 | V3 (Eng: ${CONFIG.engineId || CONFIG.apiType})`, 'color:#8b5cf6;font-weight:bold', '');
+  }
 }
 
 if (document.body) init();
 else document.addEventListener('DOMContentLoaded', init);
-window.__CURSOR_I18N_INJECTED__ = true;
+window.__LIVE_I18N_INJECTED__ = true;
