@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, safeStorage, dialog, nativeTheme, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, safeStorage, dialog, nativeTheme, shell, Menu } = require('electron');
 const path = require('path');
 const fs   = require('fs');
 
@@ -138,6 +138,35 @@ function deleteDir(dir) {
   try { if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}
 }
 
+// ─── Menu ─────────────────────────────────────────────────────────────────────
+function buildMenu() {
+  const template = [
+    {
+      label: app.getName(),
+      submenu: [
+        { label: '关于 Live Translator Hub', role: 'about' },
+        { type: 'separator' },
+        { label: '隐藏', role: 'hide', accelerator: 'Command+H' },
+        { type: 'separator' },
+        { label: '退出', role: 'quit', accelerator: 'Command+Q' },
+      ],
+    },
+    {
+      label: '编辑',
+      submenu: [
+        { label: '撤销', role: 'undo', accelerator: 'Command+Z' },
+        { label: '重做', role: 'redo', accelerator: 'Shift+Command+Z' },
+        { type: 'separator' },
+        { label: '剪切', role: 'cut', accelerator: 'Command+X' },
+        { label: '复制', role: 'copy', accelerator: 'Command+C' },
+        { label: '粘贴', role: 'paste', accelerator: 'Command+V' },
+        { label: '全选', role: 'selectAll', accelerator: 'Command+A' },
+      ],
+    },
+  ];
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+}
+
 // ─── Window ──────────────────────────────────────────────────────────────────
 let mainWindow;
 
@@ -227,6 +256,7 @@ app.whenReady().then(() => {
   nativeTheme.themeSource = 'dark';
   if (process.platform === 'darwin') {
     app.dock.setIcon(path.join(__dirname, '../build/icon-mac.png'));
+    buildMenu();
   }
   migrateFromLegacy();
 
