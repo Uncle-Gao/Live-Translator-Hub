@@ -7,48 +7,44 @@ header = """
 
 ## Download / 下载指引
 
-| Platform 平台 | Arch 架构 | Type 类型 | Download 下载 |
-|:---|:---|:---|:---|
-| macOS | x64 | DMG | [下载](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live%20Translator%20Hub-{{ version | trim_start_matches(pat="v") }}-mac-x64.dmg) |
-| macOS | arm64 (Apple Silicon) | DMG | [下载](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live%20Translator%20Hub-{{ version | trim_start_matches(pat="v") }}-mac-arm64.dmg) |
-| macOS | x64 | ZIP | [下载](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live%20Translator%20Hub-{{ version | trim_start_matches(pat="v") }}-mac-x64.zip) |
-| macOS | arm64 (Apple Silicon) | ZIP | [下载](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live%20Translator%20Hub-{{ version | trim_start_matches(pat="v") }}-mac-arm64.zip) |
-| Windows | x64 | 安装包 | [下载](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live%20Translator%20Hub-{{ version | trim_start_matches(pat="v") }}-win-x64.exe) |
-| Windows | x64 | 便携版 | [下载](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live%20Translator%20Hub-{{ version | trim_start_matches(pat="v") }}-win-x64.zip) |
-| Linux | x64 | AppImage | [下载](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live%20Translator%20Hub-{{ version | trim_start_matches(pat="v") }}-linux-x64.AppImage) |
-| Linux | x64 | DEB | [下载](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live%20Translator%20Hub-{{ version | trim_start_matches(pat="v") }}-linux-x64.deb) |
+| Platform / 平台 | Arch / 架构 | Download / 下载 |
+|:---|:---|:---|
+| macOS | x64 (Intel) | [Live Translator Hub-{{ version | trim_start_matches(pat="v") }}-mac-x64.dmg](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live%20Translator%20Hub-{{ version | trim_start_matches(pat="v") }}-mac-x64.dmg) |
+| macOS | arm64 (Apple Silicon) | [Live Translator Hub-{{ version | trim_start_matches(pat="v") }}-mac-arm64.dmg](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live%20Translator%20Hub-{{ version | trim_start_matches(pat="v") }}-mac-arm64.dmg) |
+| Windows | x64 | [Live Translator Hub-{{ version | trim_start_matches(pat="v") }}-win-x64.exe](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live%20Translator%20Hub-{{ version | trim_start_matches(pat="v") }}-win-x64.exe) |
+| Linux | x64 | [Live Translator Hub-{{ version | trim_start_matches(pat="v") }}-linux-x64.AppImage](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live%20Translator%20Hub-{{ version | trim_start_matches(pat="v") }}-linux-x64.AppImage) |
 
-> macOS 用户：首次打开时若提示“无法验证开发者”，请在**系统设置 → 隐私与安全性**中点击“仍要打开”。
-> Windows 用户：若 Smartscreen 阻止运行，请点击“更多信息” → “仍要运行”。
-> Linux 用户：AppImage 下载后需 `chmod +x` 赋予执行权限。
+> **macOS**: If prompted that the developer cannot be verified, go to **System Settings → Privacy & Security** and click "Open Anyway".
+> **Windows**: If SmartScreen blocks the app, click "More info" → "Run anyway".
+> **Linux**: Run `chmod +x` on the AppImage before executing.
 
 ---
-
 """
 
 body = """
-{%- if version -%}
+{% if version -%}
 ## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
 {% else -%}
 ## [Unreleased]
-{% endif -%}
+{% endif %}
 
-### English
+### Changelog
 
 {% for group, commits in commits | group_by(attribute="group") %}
 #### {{ group }}
 {% for commit in commits %}
 - {{ commit.message | split(pat="\n") | first | trim }}
-{%- endfor %}
 {% endfor %}
 
-### 中文
+{% endfor %}
+### 更新日志
 
 {% for group, commits in commits | group_by(attribute="group") %}
 #### {% if group == "Features" %}新功能{% elif group == "Bug Fixes" %}Bug 修复{% elif group == "Refactoring" %}重构{% elif group == "Documentation" %}文档{% elif group == "Miscellaneous" %}杂项{% elif group == "Releases" %}发布{% else %}{{ group }}{% endif %}
 {% for commit in commits %}
 - {{ commit.message | split(pat="\n") | first | trim }}
-{%- endfor %}
+{% endfor %}
+
 {% endfor %}
 """
 trim = true
