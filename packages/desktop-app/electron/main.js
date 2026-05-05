@@ -2,6 +2,8 @@ const { app, BrowserWindow, ipcMain, safeStorage, dialog, nativeTheme, shell } =
 const path = require('path');
 const fs   = require('fs');
 
+app.setName('Live Translator Hub');
+
 let autoUpdater = null;
 try { ({ autoUpdater } = require('electron-updater')); } catch { /* dev mode without package */ }
 
@@ -140,19 +142,20 @@ function deleteDir(dir) {
 let mainWindow;
 
 function createWindow() {
+  const isMac = process.platform === 'darwin';
+
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 760,
     minWidth: 1000,
     minHeight: 640,
-    icon: path.join(__dirname, '../build/icon.png'),
+    icon: path.join(__dirname, '../build/icon-mac.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
     },
-    titleBarStyle: 'hidden',
-    trafficLightPosition: { x: 16, y: 20 },
+    ...(isMac && { titleBarStyle: 'hidden', trafficLightPosition: { x: 16, y: 20 } }),
     backgroundColor: '#0B0D10',
   });
 
@@ -222,7 +225,7 @@ let cursor, claude, DictGenerator;
 app.whenReady().then(() => {
   nativeTheme.themeSource = 'dark';
   if (process.platform === 'darwin') {
-    app.dock.setIcon(path.join(__dirname, '../build/icon.png'));
+    app.dock.setIcon(path.join(__dirname, '../build/icon-mac.png'));
   }
   migrateFromLegacy();
 
