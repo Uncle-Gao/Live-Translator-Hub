@@ -10,9 +10,9 @@ O Live Translator Hub é um **aplicativo de desktop GUI Electron + React** que f
 
 Este projeto é uma versão arquiteturalmente atualizada do [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) — evoluindo de scripts CLI para uma GUI com painel de status e logs em tempo real, unificando as capacidades de tradução do Cursor e do Claude em uma única plataforma.
 
+![Captura de tela](../../image.png)
+![Captura de tela](../../image-1.png)
 
-![Captura de tela](image.png)
-![Captura de tela](image-1.png)
 ## Arquitetura
 
 ```
@@ -30,12 +30,12 @@ live-translator-ecosystem/          # npm workspaces monorepo
 
 ### Runtime de Tradução
 
-`packages/core/src/translator-engine.js` é o único runtime injetado nos aplicativos alvo — JavaScript puro do navegador, sem dependências de módulo. Responsabilidades incluem:
+`packages/core/src/translator-engine.js` é o único runtime injetado nos aplicativos alvo — JavaScript puro do navegador, sem dependências de módulos. Responsabilidades incluem:
 
-- **Correspondência de dicionário**: entradas estáticas + padrões regex
-- **Ponte de proxy de tradução AI**: no ambiente Webview, encaminha solicitações de tradução para a janela principal via `postMessage`, contornando restrições de rede CSP
-- **Cache de tradução**: cache persistente baseado em `localStorage`, com chave `live_i18n_cache_<entity_name>`
-- **Pesquisa de dicionário aninhada**: suporta modo `enableNestedDict`
+- **Correspondência de dicionário**: Entradas estáticas + padrões regex
+- **Ponte de proxy de tradução AI**: No ambiente Webview, encaminha solicitações de tradução para a janela principal via `postMessage`, contornando restrições de rede CSP
+- **Cache de tradução**: Cache persistente baseado em `localStorage`, com chave `live_i18n_cache_<entity_name>`
+- **Pesquisa de dicionário aninhada**: Suporta modo `enableNestedDict`
 
 ## Destaques de Funcionalidades
 
@@ -58,16 +58,16 @@ Através da arquitetura Translation Bridge, a capacidade de tradução AI pode p
 
 ### Depuração Interativa
 
-- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) alterna borda de destaque tracejada azul
+- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) alterna borda de destaque azul tracejada
 - No modo de destaque, mantenha pressionado `Option` (Mac) / `Alt` (Win) e passe o mouse sobre texto chinês para ver o texto original
 
 ### Regras de Bloqueio por Domínio
 
-Cada entidade (janela principal e plugins individuais) possui conjuntos de regras de bloqueio totalmente independentes (seletores CSS, correspondência de URL, correspondência de título), garantindo que áreas de código e zonas de interação principal não sejam afetadas pela tradução.
+Cada entidade (janela principal e plugins individuais) possui conjuntos de regras de bloqueio totalmente independentes (seletores CSS, correspondência de URL, correspondência de título), garantindo que áreas de código e regiões de interação principal não sejam afetadas pela tradução.
 
 ### Atualização Automática
 
-Inclui `electron-updater`, suporta verificação, download e instalação automática de atualizações no macOS dentro do aplicativo.
+Inclui `electron-updater`, suportando verificação, download e instalação automática de atualizações no macOS dentro do aplicativo.
 
 ## Início Rápido
 
@@ -87,9 +87,9 @@ npm run build -w desktop-app
 1. Configure as chaves do mecanismo AI no painel **API Keys**
 2. Alterne para o painel **Cursor Engine** ou **Claude Engine**
 3. Clique em **Deploy** para implantar a tradução com um clique
-4. Reinicie o aplicativo alvo para aplicar as alterações
+4. Reinicie o aplicativo alvo para que as alterações entrem em vigor
 
-### Requisitos do Sistema
+### Requisitos de Sistema
 
 - macOS 13+ (recomendado)
 - Node.js 18+
@@ -97,9 +97,9 @@ npm run build -w desktop-app
 
 ## Segurança
 
-- **Armazenamento criptografado de chaves de API**: criptografado via `safeStorage` do Electron e salvo em `~/.live_translator_hub/api_keys.enc`, não gravado em arquivos de configuração
-- **Comunicação direta**: solicitações de tradução vão diretamente para a API do fornecedor AI, sem servidores intermediários
-- **Isolamento por domínio**: regras de bloqueio não tocam nos arquivos de código-fonte
+- **Armazenamento criptografado de chaves de API**: Criptografado via `safeStorage` do Electron e salvo em `~/.live_translator_hub/api_keys.enc`, não gravado em arquivos de configuração
+- **Comunicação direta**: Solicitações de tradução vão diretamente para as APIs dos fornecedores AI, sem servidores intermediários
+- **Isolamento por domínio**: Regras de bloqueio não tocam nos arquivos de código-fonte
 
 ---
 

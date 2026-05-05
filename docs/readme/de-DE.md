@@ -6,13 +6,13 @@
 
 ## Projektübersicht
 
-Live Translator Hub ist eine **Electron + React GUI Desktop-Anwendung**, die eine Ein-Klick-Sinisierung für die beiden KI-Programmiertools Cursor und Claude bietet. Über einen einheitlichen Übersetzungs-Laufzeitkern werden die Engine-Bereitstellung, API-Schlüsselkonfiguration und Wörterbuchgenerierung für beide Zielanwendungen in einer Oberfläche verwaltet.
+Live Translator Hub ist eine **Electron + React GUI Desktop-Anwendung**, die eine Ein-Klick-Lokalisierung für die beiden KI-Programmiertools Cursor und Claude bietet. Über einen einheitlichen Übersetzungs-Laufzeitkern werden die Engine-Bereitstellung, API-Schlüsselkonfiguration und Wörterbuchgenerierung für beide Zielanwendungen in einer Oberfläche verwaltet.
 
-Dieses Projekt ist die architektonische Weiterentwicklung von [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) – von einem CLI-Skript zu einer GUI mit Status-Panel und Echtzeitprotokollierung, die die Sinisierungsfähigkeiten von Cursor und Claude in einer einzigen, einheitlichen Plattform vereint.
+Dieses Projekt ist die architektonische Weiterentwicklung von [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) – von einem CLI-Skript zu einer GUI mit Statuspanel und Echtzeitprotokollierung, die die Lokalisierungsfähigkeiten von Cursor und Claude in einer einzigen, einheitlichen Plattform vereint.
 
+![Screenshot](../../image.png)
+![Screenshot](../../image-1.png)
 
-![Screenshot](image.png)
-![Screenshot](image-1.png)
 ## Architektur
 
 ```
@@ -23,8 +23,8 @@ live-translator-ecosystem/          # npm workspaces monorepo
 │   │   ├── electron/preload.js     # Kommunikationsbrücke zum Renderer-Prozess
 │   │   └── src/                    # React 19 + Tailwind v4 + Zustand
 │   ├── core/                       # Übersetzungs-Laufzeitkern (translator-engine.js)
-│   ├── patcher-cursor/             # Cursor-Anwendungs-Patcher
-│   ├── patcher-claude/             # Claude-Anwendungs-Patcher
+│   ├── patcher-cursor/             # Patcher für die Cursor-Anwendung
+│   ├── patcher-claude/             # Patcher für die Claude-Anwendung
 │   └── dict-generator/             # KI-Wörterbuchgenerator
 ```
 
@@ -41,33 +41,33 @@ live-translator-ecosystem/          # npm workspaces monorepo
 
 ### Einheitliche Verwaltung zweier Engines
 
-Verwalten Sie den Sinisierungs-Bereitstellungsstatus, die Wörterbuchversion und die Ausschlussregeln für Cursor und Claude in derselben Oberfläche, ohne zwischen Tools wechseln zu müssen.
+Verwalten Sie den Lokalisierungsbereitstellungsstatus, die Wörterbuchversionen und Ausschlussregeln für Cursor und Claude in derselben Oberfläche, ohne zwischen Tools wechseln zu müssen.
 
 ### Webview-Durchdringung für alle Szenarien
 
-Durch die Translation-Bridge-Architektur kann die KI-Übersetzungsfähigkeit vom Hauptfenster auf alle Ebenen von Webview-Plugins (z. B. Claude Code) durchdringen und so Netzwerkblockaden unter strengen CSP-Richtlinien umgehen.
+Durch die Translation-Bridge-Architektur kann die KI-Übersetzungsfähigkeit vom Hauptfenster in alle Ebenen von Webview-Plugins (z. B. Claude Code) vordringen und so Netzwerkblockaden unter strengen CSP-Richtlinien umgehen.
 
 ### Vier-Panel-Funktionslayout
 
 | Panel | Funktion |
 | :--- | :--- |
-| **Cursor Engine** | Sinisierung von Cursor bereitstellen/wiederherstellen, domänenspezifische Ausschlussregeln für Hauptfenster und Webview-Plugins verwalten |
-| **Claude Engine** | Sinisierung von Claude bereitstellen/wiederherstellen, Überspringungsregeln konfigurieren |
-| **API Keys** | API-Schlüssel für mehrere KI-Übersetzungs-Engines verwalten (unterstützt OpenAI, Anthropic, Google Gemini, DeepL), Schlüssel werden über Electron `safeStorage` verschlüsselt gespeichert |
-| **Dict Generator** | UI-Zeichenfolgen aus dem Quellcode der Zielanwendung extrahieren und über KI in großen Mengen Übersetzungswörterbücher generieren |
+| **Cursor Engine** | Bereitstellung/Wiederherstellung der Cursor-Lokalisierung, Verwaltung der bereichsspezifischen Ausschlussregeln für Hauptfenster und Webview-Plugins |
+| **Claude Engine** | Bereitstellung/Wiederherstellung der Claude-Lokalisierung, Konfiguration von Überspringungsregeln |
+| **API Keys** | Verwaltung von API-Schlüsseln für mehrere KI-Übersetzungs-Engines (Unterstützung für OpenAI, Anthropic, Google Gemini, DeepL), Schlüssel werden über Electron `safeStorage` verschlüsselt gespeichert |
+| **Dict Generator** | Extraktion von UI-Strings aus dem Quellcode der Zielanwendung, Batch-Generierung von Übersetzungswörterbüchern durch KI |
 
 ### Interaktives Debugging
 
 - `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) zum Umschalten des blauen, gestrichelten Hervorhebungsrahmens
 - Im Hervorhebungsmodus `Option` (Mac) / `Alt` (Win) gedrückt halten und über chinesischen Text fahren, um den Originaltext anzuzeigen
 
-### Domänenspezifische Ausschlussregeln
+### Bereichsspezifische Ausschlussregeln
 
-Jede Entität (Hauptfenster und einzelne Plugins) verfügt über einen vollständig unabhängigen Satz von Ausschlussregeln (CSS-Selektoren, URL-Abgleich, Titelabgleich), um sicherzustellen, dass Codebereiche und Kerninteraktionsbereiche von der Übersetzung unberührt bleiben.
+Jede Entität (Hauptfenster und einzelne Plugins) verfügt über einen vollständig unabhängigen Satz von Ausschlussregeln (CSS-Selektoren, URL-Matching, Titel-Matching), um sicherzustellen, dass Codebereiche und Kerninteraktionsbereiche von der Übersetzung unberührt bleiben.
 
 ### Automatische Updates
 
-Integriertes `electron-updater` für automatische macOS-App-Updates (Überprüfung, Download und Installation).
+Integriertes `electron-updater` für die automatische Suche, den Download und die Installation von Updates innerhalb der macOS-Anwendung.
 
 ## Schnellstart
 
@@ -86,7 +86,7 @@ npm run build -w desktop-app
 
 1. Konfigurieren Sie die KI-Engine-Schlüssel im Panel **API Keys**
 2. Wechseln Sie zum Panel **Cursor Engine** oder **Claude Engine**
-3. Klicken Sie auf **Deploy**, um die Sinisierung mit einem Klick bereitzustellen
+3. Klicken Sie auf **Deploy**, um die Lokalisierung mit einem Klick bereitzustellen
 4. Starten Sie die Zielanwendung neu, um die Änderungen zu übernehmen
 
 ### Systemanforderungen
@@ -98,8 +98,8 @@ npm run build -w desktop-app
 ## Sicherheit
 
 - **Verschlüsselte API-Schlüsselspeicherung**: Über Electron `safeStorage` verschlüsselt in `~/.live_translator_hub/api_keys.enc` gespeichert, nicht in Konfigurationsdateien
-- **Direkte Kommunikation**: Übersetzungsanfragen gehen direkt an die KI-Anbieter-APIs, kein zwischengeschalteter Server
-- **Domänenisolation**: Ausschlussregeln berühren keine Quelldateien
+- **Direkte Kommunikation**: Übersetzungsanfragen gehen direkt an die API der KI-Anbieter, kein zwischengeschalteter Server
+- **Bereichsisolierung**: Ausschlussregeln berühren keine Quelldateien
 
 ---
 

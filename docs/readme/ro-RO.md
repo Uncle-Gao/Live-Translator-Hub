@@ -8,11 +8,11 @@
 
 Live Translator Hub este o **aplicație desktop GUI Electron + React** care oferă traducere într-un singur clic pentru două instrumente de programare AI: Cursor și Claude. Printr-un nucleu unificat de runtime de traducere, gestionează implementarea motorului, configurarea cheilor API și generarea dicționarelor pentru ambele aplicații țintă dintr-o singură interfață.
 
-Acest proiect este o versiune arhitecturală îmbunătățită a [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) — evoluând de la un script CLI la o interfață GUI cu panou de stare și jurnal în timp real, unificând capacitățile de traducere pentru Cursor și Claude într-o singură platformă.
+Acest proiect este o versiune arhitecturală îmbunătățită a [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) – evoluând de la un script CLI la o interfață GUI cu panou de stare și jurnal în timp real, unificând capacitățile de traducere pentru Cursor și Claude într-o singură platformă.
 
+![Captură de ecran](../../image.png)
+![Captură de ecran](../../image-1.png)
 
-![Captură de ecran](image.png)
-![Captură de ecran](image-1.png)
 ## Arhitectură
 
 ```
@@ -20,7 +20,7 @@ live-translator-ecosystem/          # Monorepo npm workspaces
 ├── packages/
 │   ├── desktop-app/                # GUI Electron + React (Live Translator Hub)
 │   │   ├── electron/main.js        # Proces principal, canale IPC și persistență configurare
-│   │   ├── electron/preload.js     # Punte de comunicare pentru procesul de randare
+│   │   ├── electron/preload.js     # Pod de comunicare pentru procesul de randare
 │   │   └── src/                    # React 19 + Tailwind v4 + Zustand
 │   ├── core/                       # Nucleu runtime de traducere (translator-engine.js)
 │   ├── patcher-cursor/             # Patcher pentru aplicația Cursor
@@ -30,12 +30,12 @@ live-translator-ecosystem/          # Monorepo npm workspaces
 
 ### Runtime de traducere
 
-`packages/core/src/translator-engine.js` este singurul runtime injectat în aplicațiile țintă — JavaScript pur de browser, fără dependențe de module. Responsabilitățile includ:
+`packages/core/src/translator-engine.js` este singurul runtime injectat în aplicațiile țintă – JavaScript pur de browser, fără dependențe de module. Responsabilitățile includ:
 
 - **Potrivire dicționar**: intrări statice + modele regex
-- **Punte proxy de traducere AI**: în mediul Webview, folosește `postMessage` pentru a redirecționa cererile de traducere către fereastra principală, ocolind restricțiile CSP de rețea
+- **Pod proxy de traducere AI**: în medii Webview, folosește `postMessage` pentru a redirecționa cererile de traducere către fereastra principală, ocolind restricțiile CSP de rețea
 - **Cache de traducere**: cache persistent bazat pe `localStorage`, cu cheia `live_i18n_cache_<entity_name>`
-- **Căutare dicționar imbricat**: suportă modul `enableNestedDict`
+- **Căutare dicționar imbricată**: suportă modul `enableNestedDict`
 
 ## Caracteristici principale
 
@@ -51,19 +51,19 @@ Prin arhitectura Translation Bridge, capacitățile de traducere AI pot pătrund
 
 | Panou | Funcție |
 | :--- | :--- |
-| **Cursor Engine** | Implementează/restaurează traducerea Cursor, gestionează regulile de excludere pe domenii pentru fereastra principală și pluginurile Webview |
+| **Cursor Engine** | Implementează/restaurează traducerea Cursor, gestionează reguli de excludere separate pentru fereastra principală și pluginurile Webview |
 | **Claude Engine** | Implementează/restaurează traducerea Claude, configurează reguli de omitere |
-| **API Keys** | Gestionează cheile API pentru mai multe motoare de traducere AI (suportă OpenAI, Anthropic, Google Gemini, DeepL), cheile sunt stocate criptat prin `safeStorage` al Electron |
-| **Dict Generator** | Extrage șiruri UI din codul sursă al aplicației țintă și generează dicționare de traducere în loturi prin AI |
+| **API Keys** | Gestionează cheile API pentru mai multe motoare de traducere AI (suportă OpenAI, Anthropic, Google Gemini, DeepL), chei stocate criptat prin `safeStorage` Electron |
+| **Dict Generator** | Extrage șiruri UI din codul sursă al aplicației țintă și generează dicționare de traducere în masă prin AI |
 
 ### Debugging interactiv
 
-- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) comută chenarul de evidențiere punctat albastru
-- În modul de evidențiere, țineți apăsat `Option` (Mac) / `Alt` (Win) și plasați cursorul peste textul chinez pentru a vedea textul original
+- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) comută chenarul de evidențiere albastru punctat
+- În modul evidențiere, țineți apăsat `Option` (Mac) / `Alt` (Win) și plasați cursorul peste textul chinez pentru a vedea textul original
 
 ### Reguli de excludere pe domenii
 
-Fiecare entitate (fereastra principală și fiecare plugin) are un set complet independent de reguli de excludere (selectoare CSS, potrivire URL, potrivire titlu), asigurând că zona de cod și zona de interacțiune principală nu sunt afectate de traducere.
+Fiecare entitate (fereastra principală și fiecare plugin) are un set complet independent de reguli de excludere (selectoare CSS, potrivire URL, potrivire titlu), asigurând că zona de cod și zonele de interacțiune principală nu sunt afectate de traducere.
 
 ### Actualizare automată
 
@@ -78,7 +78,7 @@ npm install
 # Pornire mod dezvoltare GUI
 npm run dev
 
-# Construire versiune distribuibilă macOS
+# Construire versiune distribuită macOS
 npm run build -w desktop-app
 ```
 
@@ -97,7 +97,7 @@ npm run build -w desktop-app
 
 ## Securitate
 
-- **Stocare criptată a cheilor API**: criptate prin `safeStorage` al Electron și salvate în `~/.live_translator_hub/api_keys.enc`, fără a fi scrise în fișiere de configurare
+- **Stocare criptată a cheilor API**: salvate criptat prin `safeStorage` Electron în `~/.live_translator_hub/api_keys.enc`, nu sunt scrise în fișiere de configurare
 - **Comunicare directă**: cererile de traducere ajung direct la API-ul furnizorului AI, fără servere intermediare
 - **Izolare pe domenii**: regulile de excludere nu modifică fișierele sursă
 

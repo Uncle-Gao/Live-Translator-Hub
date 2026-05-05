@@ -8,23 +8,22 @@
 
 Live Translator Hub là một **ứng dụng desktop GUI Electron + React**, cung cấp khả năng Hán hóa một chạm cho hai công cụ lập trình AI là Cursor và Claude. Thông qua một nhân thời gian chạy dịch thuật thống nhất, quản lý việc triển khai engine, cấu hình khóa API và tạo từ điển cho cả hai ứng dụng mục tiêu trong một giao diện duy nhất.
 
-Dự án này là phiên bản nâng cấp kiến trúc của [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) — từ một script CLI phát triển thành GUI với bảng trạng thái và nhật ký thời gian thực, đồng thời hợp nhất khả năng Hán hóa của Cursor và Claude thành một nền tảng thống nhất.
+Dự án này là phiên bản nâng cấp kiến trúc của [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) — từ script CLI tiến hóa thành GUI với bảng trạng thái và nhật ký thời gian thực, đồng thời hợp nhất khả năng Hán hóa của Cursor và Claude thành cùng một nền tảng thống nhất.
 
-
-![Ảnh chụp màn hình](image.png)
-![Ảnh chụp màn hình](image-1.png)
+![Ảnh chụp màn hình](../../image.png)
+![Ảnh chụp màn hình](../../image-1.png)
 ## Kiến trúc
 
 ```
 live-translator-ecosystem/          # npm workspaces monorepo
 ├── packages/
-│   ├── desktop-app/                # GUI Electron + React (Live Translator Hub)
+│   ├── desktop-app/                # Electron + React GUI (Live Translator Hub)
 │   │   ├── electron/main.js        # Tiến trình chính, kênh IPC và lưu trữ cấu hình
 │   │   ├── electron/preload.js     # Cầu nối giao tiếp tiến trình render
 │   │   └── src/                    # React 19 + Tailwind v4 + Zustand
 │   ├── core/                       # Nhân thời gian chạy dịch thuật (translator-engine.js)
-│   ├── patcher-cursor/             # Patcher ứng dụng Cursor
-│   ├── patcher-claude/             # Patcher ứng dụng Claude
+│   ├── patcher-cursor/             # Trình vá ứng dụng Cursor
+│   ├── patcher-claude/             # Trình vá ứng dụng Claude
 │   └── dict-generator/             # Trình tạo từ điển AI
 ```
 
@@ -32,8 +31,8 @@ live-translator-ecosystem/          # npm workspaces monorepo
 
 `packages/core/src/translator-engine.js` là thời gian chạy duy nhất được tiêm vào ứng dụng mục tiêu — JavaScript thuần trình duyệt, không phụ thuộc module. Trách nhiệm bao gồm:
 
-- **Khớp từ điển**: Mục từ tĩnh + mẫu biểu thức chính quy
-- **Cầu nối proxy dịch AI**: Trong môi trường Webview, chuyển tiếp yêu cầu dịch đến cửa sổ chính qua `postMessage`, vượt qua giới hạn mạng của CSP
+- **Khớp từ điển**: Mục từ tĩnh + Mẫu regex
+- **Cầu nối proxy dịch AI**: Trong môi trường Webview, sử dụng `postMessage` để chuyển tiếp yêu cầu dịch đến cửa sổ chính, vượt qua giới hạn mạng CSP
 - **Bộ nhớ đệm dịch**: Bộ nhớ đệm bền vững dựa trên `localStorage`, khóa là `live_i18n_cache_<entity_name>`
 - **Tra cứu từ điển lồng nhau**: Hỗ trợ chế độ `enableNestedDict`
 
@@ -45,13 +44,13 @@ Quản lý trạng thái triển khai Hán hóa, phiên bản từ điển và q
 
 ### Xuyên thấu Webview mọi tình huống
 
-Thông qua kiến trúc Translation Bridge, khả năng dịch AI có thể xuyên thấu từ cửa sổ chính đến tất cả các plugin Webview nhiều lớp (ví dụ: Claude Code), giải quyết vấn đề chặn mạng trong môi trường CSP nghiêm ngặt.
+Thông qua kiến trúc Translation Bridge, khả năng dịch AI có thể xuyên thấu từ cửa sổ chính đến tất cả các plugin Webview nhiều lớp (ví dụ: Claude Code), giải quyết vấn đề chặn mạng trong các chính sách CSP nghiêm ngặt.
 
 ### Bố cục chức năng bốn bảng
 
 | Bảng | Chức năng |
 | :--- | :--- |
-| **Cursor Engine** | Triển khai/Khôi phục Hán hóa Cursor, quản lý quy tắc chặn riêng cho cửa sổ chính và plugin Webview |
+| **Cursor Engine** | Triển khai/Khôi phục Hán hóa Cursor, quản lý quy tắc chặn theo miền cho cửa sổ chính và plugin Webview |
 | **Claude Engine** | Triển khai/Khôi phục Hán hóa Claude, cấu hình quy tắc bỏ qua |
 | **API Keys** | Quản lý khóa API cho nhiều engine dịch AI (hỗ trợ OpenAI, Anthropic, Google Gemini, DeepL), khóa được mã hóa lưu trữ qua Electron `safeStorage` |
 | **Dict Generator** | Trích xuất chuỗi UI từ mã nguồn ứng dụng mục tiêu, tạo hàng loạt từ điển dịch qua AI |
@@ -93,14 +92,14 @@ npm run build -w desktop-app
 
 - macOS 13+ (khuyến nghị)
 - Node.js 18+
-- Ứng dụng desktop Cursor hoặc Claude đã được cài đặt
+- Đã cài đặt ứng dụng desktop Cursor hoặc Claude
 
 ## Bảo mật
 
-- **Lưu trữ khóa API mã hóa**: Được mã hóa và lưu vào `~/.live_translator_hub/api_keys.enc` qua Electron `safeStorage`, không ghi vào tệp cấu hình
+- **Lưu trữ khóa API mã hóa**: Được mã hóa và lưu vào `~/.live_translator_hub/api_keys.enc` thông qua Electron `safeStorage`, không ghi vào tệp cấu hình
 - **Giao tiếp trực tiếp**: Yêu cầu dịch đến thẳng API của nhà cung cấp AI, không có máy chủ trung gian
 - **Cách ly theo miền**: Quy tắc chặn không chạm vào tệp mã nguồn
 
 ---
 
-*Dự án này chỉ dành cho mục đích trao đổi và học tập. Chất lượng dịch thuật phụ thuộc vào mô hình AI được chọn.*
+*Dự án này chỉ dành cho mục đích trao đổi và học tập. Chất lượng bản dịch phụ thuộc vào mô hình AI được chọn.*

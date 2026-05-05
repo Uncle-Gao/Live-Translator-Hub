@@ -6,13 +6,13 @@
 
 ## Przegląd projektu
 
-**Live Translator Hub** to aplikacja desktopowa **Electron + React GUI**, która zapewnia jednym kliknięciem sinizację dwóch narzędzi AI do programowania: Cursor i Claude. Dzięki ujednoliconemu rdzeniowi środowiska uruchomieniowego tłumaczenia, w jednym interfejsie zarządza się wdrażaniem silników, konfiguracją kluczy API i generowaniem słowników dla obu docelowych aplikacji.
+**Live Translator Hub** to aplikacja desktopowa **Electron + React GUI**, która zapewnia jednym kliknięciem chińską lokalizację dla dwóch narzędzi AI do programowania: Cursor i Claude. Dzięki ujednoliconemu rdzeniowi środowiska uruchomieniowego tłumaczenia, w jednym interfejsie zarządza się wdrażaniem silników, konfiguracją kluczy API i generowaniem słowników dla obu docelowych aplikacji.
 
-Ten projekt jest ulepszoną architektonicznie wersją [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) – ewolucją ze skryptu CLI w GUI z panelem stanu i logami na żywo, łączącą możliwości sinizacji Cursor i Claude w jedną ujednoliconą platformę.
+Projekt ten jest ulepszoną architektonicznie wersją [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) – ewolucją ze skryptu CLI w GUI z panelem stanu i logami w czasie rzeczywistym, łączącą możliwości lokalizacji Cursor i Claude w jedną ujednoliconą platformę.
 
+![Zrzut ekranu](../../image.png)
+![Zrzut ekranu](../../image-1.png)
 
-![Zrzut ekranu](image.png)
-![Zrzut ekranu](image-1.png)
 ## Architektura
 
 ```
@@ -30,40 +30,40 @@ live-translator-ecosystem/          # npm workspaces monorepo
 
 ### Środowisko uruchomieniowe tłumaczenia
 
-`packages/core/src/translator-engine.js` to jedyne środowisko uruchomieniowe wstrzykiwane do docelowych aplikacji – czysty JavaScript przeglądarkowy, bez zależności modułowych. Do jego obowiązków należą:
+`packages/core/src/translator-engine.js` to jedyne środowisko uruchomieniowe wstrzykiwane do docelowych aplikacji – czysty JavaScript przeglądarkowy, bez zależności modułowych. Jego obowiązki obejmują:
 
-- **Dopasowywanie słownikowe**: statyczne wpisy + wzorce regularne
-- **Mostek proxy tłumaczenia AI**: w środowisku Webview, za pomocą `postMessage` przekazuje żądania tłumaczenia do okna głównego, omijając ograniczenia sieciowe CSP
-- **Pamięć podręczna tłumaczeń**: trwała pamięć podręczna oparta na `localStorage`, z kluczami `live_i18n_cache_<nazwa_encji>`
-- **Wyszukiwanie w zagnieżdżonych słownikach**: obsługa trybu `enableNestedDict`
+- **Dopasowywanie słowników**: Statyczne wpisy + wzorce regularne
+- **Mostek proxy tłumaczenia AI**: W środowisku Webview, za pomocą `postMessage` przekazuje żądania tłumaczenia do głównego okna, omijając ograniczenia sieciowe CSP
+- **Pamięć podręczna tłumaczeń**: Trwała pamięć podręczna oparta na `localStorage`, z kluczami `live_i18n_cache_<nazwa_encji>`
+- **Wyszukiwanie w zagnieżdżonych słownikach**: Obsługa trybu `enableNestedDict`
 
 ## Najważniejsze funkcje
 
 ### Ujednolicone zarządzanie dwoma silnikami
 
-W jednym interfejsie zarządzaj stanem wdrożenia sinizacji, wersją słownika i regułami blokowania dla Cursor i Claude, bez konieczności przełączania narzędzi.
+W jednym interfejsie zarządzaj stanem wdrożenia lokalizacji, wersją słownika i regułami blokowania dla Cursor i Claude, bez konieczności przełączania narzędzi.
 
 ### Penetracja Webview we wszystkich scenariuszach
 
-Dzięki architekturze Translation Bridge, możliwości tłumaczenia AI mogą przenikać z okna głównego do wszystkich warstw wtyczek Webview (np. Claude Code), rozwiązując problem blokowania dostępu do sieci w przypadku restrykcyjnych polityk CSP.
+Dzięki architekturze Translation Bridge, możliwości tłumaczenia AI mogą przenikać z głównego okna do wszystkich warstw wtyczek Webview (np. Claude Code), rozwiązując problem blokowania dostępu do sieci w ramach restrykcyjnych polityk CSP.
 
 ### Układ funkcjonalny czterech paneli
 
 | Panel | Funkcja |
 | :--- | :--- |
-| **Cursor Engine** | Wdrażanie/przywracanie sinizacji Cursor, zarządzanie regułami blokowania dla okna głównego i wtyczek Webview |
-| **Claude Engine** | Wdrażanie/przywracanie sinizacji Claude, konfiguracja reguł pomijania |
+| **Cursor Engine** | Wdrażanie/przywracanie lokalizacji Cursor, zarządzanie regułami blokowania dla głównego okna i wtyczek Webview |
+| **Claude Engine** | Wdrażanie/przywracanie lokalizacji Claude, konfiguracja reguł pomijania |
 | **API Keys** | Zarządzanie kluczami API dla wielu silników tłumaczenia AI (obsługa OpenAI, Anthropic, Google Gemini, DeepL), klucze szyfrowane za pomocą `safeStorage` Electron |
-| **Dict Generator** | Ekstrakcja ciągów UI z kodu źródłowego docelowej aplikacji, masowe generowanie słowników tłumaczeniowych przez AI |
+| **Dict Generator** | Ekstrakcja ciągów UI z kodu źródłowego docelowej aplikacji i masowe generowanie słowników tłumaczeniowych przez AI |
 
 ### Debugowanie interaktywne
 
 - `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) – przełączanie niebieskiej przerywanej ramki podświetlenia
-- W trybie podświetlenia, przytrzymaj `Option` (Mac) / `Alt` (Win) i najedź na chiński tekst, aby zobaczyć oryginał
+- W trybie podświetlenia przytrzymaj `Option` (Mac) / `Alt` (Win) i najedź na chiński tekst, aby zobaczyć oryginał
 
-### Reguły blokowania dla domen
+### Reguły blokowania dla poszczególnych domen
 
-Każda encja (okno główne i poszczególne wtyczki) ma całkowicie niezależny zestaw reguł blokowania (selektory CSS, dopasowanie URL, dopasowanie tytułu), co gwarantuje, że obszar kodu i kluczowe interakcje nie zostaną naruszone przez tłumaczenie.
+Każda encja (główne okno i poszczególne wtyczki) ma całkowicie niezależny zestaw reguł blokowania (selektory CSS, dopasowanie URL, dopasowanie tytułu), co gwarantuje, że obszary kodu i kluczowe interakcje nie zostaną naruszone przez tłumaczenie.
 
 ### Automatyczne aktualizacje
 
@@ -78,7 +78,7 @@ npm install
 # Uruchomienie trybu deweloperskiego GUI
 npm run dev
 
-# Budowanie wersji dystrybucyjnej dla macOS
+# Budowanie dystrybuowalnej wersji dla macOS
 npm run build -w desktop-app
 ```
 
@@ -86,7 +86,7 @@ npm run build -w desktop-app
 
 1. W panelu **API Keys** skonfiguruj klucze silników AI
 2. Przełącz na panel **Cursor Engine** lub **Claude Engine**
-3. Kliknij **Deploy**, aby jednym kliknięciem wdrożyć sinizację
+3. Kliknij **Deploy**, aby jednym kliknięciem wdrożyć lokalizację
 4. Uruchom ponownie docelową aplikację, aby zmiany zaczęły obowiązywać
 
 ### Wymagania systemowe
@@ -97,10 +97,10 @@ npm run build -w desktop-app
 
 ## Bezpieczeństwo
 
-- **Szyfrowane przechowywanie kluczy API**: klucze są szyfrowane za pomocą `safeStorage` Electron i zapisywane w `~/.live_translator_hub/api_keys.enc`, nie są zapisywane w plikach konfiguracyjnych
-- **Komunikacja bezpośrednia**: żądania tłumaczenia trafiają bezpośrednio do API dostawcy AI, bez serwera pośredniczącego
-- **Izolacja domen**: reguły blokowania nie ingerują w pliki źródłowe
+- **Szyfrowane przechowywanie kluczy API**: Klucze są szyfrowane za pomocą `safeStorage` Electron i zapisywane w `~/.live_translator_hub/api_keys.enc`, nie są zapisywane w plikach konfiguracyjnych
+- **Bezpośrednia komunikacja**: Żądania tłumaczenia trafiają bezpośrednio do API dostawcy AI, bez serwerów pośredniczących
+- **Izolacja domen**: Reguły blokowania nie ingerują w pliki źródłowe
 
 ---
 
-*Ten projekt służy wyłącznie do celów edukacyjnych i wymiany wiedzy. Jakość tłumaczenia zależy od wybranego modelu AI.*
+*Projekt ten służy wyłącznie do celów edukacyjnych i wymiany wiedzy. Jakość tłumaczenia zależy od wybranego modelu AI.*

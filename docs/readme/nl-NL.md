@@ -6,13 +6,13 @@
 
 ## Projectoverzicht
 
-Live Translator Hub is een **Electron + React GUI desktopapplicatie** die eenvoudige Chinese vertaling biedt voor twee AI-programmeertools: Cursor en Claude. Via een uniforme vertaalruntime-kernel beheer je in één interface de engine-implementatie, API-sleutelconfiguratie en woordenboekgeneratie voor beide doelapplicaties.
+Live Translator Hub is een **Electron + React GUI desktopapplicatie** die eenvoudige Chinese vertaling biedt voor twee AI-programmeertools: Cursor en Claude. Via een uniforme vertaalruntime-kernel beheer je de engine-implementatie, API-sleutelconfiguratie en woordenboekgeneratie voor beide doelapplicaties in één interface.
 
 Dit project is een architectuurupgrade van [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) – geëvolueerd van een CLI-script naar een GUI met statuspaneel en realtime logs, waarbij de vertaalmogelijkheden van Cursor en Claude worden samengevoegd in één uniform platform.
 
+![Screenshot](../../image.png)
+![Screenshot](../../image-1.png)
 
-![Screenshot](image.png)
-![Screenshot](image-1.png)
 ## Architectuur
 
 ```
@@ -23,8 +23,8 @@ live-translator-ecosystem/          # npm workspaces monorepo
 │   │   ├── electron/preload.js     # Communicatiebrug voor renderproces
 │   │   └── src/                    # React 19 + Tailwind v4 + Zustand
 │   ├── core/                       # Vertaalruntime-kernel (translator-engine.js)
-│   ├── patcher-cursor/             # Cursor-applicatie Patcher
-│   ├── patcher-claude/             # Claude-applicatie Patcher
+│   ├── patcher-cursor/             # Cursor-app Patcher
+│   ├── patcher-claude/             # Claude-app Patcher
 │   └── dict-generator/             # AI-woordenboekgenerator
 ```
 
@@ -45,7 +45,7 @@ Beheer de implementatiestatus, woordenboekversies en uitsluitingsregels voor zow
 
 ### Webview-penetratie in alle scenario's
 
-Via de Translation Bridge-architectuur kan AI-vertaling vanuit het hoofdvenster doordringen tot alle lagen van Webview-plugins (zoals Claude Code), waarmee netwerkblokkering onder strikte CSP-beleid wordt opgelost.
+Via de Translation Bridge-architectuur kan AI-vertaling vanuit het hoofdvenster doordringen tot alle lagen van Webview-plugins (zoals Claude Code), waarmee netwerkblokkades onder strikte CSP-beleid worden opgelost.
 
 ### Vierpaneel-functielay-out
 
@@ -58,16 +58,16 @@ Via de Translation Bridge-architectuur kan AI-vertaling vanuit het hoofdvenster 
 
 ### Interactieve debugging
 
-- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) schakelt blauwe stippellijnmarkering in
-- Houd in de markeermodus `Option` (Mac) / `Alt` (Win) ingedrukt en zweef over Chinese tekst om de originele tekst te zien
+- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) schakelt blauwe gestreepte markeringsranden in
+- Houd in de markeringsmodus `Option` (Mac) / `Alt` (Win) ingedrukt en zweef over Chinese tekst om de originele tekst te zien
 
 ### Domeinspecifieke uitsluitingsregels
 
-Elke entiteit (hoofdvenster en elke plugin) heeft volledig onafhankelijke uitsluitingsregels (CSS-selectors, URL-matching, titelmatching), zodat codegebieden en kerninteractiegebieden niet door vertaling worden beïnvloed.
+Elke entiteit (hoofdvenster en afzonderlijke plugins) heeft volledig onafhankelijke sets uitsluitingsregels (CSS-selectors, URL-matching, titelmatching), zodat codegebieden en kerninteractiezones niet door vertaling worden beïnvloed.
 
 ### Automatische updates
 
-Ingebouwde `electron-updater`, ondersteunt automatisch controleren, downloaden en installeren van updates binnen de macOS-applicatie.
+Ingebouwde `electron-updater`, ondersteunt automatisch controleren, downloaden en installeren van updates binnen de macOS-app.
 
 ## Snel starten
 
@@ -98,9 +98,9 @@ npm run build -w desktop-app
 ## Beveiliging
 
 - **Versleutelde API-sleutelopslag**: Opgeslagen via Electron `safeStorage` in `~/.live_translator_hub/api_keys.enc`, niet in configuratiebestanden
-- **Directe communicatie**: Vertaalverzoeken gaan rechtstreeks naar de AI-leverancier-API, geen tussenliggende servers
+- **Directe communicatie**: Vertaalverzoeken gaan rechtstreeks naar de AI-leveranciers-API, zonder tussenliggende servers
 - **Domeinisolatie**: Uitsluitingsregels raken geen broncodebestanden
 
 ---
 
-*Dit project is uitsluitend bedoeld voor uitwisseling en leerdoeleinden. De vertaalkwaliteit wordt beïnvloed door het gekozen AI-model.*
+*Dit project is uitsluitend bedoeld voor uitwisseling en leerdoeleinden. De vertaalkwaliteit wordt beïnvloed door het geselecteerde AI-model.*

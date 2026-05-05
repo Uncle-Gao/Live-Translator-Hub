@@ -6,13 +6,13 @@
 
 ## Projektöversikt
 
-Live Translator Hub är en **Electron + React GUI-skrivbordsapplikation** som erbjuder ett-klicks-översättning till kinesiska för två AI-programmeringsverktyg: Cursor och Claude. Genom en enhetlig översättningsruntime-kärna hanteras motorinstallation, API-nyckelkonfiguration och ordboksgenerering för båda målapplikationerna från ett enda gränssnitt.
+Live Translator Hub är en **Electron + React GUI-skrivbordsapplikation** som erbjuder ett-klicks-kinesifiering för två AI-programmeringsverktyg: Cursor och Claude. Genom en enhetlig översättningsruntime-kärna hanteras motorinstallation, API-nyckelkonfiguration och ordboksgenerering för båda målapplikationerna från ett enda gränssnitt.
 
-Detta projekt är en arkitektonisk uppgradering av [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) – från CLI-skript till ett GUI med statuspanel och realtidsloggar, som slår samman översättningskapaciteten för Cursor och Claude till en gemensam plattform.
+Detta projekt är en arkitektonisk uppgradering av [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) – från CLI-skript till ett GUI med statuspanel och realtidsloggar, som slår samman kinesifieringskapaciteten för Cursor och Claude till en gemensam plattform.
 
+![Skärmdump](../../image.png)
+![Skärmdump](../../image-1.png)
 
-![Skärmdump](image.png)
-![Skärmdump](image-1.png)
 ## Arkitektur
 
 ```
@@ -30,31 +30,31 @@ live-translator-ecosystem/          # npm workspaces monorepo
 
 ### Översättningsruntime
 
-`packages/core/src/translator-engine.js` är den enda runtime som injiceras i målapplikationerna – ren webbläsar-JS, inga modulberoenden. Ansvar inkluderar:
+`packages/core/src/translator-engine.js` är den enda runtime som injiceras i målapplikationerna – ren webbläsar-JS, inga modulberoenden. Ansvarar för:
 
 - **Ordboksmatchning**: Statiska poster + regex-mönster
-- **AI-översättningsproxybrygga**: I Webview-miljö vidarebefordras översättningsförfrågningar via `postMessage` till huvudfönstret, vilket kringgår CSP-begränsningar för nätverksåtkomst
+- **AI-översättningsproxybrygga**: I Webview-miljöer vidarebefordras översättningsförfrågningar via `postMessage` till huvudfönstret, vilket kringgår CSP-begränsningar för nätverksåtkomst
 - **Översättningscache**: Beständig cache baserad på `localStorage`, med nyckelnamn `live_i18n_cache_<entity_name>`
-- **Nästlad ordbokssökning**: Stöd för `enableNestedDict`-läge
+- **Nestad ordbokssökning**: Stöd för `enableNestedDict`-läge
 
 ## Funktioner
 
 ### Enhetlig hantering av två motorer
 
-Hantera distributionsstatus, ordboksversioner och blockeringsregler för Cursor och Claude från samma gränssnitt – inget verktygsbyte krävs.
+Hantera kinesifieringsstatus, ordboksversioner och blockeringsregler för Cursor och Claude separat från samma gränssnitt – inget verktygsbyte krävs.
 
-### Webview-genomträngning i alla scenarier
+### Webview-genomträngning för alla scenarier
 
-Genom Translation Bridge-arkitekturen kan AI-översättningskapaciteten tränga igenom från huvudfönstret till alla nivåer av Webview-plugins (t.ex. Claude Code), vilket löser problem med nätverksblockering under strikta CSP-policyer.
+Genom Translation Bridge-arkitekturen kan AI-översättningskapaciteten tränga igenom från huvudfönstret till alla nivåer av Webview-plugins (t.ex. Claude Code), vilket löser nätverksblockeringsproblem under strikta CSP-policyer.
 
-### Fyrpanelsfunktionslayout
+### Fyrpanelslayout
 
 | Panel | Funktion |
 | :--- | :--- |
-| **Cursor Engine** | Distribuera/återställ Cursor-översättning, hantera domänspecifika blockeringsregler för huvudfönster och Webview-plugins |
-| **Claude Engine** | Distribuera/återställ Claude-översättning, konfigurera hoppregler |
+| **Cursor Engine** | Installera/återställ kinesifiering för Cursor, hantera domänspecifika blockeringsregler för huvudfönster och Webview-plugins |
+| **Claude Engine** | Installera/återställ kinesifiering för Claude, konfigurera hoppningsregler |
 | **API Keys** | Hantera API-nycklar för flera AI-översättningsmotorer (stöd för OpenAI, Anthropic, Google Gemini, DeepL), nycklar krypteras med Electron `safeStorage` |
-| **Dict Generator** | Extrahera UI-strängar från målapplikationens källkod, generera översättningsordböcker i batch via AI |
+| **Dict Generator** | Extrahera UI-strängar från målapplikationens källkod och generera översättningsordböcker i batch via AI |
 
 ### Interaktiv felsökning
 
@@ -63,11 +63,11 @@ Genom Translation Bridge-arkitekturen kan AI-översättningskapaciteten tränga 
 
 ### Domänspecifika blockeringsregler
 
-Varje entitet (huvudfönster och varje plugin) har helt oberoende uppsättningar blockeringsregler (CSS-väljare, URL-matchning, titelmatchning), vilket säkerställer att kodområden och kärninteraktionsområden inte påverkas av översättning.
+Varje enhet (huvudfönster och varje plugin) har helt oberoende uppsättningar blockeringsregler (CSS-väljare, URL-matchning, titelmatchning), vilket säkerställer att kodområden och kärninteraktionsområden inte påverkas av översättning.
 
 ### Automatiska uppdateringar
 
-Inbyggd `electron-updater` stödjer automatisk kontroll, nedladdning och installation av uppdateringar i macOS-applikationen.
+Inbyggt `electron-updater` stöd för automatisk kontroll, nedladdning och installation av uppdateringar i macOS-applikationen.
 
 ## Snabbstart
 
@@ -84,9 +84,9 @@ npm run build -w desktop-app
 
 ### Användningsflöde
 
-1. Konfigurera AI-motorernas nycklar i panelen **API Keys**
+1. Konfigurera AI-motorernas API-nycklar i panelen **API Keys**
 2. Växla till panelen **Cursor Engine** eller **Claude Engine**
-3. Klicka på **Deploy** för att distribuera översättningen med ett klick
+3. Klicka på **Deploy** för att installera kinesifiering med ett klick
 4. Starta om målapplikationen för att aktivera
 
 ### Systemkrav
@@ -97,10 +97,10 @@ npm run build -w desktop-app
 
 ## Säkerhet
 
-- **Krypterad lagring av API-nycklar**: Krypteras med Electron `safeStorage` och sparas i `~/.live_translator_hub/api_keys.enc`, skrivs inte till konfigurationsfiler
-- **Direkt kommunikation**: Översättningsförfrågningar går direkt till AI-leverantörens API, ingen mellanhandsserver
+- **Krypterad lagring av API-nycklar**: Sparas krypterat via Electron `safeStorage` i `~/.live_translator_hub/api_keys.enc`, skrivs inte till konfigurationsfiler
+- **Direktkommunikation**: Översättningsförfrågningar går direkt till AI-leverantörernas API:er, ingen mellanhandsserver
 - **Domänisolering**: Blockeringsregler påverkar inte källkodsfilerna
 
 ---
 
-*Detta projekt är endast avsett för utbildnings- och inlärningssyfte. Översättningskvaliteten påverkas av den valda AI-modellen.*
+*Detta projekt är endast avsett för utbildnings- och referensändamål. Översättningskvaliteten påverkas av den valda AI-modellen.*

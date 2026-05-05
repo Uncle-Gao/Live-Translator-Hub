@@ -10,9 +10,9 @@ O Live Translator Hub é uma **aplicação desktop GUI Electron + React** que fo
 
 Este projeto é uma versão arquiteturalmente atualizada do [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) — evoluindo de um script CLI para uma GUI com painel de estado e logs em tempo real, unificando as capacidades de tradução do Cursor e do Claude na mesma plataforma.
 
+![Captura de ecrã](../../image.png)
+![Captura de ecrã](../../image-1.png)
 
-![Captura de ecrã](image.png)
-![Captura de ecrã](image-1.png)
 ## Arquitetura
 
 ```
@@ -30,29 +30,29 @@ live-translator-ecosystem/          # npm workspaces monorepo
 
 ### Runtime de Tradução
 
-`packages/core/src/translator-engine.js` é o único runtime injetado nas aplicações alvo — JavaScript puro para navegador, sem dependências de módulos. As suas responsabilidades incluem:
+`packages/core/src/translator-engine.js` é o único runtime injetado nas aplicações alvo — JavaScript puro do navegador, sem dependências de módulos. As suas responsabilidades incluem:
 
 - **Correspondência de dicionário**: entradas estáticas + padrões regex
 - **Ponte de proxy de tradução AI**: no ambiente Webview, encaminha pedidos de tradução para a janela principal via `postMessage`, contornando as restrições de rede CSP
 - **Cache de tradução**: cache persistente baseado em `localStorage`, com chave `live_i18n_cache_<entity_name>`
-- **Pesquisa em dicionário aninhado**: suporta modo `enableNestedDict`
+- **Pesquisa de dicionário aninhada**: suporta modo `enableNestedDict`
 
 ## Destaques de Funcionalidades
 
 ### Gestão Unificada de Dois Motores
 
-Numa única interface, gere o estado de implantação da tradução, versões de dicionário e regras de bloqueio para Cursor e Claude separadamente, sem necessidade de alternar entre ferramentas.
+Numa única interface, gere o estado de implantação da tradução, versões de dicionário e regras de bloqueio para Cursor e Claude separadamente, sem necessidade de alternar ferramentas.
 
 ### Penetração Webview em Todos os Cenários
 
 Através da arquitetura Translation Bridge, a capacidade de tradução AI pode penetrar da janela principal para todos os níveis de plugins Webview (como Claude Code), resolvendo problemas de bloqueio de rede sob políticas CSP rigorosas.
 
-### Layout de Quatro Painéis
+### Layout de Quatro Painéis Funcionais
 
 | Painel | Função |
 | :--- | :--- |
-| **Cursor Engine** | Implantar/restaurar tradução do Cursor, gerir regras de bloqueio por domínio para a janela principal e plugins Webview |
-| **Claude Engine** | Implantar/restaurar tradução do Claude, configurar regras de omissão |
+| **Cursor Engine** | Implementar/Reverter tradução do Cursor, gerir regras de bloqueio por domínio para a janela principal e plugins Webview |
+| **Claude Engine** | Implementar/Reverter tradução do Claude, configurar regras de omissão |
 | **API Keys** | Gerir chaves de API para múltiplos motores de tradução AI (suporta OpenAI, Anthropic, Google Gemini, DeepL), chaves armazenadas encriptadas via `safeStorage` do Electron |
 | **Dict Generator** | Extrair strings de UI do código fonte da aplicação alvo e gerar dicionários de tradução em lote via AI |
 
@@ -63,11 +63,11 @@ Através da arquitetura Translation Bridge, a capacidade de tradução AI pode p
 
 ### Regras de Bloqueio por Domínio
 
-Cada entidade (janela principal e cada plugin) possui um conjunto de regras de bloqueio totalmente independente (seletores CSS, correspondência de URL, correspondência de título), garantindo que as áreas de código e interação principal não sejam afetadas pela tradução.
+Cada entidade (janela principal e cada plugin) possui conjuntos de regras de bloqueio completamente independentes (seletores CSS, correspondência de URL, correspondência de título), garantindo que as áreas de código e interação principal não sejam afetadas pela tradução.
 
 ### Atualização Automática
 
-Inclui `electron-updater`, suporta verificação, download e instalação automática de atualizações na aplicação macOS.
+Inclui `electron-updater`, suporta verificação, download e instalação automática de atualizações dentro da aplicação no macOS.
 
 ## Início Rápido
 
@@ -86,7 +86,7 @@ npm run build -w desktop-app
 
 1. Configure as chaves do motor AI no painel **API Keys**
 2. Mude para o painel **Cursor Engine** ou **Claude Engine**
-3. Clique em **Deploy** para implantar a tradução com um clique
+3. Clique em **Deploy** para implementar a tradução com um clique
 4. Reinicie a aplicação alvo para que as alterações tenham efeito
 
 ### Requisitos de Sistema
@@ -97,10 +97,10 @@ npm run build -w desktop-app
 
 ## Segurança
 
-- **Armazenamento encriptado de chaves de API**: encriptado via `safeStorage` do Electron e guardado em `~/.live_translator_hub/api_keys.enc`, não escrito em ficheiros de configuração
+- **Armazenamento encriptado de chaves API**: encriptado via `safeStorage` do Electron e guardado em `~/.live_translator_hub/api_keys.enc`, não escrito em ficheiros de configuração
 - **Comunicação direta**: os pedidos de tradução vão diretamente para a API do fornecedor AI, sem servidores intermediários
 - **Isolamento por domínio**: as regras de bloqueio não tocam nos ficheiros de código fonte
 
 ---
 
-*Este projeto destina-se apenas a fins de aprendizagem e troca de conhecimentos. A qualidade da tradução é influenciada pelo modelo AI selecionado.*
+*Este projeto é apenas para fins de aprendizagem e troca. A qualidade da tradução é influenciada pelo modelo AI selecionado.*

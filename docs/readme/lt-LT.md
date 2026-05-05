@@ -6,13 +6,13 @@
 
 ## Projekto apžvalga
 
-„Live Translator Hub“ yra **„Electron + React GUI“ darbalaukio programa**, skirta vienu paspaudimu išversti į kinų kalbą dvi AI programavimo priemones – „Cursor“ ir „Claude“. Naudodama vieningą vertimo vykdymo branduolį, programa vienoje sąsajoje valdo abiejų tikslinių programų variklių diegimą, API raktų konfigūraciją ir žodynų generavimą.
+Live Translator Hub yra **Electron + React GUI darbalaukio programa**, skirta vienu paspaudimu sulietuvinti dvi AI programavimo priemones – Cursor ir Claude. Naudojant vieningą vertimo vykdymo branduolį, vienoje sąsajoje valdomas dviejų tikslinių programų variklių diegimas, API raktų konfigūracija ir žodynų generavimas.
 
-Šis projektas yra [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) architektūrinis atnaujinimas – nuo CLI scenarijaus iki GUI su būsenos skydeliu ir realaus laiko žurnalais, sujungiant „Cursor“ ir „Claude“ vertimo galimybes į vieną bendrą platformą.
+Šis projektas yra [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) architektūrinis atnaujinimas – nuo CLI scenarijaus pereinama prie GUI su būsenos skydeliu ir realaus laiko žurnalais, o Cursor ir Claude sulietuvinimo galimybės sujungiamos į vieną bendrą platformą.
 
+![Ekrano nuotrauka](../../image.png)
+![Ekrano nuotrauka](../../image-1.png)
 
-![Ekrano nuotrauka](image.png)
-![Ekrano nuotrauka](image-1.png)
 ## Architektūra
 
 ```
@@ -23,8 +23,8 @@ live-translator-ecosystem/          # npm workspaces monorepo
 │   │   ├── electron/preload.js     # Atvaizdavimo proceso ryšio tiltas
 │   │   └── src/                    # React 19 + Tailwind v4 + Zustand
 │   ├── core/                       # Vertimo vykdymo branduolys (translator-engine.js)
-│   ├── patcher-cursor/             # „Cursor“ programos taisymo įrankis
-│   ├── patcher-claude/             # „Claude“ programos taisymo įrankis
+│   ├── patcher-cursor/             # Cursor programos taisymo įrankis
+│   ├── patcher-claude/             # Claude programos taisymo įrankis
 │   └── dict-generator/             # AI žodynų generatorius
 ```
 
@@ -33,35 +33,35 @@ live-translator-ecosystem/          # npm workspaces monorepo
 `packages/core/src/translator-engine.js` yra vienintelis vykdymo branduolys, įterpiamas į tikslinę programą – grynas naršyklės JS, be modulių priklausomybių. Jo atsakomybės apima:
 
 - **Žodynų atitikimas**: statiniai įrašai + reguliariųjų išraiškų šablonai
-- **AI vertimo tarpininko tiltas**: „Webview“ aplinkoje naudoja `postMessage` vertimo užklausoms perduoti į pagrindinį langą, apeinant CSP tinklo apribojimus
-- **Vertimo talpykla**: nuolatinė talpykla, pagrįsta `localStorage`, raktas: `live_i18n_cache_<entity_name>`
+- **AI vertimo tarpininko tiltas**: Webview aplinkoje naudojant `postMessage` vertimo užklausos perduodamos į pagrindinį langą, apeinant CSP tinklo apribojimus
+- **Vertimo talpykla**: nuolatinė talpykla, pagrįsta `localStorage`, raktas – `live_i18n_cache_<entity_name>`
 - **Įdėtinė žodynų paieška**: palaiko `enableNestedDict` režimą
 
 ## Funkcijų akcentai
 
-### Vieningas dviejų variklių valdymas
+### Dviejų variklių vieningas valdymas
 
-Toje pačioje sąsajoje atskirai valdykite „Cursor“ ir „Claude“ vertimo diegimo būseną, žodynų versijas ir blokavimo taisykles, nereikia keisti įrankių.
+Toje pačioje sąsajoje atskirai valdoma Cursor ir Claude sulietuvinimo diegimo būsena, žodynų versijos ir blokavimo taisyklės, nereikia keisti įrankių.
 
-### Visų scenarijų „Webview“ prasiskverbimas
+### Visų scenarijų Webview prasiskverbimas
 
-Naudojant vertimo tilto architektūrą, AI vertimo galimybės gali prasiskverbti iš pagrindinio lango į visų lygių „Webview“ papildinius (pvz., „Claude Code“), išsprendžiant tinklo blokavimo problemas, kylančias dėl griežtų CSP strategijų.
+Naudojant Translation Bridge architektūrą, AI vertimo galimybės gali prasiskverbti iš pagrindinio lango į visų lygių Webview papildinius (pvz., Claude Code), išsprendžiant tinklo blokavimo problemas, kylančias dėl griežtų CSP strategijų.
 
 ### Keturių skydelių funkcinis išdėstymas
 
 | Skydelis | Funkcija |
 | :--- | :--- |
-| **Cursor Engine** | Diegti / atkurti „Cursor“ vertimą, valdyti pagrindinio lango ir „Webview“ papildinių domenų blokavimo taisykles |
-| **Claude Engine** | Diegti / atkurti „Claude“ vertimą, konfigūruoti praleidimo taisykles |
-| **API Keys** | Valdyti kelių AI vertimo variklių API raktus (palaiko OpenAI, Anthropic, Google Gemini, DeepL), raktai šifruojami naudojant Electron `safeStorage` |
-| **Dict Generator** | Iš tikslinės programos šaltinio kodo išgauti UI eilutes, naudojant AI masiškai generuoti vertimo žodynus |
+| **Cursor Engine** | Cursor sulietuvinimo diegimas / atkūrimas, pagrindinio lango ir Webview papildinių atskirų sričių blokavimo taisyklių valdymas |
+| **Claude Engine** | Claude sulietuvinimo diegimas / atkūrimas, praleidimo taisyklių konfigūravimas |
+| **API Keys** | Kelių AI vertimo variklių API raktų valdymas (palaiko OpenAI, Anthropic, Google Gemini, DeepL), raktai šifruotai saugomi naudojant Electron `safeStorage` |
+| **Dict Generator** | Iš tikslinės programos šaltinio kodo ištraukiamos UI eilutės, naudojant AI masiškai generuojamas vertimo žodynas |
 
 ### Interaktyvus derinimas
 
-- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) – perjungti mėlyną punktyrinį paryškinimo rėmelį
-- Paryškinimo režimu laikykite `Option` (Mac) / `Alt` (Win) ir užveskite pelę ant kinų kalbos teksto, kad pamatytumėte originalą
+- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) perjungia mėlyną punktyrinį paryškinimo rėmelį
+- Paryškinimo režimu laikant `Option` (Mac) / `Alt` (Win) ir užvedus pelę ant kinų kalbos teksto, rodomas originalus tekstas
 
-### Domenų blokavimo taisyklės
+### Atskirų sričių blokavimo taisyklės
 
 Kiekvienas objektas (pagrindinis langas ir kiekvienas papildinys) turi visiškai nepriklausomą blokavimo taisyklių rinkinį (CSS selektoriai, URL atitikimas, pavadinimo atitikimas), užtikrinant, kad kodo sritis ir pagrindinės sąveikos sritys nebūtų paveiktos vertimo.
 
@@ -72,34 +72,34 @@ Integruotas `electron-updater`, palaikantis automatinį naujinimų tikrinimą, a
 ## Greita pradžia
 
 ```bash
-# Įdiegti priklausomybes
+# Priklausomybių diegimas
 npm install
 
-# Paleisti GUI kūrimo režimą
+# GUI kūrimo režimo paleidimas
 npm run dev
 
-# Sukurti macOS platinamą versiją
+# macOS platinamos versijos kūrimas
 npm run build -w desktop-app
 ```
 
 ### Naudojimo eiga
 
-1. Skydelyje **API Keys** sukonfigūruokite AI variklio raktus
-2. Pereikite į skydelį **Cursor Engine** arba **Claude Engine**
-3. Spustelėkite **Deploy**, kad vienu paspaudimu įdiegtumėte vertimą
+1. **API Keys** skydelyje sukonfigūruokite AI variklio raktus
+2. Pereikite į **Cursor Engine** arba **Claude Engine** skydelį
+3. Spustelėkite **Deploy**, kad vienu paspaudimu įdiegtumėte sulietuvinimą
 4. Paleiskite iš naujo tikslinę programą, kad pakeitimai įsigaliotų
 
 ### Sistemos reikalavimai
 
 - macOS 13+ (rekomenduojama)
 - Node.js 18+
-- Įdiegta „Cursor“ arba „Claude“ darbalaukio programa
+- Įdiegta Cursor arba Claude darbalaukio programa
 
 ## Saugumas
 
-- **Šifruotas API raktų saugojimas**: naudojant Electron `safeStorage` šifruojama ir išsaugoma `~/.live_translator_hub/api_keys.enc`, nerašoma į konfigūracijos failus
-- **Tiesioginis ryšys**: vertimo užklausos siunčiamos tiesiai į AI gamintojo API, be tarpinių serverių
-- **Domenų izoliacija**: blokavimo taisyklės neliečia šaltinio kodo failų
+- **API raktų šifruotas saugojimas**: naudojant Electron `safeStorage` šifruotai išsaugomi į `~/.live_translator_hub/api_keys.enc`, neįrašomi į konfigūracijos failus
+- **Tiesioginis ryšys**: vertimo užklausos siunčiamos tiesiai į AI tiekėjo API, be tarpinių serverių
+- **Atskirų sričių izoliacija**: blokavimo taisyklės nekeičia šaltinio kodo failų
 
 ---
 

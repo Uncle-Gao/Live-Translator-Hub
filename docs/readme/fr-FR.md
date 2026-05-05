@@ -8,11 +8,11 @@
 
 Live Translator Hub est une **application de bureau GUI Electron + React** qui fournit une sinisation en un clic pour deux outils de programmation IA : Cursor et Claude. Grâce à un noyau d'exécution de traduction unifié, elle gère le déploiement des moteurs, la configuration des clés API et la génération de dictionnaires pour les deux applications cibles depuis une seule interface.
 
-Ce projet est une version améliorée de l'architecture de [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) — passant d'un script CLI à une GUI avec panneau d'état et journaux en temps réel, fusionnant les capacités de sinisation de Cursor et Claude en une plateforme unifiée.
+Ce projet est une version améliorée de l'architecture de [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) — passant d'un script CLI à une GUI avec panneau d'état et journaux en temps réel, fusionnant les capacités de sinisation de Cursor et Claude en une plateforme unique.
 
+![Capture d'écran](../../image.png)
+![Capture d'écran](../../image-1.png)
 
-![Capture d'écran](image.png)
-![Capture d'écran](image-1.png)
 ## Architecture
 
 ```
@@ -30,36 +30,36 @@ live-translator-ecosystem/          # Monorepo npm workspaces
 
 ### Moteur d'exécution de traduction
 
-`packages/core/src/translator-engine.js` est le seul runtime injecté dans les applications cibles — pur JavaScript navigateur, sans dépendance modulaire. Ses responsabilités incluent :
+`packages/core/src/translator-engine.js` est le seul runtime injecté dans les applications cibles — pur JavaScript navigateur, sans dépendances de modules. Ses responsabilités incluent :
 
 - **Correspondance de dictionnaire** : entrées statiques + motifs regex
-- **Pont proxy de traduction IA** : dans un environnement Webview, utilise `postMessage` pour transférer les requêtes de traduction à la fenêtre principale, contournant les restrictions réseau CSP
+- **Pont proxy de traduction IA** : dans l'environnement Webview, utilise `postMessage` pour transférer les requêtes de traduction à la fenêtre principale, contournant les restrictions CSP réseau
 - **Cache de traduction** : cache persistant basé sur `localStorage`, avec la clé `live_i18n_cache_<entity_name>`
 - **Recherche de dictionnaire imbriqué** : prend en charge le mode `enableNestedDict`
 
 ## Points forts
 
-### Gestion unifiée de deux moteurs
+### Gestion unifiée des deux moteurs
 
 Gérez l'état de déploiement de sinisation, les versions de dictionnaire et les règles de blocage pour Cursor et Claude depuis la même interface, sans changer d'outil.
 
 ### Pénétration Webview tous scénarios
 
-Grâce à l'architecture Translation Bridge, la capacité de traduction IA peut pénétrer de la fenêtre principale à tous les niveaux de plugins Webview (comme Claude Code), résolvant les problèmes d'interception réseau sous des politiques CSP strictes.
+Grâce à l'architecture Translation Bridge, les capacités de traduction IA peuvent pénétrer de la fenêtre principale à tous les niveaux de plugins Webview (comme Claude Code), contournant les problèmes d'interception réseau sous des politiques CSP strictes.
 
 ### Disposition fonctionnelle à quatre panneaux
 
 | Panneau | Fonction |
 | :--- | :--- |
-| **Cursor Engine** | Déployer/Rétablir la sinisation de Cursor, gérer les règles de blocage par domaine pour la fenêtre principale et les plugins Webview |
-| **Claude Engine** | Déployer/Rétablir la sinisation de Claude, configurer les règles de saut |
+| **Cursor Engine** | Déployer/Restaurer la sinisation de Cursor, gérer les règles de blocage par domaine pour la fenêtre principale et les plugins Webview |
+| **Claude Engine** | Déployer/Restaurer la sinisation de Claude, configurer les règles de saut |
 | **API Keys** | Gérer les clés API de plusieurs moteurs de traduction IA (prend en charge OpenAI, Anthropic, Google Gemini, DeepL), les clés sont stockées cryptées via Electron `safeStorage` |
 | **Dict Generator** | Extraire les chaînes UI de l'application source, générer des dictionnaires de traduction par lots via IA |
 
 ### Débogage interactif
 
-- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) pour basculer la bordure de surbrillance en pointillés bleus
-- En mode surbrillance, maintenez `Option` (Mac) / `Alt` (Win) et survolez le texte chinois pour voir le texte original
+- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) pour basculer les bordures de surbrillance en pointillés bleus
+- En mode surbrillance, maintenez `Option` (Mac) / `Alt` (Win) et survolez le texte chinois pour voir l'original
 
 ### Règles de blocage par domaine
 
@@ -82,7 +82,7 @@ npm run dev
 npm run build -w desktop-app
 ```
 
-### Flux d'utilisation
+### Processus d'utilisation
 
 1. Configurez les clés du moteur IA dans le panneau **API Keys**
 2. Passez au panneau **Cursor Engine** ou **Claude Engine**
@@ -99,8 +99,8 @@ npm run build -w desktop-app
 
 - **Stockage crypté des clés API** : sauvegardées cryptées via Electron `safeStorage` dans `~/.live_translator_hub/api_keys.enc`, non écrites dans les fichiers de configuration
 - **Communication directe** : les requêtes de traduction vont directement aux API des fournisseurs IA, sans serveur intermédiaire
-- **Isolation par domaine** : les règles de blocage ne touchent pas aux fichiers source
+- **Isolation par domaine** : les règles de blocage ne touchent pas les fichiers source
 
 ---
 
-*Ce projet est destiné à l'apprentissage et à l'échange uniquement. La qualité de la traduction dépend du modèle IA sélectionné.*
+*Ce projet est destiné à des fins d'apprentissage et d'échange uniquement. La qualité de la traduction dépend du modèle IA sélectionné.*

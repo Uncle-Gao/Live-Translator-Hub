@@ -6,34 +6,34 @@
 
 ## Projekti ülevaade
 
-Live Translator Hub on **Electron + React GUI töölauarakendus**, mis pakub üheklõpsulist eestindamist kahele AI programmeerimistööriistale: Cursor ja Claude. Ühtse tõlke käitusaja tuuma kaudu haldab see ühes liideses kahe sihtrakenduse mootorite juurutamist, API võtmete konfigureerimist ja sõnastike genereerimist.
+Live Translator Hub on **Electron + React GUI töölauarakendus**, mis pakub ühe klõpsuga tõlkimist kahele AI programmeerimistööriistale: Cursor ja Claude. Ühtse tõlke käitusaja tuuma kaudu haldab see ühes liideses kahe sihtrakenduse mootorite juurutamist, API võtmete konfigureerimist ja sõnastike genereerimist.
 
-See projekt on [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) arhitektuuriline uuendus – CLI skriptist arenenud GUI-ks, millel on olekupaneel ja reaalajas logid, ning mis ühendab Cursori ja Claude eestindamise võimalused üheks ühtseks platvormiks.
+See projekt on [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) arhitektuuriline uuendus – CLI skriptidest arenenud GUI-ks, millel on olekupaneel ja reaalajas logid, ning mis ühendab Cursori ja Claude'i tõlkimisvõimalused üheks ühtseks platvormiks.
 
+![Kuvatõmmis](../../image.png)
+![Kuvatõmmis](../../image-1.png)
 
-![Ekraanipilt](image.png)
-![Ekraanipilt](image-1.png)
 ## Arhitektuur
 
 ```
-live-translator-ecosystem/          # npm workspaces monorepo
+live-translator-ecosystem/          # npm tööruumide monorepo
 ├── packages/
 │   ├── desktop-app/                # Electron + React GUI (Live Translator Hub)
 │   │   ├── electron/main.js        # Põhiprotsess, IPC kanalid ja konfiguratsiooni püsistamine
 │   │   ├── electron/preload.js     # Renderdusprotsessi suhtlussild
 │   │   └── src/                    # React 19 + Tailwind v4 + Zustand
 │   ├── core/                       # Tõlke käitusaja tuum (translator-engine.js)
-│   ├── patcher-cursor/             # Cursor rakenduse paikaja
-│   ├── patcher-claude/             # Claude rakenduse paikaja
+│   ├── patcher-cursor/             # Cursori rakenduse paikaja
+│   ├── patcher-claude/             # Claude'i rakenduse paikaja
 │   └── dict-generator/             # AI sõnastike generaator
 ```
 
 ### Tõlke käitusaeg
 
-`packages/core/src/translator-engine.js` on ainus käitusaeg, mis süstitakse sihtrakendusse – puhas brauseri JS, ilma moodulisõltuvusteta. Ülesanded hõlmavad:
+`packages/core/src/translator-engine.js` on ainus käitusaeg, mis süstitakse sihtrakendusse – puhas brauseri JavaScript, ilma moodulisõltuvusteta. Ülesanded hõlmavad:
 
 - **Sõnastiku sobitamine**: staatilised kirjed + regulaaravaldise mustrid
-- **AI tõlke vahendussild**: Webview keskkonnas edastab `postMessage` kaudu tõlkepäringud põhiaknasse, möödudes CSP võrgupiirangutest
+- **AI tõlke puhversild**: Webview keskkonnas edastab `postMessage` kaudu tõlkepäringud põhiaknasse, möödudes CSP võrgupiirangutest
 - **Tõlke vahemälu**: `localStorage`-põhine püsiv vahemälu, võtme nimega `live_i18n_cache_<entity_name>`
 - **Pesastatud sõnastiku otsing**: toetab `enableNestedDict` režiimi
 
@@ -41,33 +41,33 @@ live-translator-ecosystem/          # npm workspaces monorepo
 
 ### Kahe mootori ühtne haldus
 
-Samast liidesest haldage eraldi Cursori ja Claude eestindamise juurutamise olekut, sõnastiku versioone ja blokeerimisreegleid – ilma tööriistu vahetamata.
+Ühes liideses saab eraldi hallata Cursori ja Claude'i tõlkimise juurutamise olekut, sõnastiku versioone ja blokeerimisreegleid, ilma et peaks tööriistu vahetama.
 
-### Kõikide stsenaariumide Webview läbimurre
+### Kõikide stseenide Webview läbimurre
 
-Tõlke silla arhitektuuri kaudu võib AI tõlkevõimekus tungida põhiaknast kõikidesse Webview pluginatesse (nt Claude Code), lahendades võrgupäringute blokeerimise probleemi range CSP poliitika korral.
+Tõlke puhversilla arhitektuuri kaudu saab AI tõlkevõimekus tungida põhiaknast kõikidesse Webview pluginatesse (nt Claude Code), lahendades range CSP poliitika põhjustatud võrgu blokeerimise probleemid.
 
 ### Nelja paneeli funktsionaalne paigutus
 
 | Paneel | Funktsioon |
 | :--- | :--- |
-| **Cursor Engine** | Cursori eestinduse juurutamine/taastamine, põhiakna ja Webview pluginate domeenipõhiste blokeerimisreeglite haldamine |
-| **Claude Engine** | Claude eestinduse juurutamine/taastamine, vahelejätmise reeglite konfigureerimine |
+| **Cursor Engine** | Cursori tõlkimise juurutamine/taastamine, põhiakna ja Webview pluginate domeenipõhiste blokeerimisreeglite haldamine |
+| **Claude Engine** | Claude'i tõlkimise juurutamine/taastamine, vahelejätmise reeglite konfigureerimine |
 | **API Keys** | Mitme AI tõlkemootori API võtmete haldamine (toetab OpenAI, Anthropic, Google Gemini, DeepL), võtmed krüpteeritakse Electron `safeStorage` abil |
-| **Dict Generator** | UI stringide eraldamine sihtrakenduse lähtekoodist ja tõlkesõnastike hulgigeneerimine AI abil |
+| **Dict Generator** | UI stringide eraldamine sihtrakenduse lähtekoodist ja AI abil tõlkesõnastike hulgigeneerimine |
 
 ### Interaktiivne silumine
 
-- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) lülitab sinise katkendjoonega esiletõstmise piirjooned
-- Esiletõstmise režiimis hoidke all `Option` (Mac) / `Alt` (Win) ja hõljutage kursorit hiina teksti kohal, et näha originaali
+- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) lülitab sinise katkendjoonega esiletõstmise raami
+- Esiletõstmise režiimis hoidke all `Option` (Mac) / `Alt` (Win) ja hõljutage hiirt hiina keele kohal, et näha originaalteksti
 
 ### Domeenipõhised blokeerimisreeglid
 
-Igal üksusel (põhiaken ja iga plugin) on täiesti sõltumatud blokeerimisreeglite komplektid (CSS selektorid, URL-i sobitamine, pealkirja sobitamine), tagades, et koodialad ja põhilised interaktsioonialad jäävad tõlkest mõjutamata.
+Igal üksusel (põhiaken ja iga plugin) on täiesti sõltumatud blokeerimisreeglite komplektid (CSS selektorid, URL-i sobitamine, pealkirja sobitamine), tagades, et koodialad ja põhilised interaktsioonialad ei ole tõlkimisest mõjutatud.
 
 ### Automaatne uuendamine
 
-Sisseehitatud `electron-updater` toetab macOS-is rakendusesisest automaatset uuenduste kontrolli, allalaadimist ja paigaldamist.
+Sisseehitatud `electron-updater` toetab macOS-i rakendusesisest automaatset uuenduste kontrollimist, allalaadimist ja paigaldamist.
 
 ## Kiire alustamine
 
@@ -78,29 +78,29 @@ npm install
 # GUI arendusrežiimi käivitamine
 npm run dev
 
-# macOS jaotatava versiooni ehitamine
+# macOS-i levitatava versiooni ehitamine
 npm run build -w desktop-app
 ```
 
-### Kasutusvoog
+### Kasutusprotsess
 
-1. Konfigureerige AI mootori võtmed **API Keys** paneelil
+1. **API Keys** paneelil konfigureerige AI mootori võtmed
 2. Lülituge **Cursor Engine** või **Claude Engine** paneelile
-3. Klõpsake **Deploy** üheklõpsuliseks eestinduse juurutamiseks
+3. Klõpsake **Deploy**, et ühe klõpsuga tõlge juurutada
 4. Taaskäivitage sihtrakendus, et muudatused jõustuksid
 
 ### Süsteeminõuded
 
 - macOS 13+ (soovitatav)
 - Node.js 18+
-- Cursor või Claude töölauarakendus on paigaldatud
+- Cursori või Claude'i töölauarakendus on paigaldatud
 
 ## Turvalisus
 
 - **API võtmete krüpteeritud salvestamine**: Krüpteeritakse Electron `safeStorage` abil ja salvestatakse faili `~/.live_translator_hub/api_keys.enc`, mitte konfiguratsioonifaili
-- **Otsesuhtlus**: Tõlkepäringud lähevad otse AI tootja API-le, ilma vahendusserverita
+- **Otsesuhtlus**: Tõlkepäringud lähevad otse AI tootja API-le, ilma vaheserverita
 - **Domeenipõhine isoleerimine**: Blokeerimisreeglid ei puuduta lähtekoodifaile
 
 ---
 
-*See projekt on mõeldud ainult õppimiseks ja vahetamiseks. Tõlke kvaliteeti mõjutab valitud AI mudel.*
+*See projekt on mõeldud ainult õppimiseks ja suhtlemiseks. Tõlke kvaliteeti mõjutab valitud AI mudel.*

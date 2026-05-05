@@ -6,20 +6,20 @@
 
 ## Projektoversigt
 
-Live Translator Hub er en **Electron + React GUI desktop-applikation**, der tilbyder et-klik-sinisering af to AI-programmeringsværktøjer: Cursor og Claude. Via en samlet oversættelsesruntimekerne administreres motorimplementering, API-nøglekonfiguration og ordbogsgenerering for begge målapplikationer i én grænseflade.
+Live Translator Hub er en **Electron + React GUI desktop-applikation**, der tilbyder et-klik-sinisering af to AI-programmeringsværktøjer: Cursor og Claude. Gennem en ensartet oversættelsesruntimekerne administreres motorimplementering, API-nøglekonfiguration og ordbogsgenerering for begge målapplikationer i én grænseflade.
 
 Dette projekt er en arkitektonisk opgradering af [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) – fra et CLI-script til en GUI med statuspanel og realtidslogfiler, der samler siniseringskapaciteten for Cursor og Claude i én samlet platform.
 
+![Skærmbillede](../../image.png)
+![Skærmbillede](../../image-1.png)
 
-![Skærmbillede](image.png)
-![Skærmbillede](image-1.png)
 ## Arkitektur
 
 ```
 live-translator-ecosystem/          # npm workspaces monorepo
 ├── packages/
 │   ├── desktop-app/                # Electron + React GUI (Live Translator Hub)
-│   │   ├── electron/main.js        # Hovedproces, IPC-kanaler og konfigurationspersistens
+│   │   ├── electron/main.js        # Hovedproces, IPC-kanal og konfigurationspersistens
 │   │   ├── electron/preload.js     # Kommunikationsbro til renderingsproces
 │   │   └── src/                    # React 19 + Tailwind v4 + Zustand
 │   ├── core/                       # Oversættelsesruntimekerne (translator-engine.js)
@@ -32,16 +32,16 @@ live-translator-ecosystem/          # npm workspaces monorepo
 
 `packages/core/src/translator-engine.js` er den eneste runtime, der injiceres i målapplikationerne – ren browser-JS uden modulafhængigheder. Ansvarsområder omfatter:
 
-- **Ordbogsmatchning**: Statiske opslag + regulære udtryksmønstre
-- **AI-oversættelsesproxybro**: I Webview-miljøer videresendes oversættelsesanmodninger via `postMessage` til hovedvinduet, hvilket omgår CSP-begrænsninger for netværksadgang
+- **Ordbogsmatchning**: Statiske poster + regulære udtryksmønstre
+- **AI-oversættelsesproxybro**: I Webview-miljøer videresendes oversættelsesanmodninger via `postMessage` til hovedvinduet, hvilket omgår CSP-netværksbegrænsninger
 - **Oversættelsescache**: Persistent cache baseret på `localStorage` med nøglenavn `live_i18n_cache_<entity_name>`
-- **Indlejret ordbogsopslag**: Understøtter `enableNestedDict`-tilstand
+- **Indlejret ordbogssøgning**: Understøtter `enableNestedDict`-tilstand
 
-## Funktionelle højdepunkter
+## Funktionshøjdepunkter
 
-### Samlet styring af to motorer
+### Dobbeltmotor, samlet styring
 
-Administrer siniseringsimplementeringsstatus, ordbogsversioner og blokeringsregler for Cursor og Claude i én grænseflade uden at skifte værktøj.
+Administrer siniseringsimplementeringsstatus, ordbogsversioner og blokeringsregler for henholdsvis Cursor og Claude i én grænseflade uden at skifte værktøj.
 
 ### Webview-gennemtrængning i alle scenarier
 
@@ -59,15 +59,15 @@ Gennem Translation Bridge-arkitekturen kan AI-oversættelseskapaciteten trænge 
 ### Interaktiv debugging
 
 - `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) skifter blå stiplet fremhævningsramme
-- I fremhævningstilstand: Hold `Option` (Mac) / `Alt` (Win) nede og hold musen over kinesisk tekst for at se originalteksten
+- I fremhævningstilstand: Hold `Option` (Mac) / `Alt` (Win) nede og svæv over kinesisk tekst for at se originalteksten
 
 ### Domænespecifikke blokeringsregler
 
-Hver enhed (hovedvindue og individuelle plugins) har fuldstændigt uafhængige sæt af blokeringsregler (CSS-vælgere, URL-matchning, titelmatchning), hvilket sikrer, at kodeområder og kerneinteraktionsområder ikke påvirkes af oversættelse.
+Hver enhed (hovedvindue og hvert plugin) har et fuldstændigt uafhængigt sæt blokeringsregler (CSS-vælgere, URL-matchning, titelmatchning), hvilket sikrer, at kodeområder og kerneinteraktionsområder ikke påvirkes af oversættelse.
 
 ### Automatisk opdatering
 
-Indbygget `electron-updater` understøtter automatisk kontrol, download og installation af opdateringer i macOS-applikationen.
+Indbygget `electron-updater` understøtter automatisk kontrol, download og installation af opdateringer i macOS-appen.
 
 ## Kom godt i gang
 
@@ -91,15 +91,15 @@ npm run build -w desktop-app
 
 ### Systemkrav
 
-- macOS 13+ (anbefalet)
+- macOS 13+ (anbefales)
 - Node.js 18+
-- Cursor eller Claude desktop-applikation installeret
+- Cursor- eller Claude-desktopapplikation installeret
 
 ## Sikkerhed
 
 - **Krypteret API-nøglelagring**: Gemmes krypteret via Electron `safeStorage` i `~/.live_translator_hub/api_keys.enc`, skrives ikke til konfigurationsfiler
-- **Direkte kommunikation**: Oversættelsesanmodninger går direkte til AI-leverandørens API, ingen mellemliggende servere
-- **Domæneisolering**: Blokeringsregler berører ikke kildekodefiler
+- **Direkte kommunikation**: Oversættelsesanmodninger går direkte til AI-leverandørens API, ingen mellemservere
+- **Domæneisolering**: Blokeringsregler rører ikke kildekodefiler
 
 ---
 

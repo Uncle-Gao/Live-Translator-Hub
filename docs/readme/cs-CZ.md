@@ -8,11 +8,11 @@
 
 **Live Translator Hub** je desktopová aplikace s **Electron + React GUI**, která poskytuje jedním kliknutím lokalizaci do čínštiny pro dva nástroje AI programování: Cursor a Claude. Prostřednictvím jednotného překladového runtime jádra spravuje nasazení enginu, konfiguraci API klíčů a generování slovníků pro oba cílové aplikace v jednom rozhraní.
 
-Tento projekt je architektonickým upgradem [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) – přechodem z CLI skriptu na GUI s panelem stavu a živými logy, přičemž spojuje lokalizační schopnosti pro Cursor a Claude do jedné jednotné platformy.
+Tento projekt je architektonickým upgradem [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) – evolucí z CLI skriptu na GUI s panelem stavu a živými logy, který sjednocuje lokalizační schopnosti pro Cursor a Claude do jedné jednotné platformy.
 
+![Screenshot](../../image.png)
+![Screenshot](../../image-1.png)
 
-![Screenshot](image.png)
-![Screenshot](image-1.png)
 ## Architektura
 
 ```
@@ -30,18 +30,18 @@ live-translator-ecosystem/          # npm workspaces monorepo
 
 ### Překladové runtime
 
-`packages/core/src/translator-engine.js` je jediné runtime vložené do cílových aplikací – čistý prohlížečový JS bez modulových závislostí. Mezi jeho povinnosti patří:
+`packages/core/src/translator-engine.js` je jediné runtime vložené do cílových aplikací – čistý browser JS, bez modulových závislostí. Mezi jeho odpovědnosti patří:
 
 - **Párování slovníků**: Statické položky + regulární vzory
-- **Proxy most pro AI překlad**: V prostředí Webview přesměrovává požadavky na překlad pomocí `postMessage` do hlavního okna, čímž obchází omezení CSP pro přístup k síti
+- **Proxy most pro AI překlad**: V prostředí Webview přeposílá požadavky na překlad do hlavního okna pomocí `postMessage`, čímž obchází omezení CSP pro přístup k síti
 - **Cache překladů**: Perzistentní cache založená na `localStorage`, klíč `live_i18n_cache_<entity_name>`
-- **Vyhledávání ve vnořených slovnících**: Podpora režimu `enableNestedDict`
+- **Vnořené vyhledávání ve slovníku**: Podporuje režim `enableNestedDict`
 
 ## Hlavní funkce
 
 ### Jednotná správa dvou enginů
 
-V jednom rozhraní spravujte stav nasazení lokalizace, verze slovníků a pravidla blokování pro Cursor i Claude, aniž byste museli přepínat nástroje.
+Spravujte stav nasazení lokalizace, verze slovníků a pravidla blokování pro Cursor a Claude v jednom rozhraní, bez nutnosti přepínat nástroje.
 
 ### Průnik do Webview ve všech scénářích
 
@@ -53,21 +53,21 @@ Díky architektuře Translation Bridge může schopnost AI překladu proniknout 
 | :--- | :--- |
 | **Cursor Engine** | Nasazení/obnovení lokalizace Cursoru, správa pravidel blokování pro hlavní okno a Webview pluginy |
 | **Claude Engine** | Nasazení/obnovení lokalizace Claude, konfigurace pravidel přeskočení |
-| **API Keys** | Správa API klíčů pro více AI překladových enginů (podpora OpenAI, Anthropic, Google Gemini, DeepL), klíče šifrovány pomocí Electron `safeStorage` |
+| **API Keys** | Správa API klíčů pro více AI překladových enginů (podpora OpenAI, Anthropic, Google Gemini, DeepL), klíče jsou šifrovány pomocí Electron `safeStorage` |
 | **Dict Generator** | Extrakce UI řetězců ze zdrojového kódu cílové aplikace a hromadné generování překladových slovníků pomocí AI |
 
 ### Interaktivní ladění
 
-- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) přepíná zvýraznění modrým přerušovaným rámečkem
-- V režimu zvýraznění podržte `Option` (Mac) / `Alt` (Win) a najeďte na čínský text pro zobrazení originálu
+- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) přepíná zvýrazňující rámeček modrou přerušovanou čarou
+- V režimu zvýraznění podržte `Option` (Mac) / `Alt` (Win) a najeďte myší na čínský text pro zobrazení originálu
 
 ### Pravidla blokování podle domén
 
-Každá entita (hlavní okno a jednotlivé pluginy) má zcela nezávislou sadu pravidel blokování (CSS selektory, shoda URL, shoda názvu), což zajišťuje, že oblast kódu a klíčové interakční oblasti nejsou ovlivněny překladem.
+Každá entita (hlavní okno a jednotlivé pluginy) má zcela nezávislou sadu pravidel blokování (CSS selektory, URL shoda, shoda názvu), což zajišťuje, že oblast kódu a klíčové interakční oblasti nejsou ovlivněny překladem.
 
 ### Automatické aktualizace
 
-Integrovaný `electron-updater` podporuje automatickou kontrolu, stahování a instalaci aktualizací v aplikaci na macOS.
+Vestavěný `electron-updater` podporuje automatickou kontrolu, stahování a instalaci aktualizací v aplikaci pro macOS.
 
 ## Rychlý start
 
@@ -82,9 +82,9 @@ npm run dev
 npm run build -w desktop-app
 ```
 
-### Pracovní postup
+### Postup použití
 
-1. V panelu **API Keys** nakonfigurujte klíče AI enginu
+1. Nakonfigurujte klíče AI enginu v panelu **API Keys**
 2. Přepněte na panel **Cursor Engine** nebo **Claude Engine**
 3. Klikněte na **Deploy** pro nasazení lokalizace jedním kliknutím
 4. Restartujte cílovou aplikaci pro uplatnění změn
@@ -98,8 +98,8 @@ npm run build -w desktop-app
 ## Bezpečnost
 
 - **Šifrované ukládání API klíčů**: Uloženo šifrovaně pomocí Electron `safeStorage` do `~/.live_translator_hub/api_keys.enc`, nezapisuje se do konfiguračních souborů
-- **Přímá komunikace**: Požadavky na překlad směřují přímo k API poskytovatele AI, bez prostředního serveru
-- **Izolace domén**: Pravidla blokování se nedotýkají zdrojových souborů
+- **Přímá komunikace**: Požadavky na překlad jdou přímo k API výrobce AI, bez prostředního serveru
+- **Izolace podle domén**: Pravidla blokování se nedotýkají zdrojových souborů
 
 ---
 

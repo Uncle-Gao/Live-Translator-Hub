@@ -6,13 +6,13 @@
 
 ## Gambaran Projek
 
-Live Translator Hub ialah aplikasi **desktop GUI Electron + React** yang menyediakan satu klik penyetempatan Cina untuk dua alat pengaturcaraan AI, Cursor dan Claude. Melalui teras masa jalan terjemahan bersatu, ia menguruskan penggunaan enjin, konfigurasi kunci API, dan penjanaan kamus untuk kedua-dua aplikasi sasaran dalam satu antara muka.
+Live Translator Hub ialah aplikasi **desktop GUI Electron + React** yang menyediakan terjemahan satu klik untuk dua alat pengaturcaraan AI, Cursor dan Claude. Melalui teras masa jalan terjemahan bersatu, ia menguruskan penggunaan enjin, konfigurasi kunci API, dan penjanaan kamus untuk kedua-dua aplikasi sasaran dalam satu antara muka.
 
-Projek ini merupakan peningkatan seni bina [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) — berkembang daripada skrip CLI kepada GUI dengan panel status dan log masa nyata, serta menggabungkan keupayaan penyetempatan Cina Cursor dan Claude ke dalam satu platform bersatu.
+Projek ini merupakan peningkatan seni bina [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) — berkembang daripada skrip CLI kepada GUI dengan panel status dan log masa nyata, serta menggabungkan keupayaan terjemahan Cursor dan Claude ke dalam satu platform bersatu.
 
+![Tangkapan skrin](../../image.png)
+![Tangkapan skrin](../../image-1.png)
 
-![Tangkapan skrin](image.png)
-![Tangkapan skrin](image-1.png)
 ## Seni Bina
 
 ```
@@ -30,18 +30,18 @@ live-translator-ecosystem/          # npm workspaces monorepo
 
 ### Masa Jalan Terjemahan
 
-`packages/core/src/translator-engine.js` ialah satu-satunya masa jalan yang disuntik ke dalam aplikasi sasaran — JavaScript tulen pelayar, tanpa kebergantungan modul. Tanggungjawab termasuk:
+`packages/core/src/translator-engine.js` ialah satu-satunya masa jalan yang disuntik ke dalam aplikasi sasaran — JS pelayar tulen, tanpa kebergantungan modul. Tanggungjawabnya termasuk:
 
 - **Padanan kamus**: Entri statik + corak regex
 - **Jambatan proksi terjemahan AI**: Dalam persekitaran Webview, hantar permintaan terjemahan ke tetingkap utama melalui `postMessage`, memintas sekatan rangkaian CSP
-- **Cache terjemahan**: Cache kekal berasaskan `localStorage`, dengan nama kunci `live_i18n_cache_<entity_name>`
+- **Cache terjemahan**: Cache kekal berdasarkan `localStorage`, dengan nama kunci `live_i18n_cache_<entity_name>`
 - **Carian kamus bersarang**: Menyokong mod `enableNestedDict`
 
-## Ciri-ciri Utama
+## Sorotan Ciri
 
 ### Pengurusan Bersatu Dua Enjin
 
-Urus status penggunaan penyetempatan Cina, versi kamus, dan peraturan sekatan untuk Cursor dan Claude dalam antara muka yang sama, tanpa perlu menukar alat.
+Urus status penggunaan, versi kamus, dan peraturan sekatan untuk terjemahan Cursor dan Claude dalam antara muka yang sama, tanpa perlu menukar alat.
 
 ### Penembusan Webview Semua Senario
 
@@ -51,14 +51,14 @@ Melalui seni bina Jambatan Terjemahan, keupayaan terjemahan AI boleh menembusi d
 
 | Panel | Fungsi |
 | :--- | :--- |
-| **Cursor Engine** | Gunakan/pulihkan penyetempatan Cina Cursor, urus peraturan sekatan domain berasingan untuk tetingkap utama & pemalam Webview |
-| **Claude Engine** | Gunakan/pulihkan penyetempatan Cina Claude, konfigurasikan peraturan langkau |
+| **Cursor Engine** | Gunakan/pulihkan terjemahan Cursor, urus peraturan sekatan domain berasingan untuk tetingkap utama & pemalam Webview |
+| **Claude Engine** | Gunakan/pulihkan terjemahan Claude, konfigurasikan peraturan langkau |
 | **API Keys** | Urus kunci API untuk pelbagai enjin terjemahan AI (sokongan OpenAI, Anthropic, Google Gemini, DeepL), kunci disulitkan melalui `safeStorage` Electron |
 | **Dict Generator** | Ekstrak rentetan UI daripada kod sumber aplikasi sasaran, hasilkan kamus terjemahan secara pukal melalui AI |
 
 ### Penyahpepijatan Interaktif
 
-- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) untuk menogol sempadan sorotan bertitik biru
+- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) untuk togol sempadan sorotan biru bertitik
 - Dalam mod sorotan, tahan `Option` (Mac) / `Alt` (Win) dan tuding pada teks Cina untuk melihat teks asal
 
 ### Peraturan Sekatan Domain Berasingan
@@ -86,7 +86,7 @@ npm run build -w desktop-app
 
 1. Konfigurasikan kunci enjin AI dalam panel **API Keys**
 2. Tukar ke panel **Cursor Engine** atau **Claude Engine**
-3. Klik **Deploy** untuk menggunakan penyetempatan Cina dengan satu klik
+3. Klik **Deploy** untuk menggunakan terjemahan satu klik
 4. Mulakan semula aplikasi sasaran untuk kesan berkuat kuasa
 
 ### Keperluan Sistem
@@ -97,9 +97,9 @@ npm run build -w desktop-app
 
 ## Keselamatan
 
-- **Penyimpanan kunci API disulitkan**: Disimpan secara disulitkan ke `~/.live_translator_hub/api_keys.enc` melalui `safeStorage` Electron, tidak ditulis ke fail konfigurasi
+- **Penyimpanan kunci API disulitkan**: Disulitkan melalui `safeStorage` Electron dan disimpan ke `~/.live_translator_hub/api_keys.enc`, tidak ditulis ke fail konfigurasi
 - **Komunikasi terus**: Permintaan terjemahan terus ke API vendor AI, tanpa pelayan perantara
-- **Pengasingan domain**: Peraturan sekatan tidak menyentuh fail kod sumber
+- **Pengasingan domain**: Peraturan sekatan tidak menyentuh fail sumber
 
 ---
 

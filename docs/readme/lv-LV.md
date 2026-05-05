@@ -6,13 +6,13 @@
 
 ## Projekta pārskats
 
-Live Translator Hub ir **Electron + React GUI darbvirsmas lietotne**, kas nodrošina vienas klikšķa lokalizāciju diviem AI programmēšanas rīkiem — Cursor un Claude. Izmantojot vienotu tulkošanas izpildlaika kodolu, vienā saskarnē tiek pārvaldīti abu mērķa lietotņu dzinēju izvietošana, API atslēgu konfigurācija un vārdnīcu ģenerēšana.
+Live Translator Hub ir **Electron + React GUI darbvirsmas lietotne**, kas nodrošina vienas pogaļas lokalizāciju diviem AI programmēšanas rīkiem — Cursor un Claude. Izmantojot vienotu tulkošanas izpildlaika kodolu, vienā saskarnē tiek pārvaldīta abu mērķa lietotņu dzinēju izvietošana, API atslēgu konfigurācija un vārdnīcu ģenerēšana.
 
-Šis projekts ir [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) arhitektūras jauninājums — no CLI skripta evolūcija uz GUI ar statusa paneli un reāllaika žurnāliem, apvienojot Cursor un Claude lokalizācijas iespējas vienotā platformā.
+Šis projekts ir [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) arhitektūras jauninājums — no CLI skripta evolūcija uz GUI ar statusa paneli un reāllaika žurnāliem, apvienojot Cursor un Claude lokalizācijas iespējas vienā vienotā platformā.
 
+![Ekrānuzņēmums](../../image.png)
+![Ekrānuzņēmums](../../image-1.png)
 
-![Ekrānuzņēmums](image.png)
-![Ekrānuzņēmums](image-1.png)
 ## Arhitektūra
 
 ```
@@ -32,10 +32,10 @@ live-translator-ecosystem/          # npm workspaces monorepo
 
 `packages/core/src/translator-engine.js` ir vienīgais izpildlaiks, kas tiek ievadīts mērķa lietotnē — tīrs pārlūkprogrammas JS bez moduļu atkarībām. Tā pienākumi ietver:
 
-- **Vārdnīcas atbilstība**: statiski vārdi + regulārās izteiksmes
+- **Vārdnīcu saskaņošana**: statiskie vārdi + regulārās izteiksmes
 - **AI tulkošanas starpnieka tilts**: Webview vidē, izmantojot `postMessage`, tulkošanas pieprasījumi tiek pārsūtīti uz galveno logu, apejot CSP tīkla ierobežojumus
-- **Tulkošanas kešatmiņa**: uz `localStorage` balstīta pastāvīga kešatmiņa, atslēgas nosaukums `live_i18n_cache_<entity_name>`
-- **Ligzdotā vārdnīcas meklēšana**: atbalsta `enableNestedDict` režīmu
+- **Tulkošanas kešatmiņa**: pastāvīga kešatmiņa, izmantojot `localStorage`, ar atslēgas nosaukumu `live_i18n_cache_<entity_name>`
+- **Ligzdotā vārdnīcu meklēšana**: atbalsta `enableNestedDict` režīmu
 
 ## Funkciju izceļamie punkti
 
@@ -43,27 +43,27 @@ live-translator-ecosystem/          # npm workspaces monorepo
 
 Vienā saskarnē atsevišķi pārvaldiet Cursor un Claude lokalizācijas izvietošanas statusu, vārdnīcu versijas un bloķēšanas noteikumus, bez nepieciešamības pārslēgties starp rīkiem.
 
-### Pilna Webview caurlaidība
+### Pilna Webview caurspiešana
 
-Izmantojot Translation Bridge arhitektūru, AI tulkošanas iespējas var izplatīties no galvenā loga uz visiem Webview spraudņu līmeņiem (piemēram, Claude Code), risinot tīkla bloķēšanas problēmas stingras CSP politikas apstākļos.
+Izmantojot Translation Bridge arhitektūru, AI tulkošanas iespējas var caurspiest no galvenā loga uz visiem Webview spraudņu līmeņiem (piemēram, Claude Code), risinot tīkla bloķēšanas problēmas stingru CSP politiku apstākļos.
 
-### Četru paneļu funkcionālais izkārtojums
+### Četru paneļu funkciju izkārtojums
 
 | Panelis | Funkcija |
 | :--- | :--- |
 | **Cursor Engine** | Izvietot/atjaunot Cursor lokalizāciju, pārvaldīt galvenā loga un Webview spraudņu domēnu bloķēšanas noteikumus |
 | **Claude Engine** | Izvietot/atjaunot Claude lokalizāciju, konfigurēt izlaišanas noteikumus |
-| **API Keys** | Pārvaldīt vairāku AI tulkošanas dzinēju API atslēgas (atbalsta OpenAI, Anthropic, Google Gemini, DeepL), atslēgas tiek šifrētas, izmantojot Electron `safeStorage` |
-| **Dict Generator** | Iegūt UI virknes no mērķa lietotnes pirmkoda un izmantot AI, lai masveidā ģenerētu tulkošanas vārdnīcas |
+| **API Keys** | Pārvaldīt vairāku AI tulkošanas dzinēju API atslēgas (atbalsta OpenAI, Anthropic, Google Gemini, DeepL), atslēgas tiek šifrēti saglabātas, izmantojot Electron `safeStorage` |
+| **Dict Generator** | Iegūt UI virknes no mērķa lietotnes pirmkoda un ģenerēt tulkošanas vārdnīcas, izmantojot AI |
 
 ### Interaktīvā atkļūdošana
 
 - `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) — pārslēgt zilu punktētu izcelšanas apmali
-- Izcelšanas režīmā turiet `Option` (Mac) / `Alt` (Win) un virziet kursoru virs ķīniešu teksta, lai skatītu oriģinālu
+- Izcelšanas režīmā turiet `Option` (Mac) / `Alt` (Win) un novietojiet peles kursoru virs ķīniešu teksta, lai skatītu oriģinālo tekstu
 
 ### Domēnu bloķēšanas noteikumi
 
-Katram elementam (galvenajam logam un katram spraudnim) ir pilnīgi neatkarīgs bloķēšanas noteikumu kopums (CSS selektori, URL atbilstība, virsrakstu atbilstība), nodrošinot, ka koda apgabali un galvenās mijiedarbības zonas netiek ietekmētas tulkošanas laikā.
+Katram entitātei (galvenajam logam un katram spraudnim) ir pilnīgi neatkarīgs bloķēšanas noteikumu kopums (CSS selektori, URL saskaņošana, virsrakstu saskaņošana), nodrošinot, ka koda apgabali un galvenās interakcijas zonas netiek ietekmētas tulkošanas laikā.
 
 ### Automātiskie atjauninājumi
 
@@ -93,13 +93,13 @@ npm run build -w desktop-app
 
 - macOS 13+ (ieteicams)
 - Node.js 18+
-- Instalēta Cursor vai Claude darbvirsmas lietotne
+- Cursor vai Claude darbvirsmas lietotne ir instalēta
 
 ## Drošība
 
-- **API atslēgu šifrēta glabāšana**: izmantojot Electron `safeStorage`, atslēgas tiek šifrēti saglabātas `~/.live_translator_hub/api_keys.enc`, netiek ierakstītas konfigurācijas failos
-- **Tiešā komunikācija**: tulkošanas pieprasījumi tiek nosūtīti tieši uz AI ražotāja API, bez starpniekserveriem
-- **Domēnu izolācija**: bloķēšanas noteikumi neskar pirmkoda failus
+- **API atslēgu šifrēta saglabāšana**: Izmantojot Electron `safeStorage`, atslēgas tiek šifrēti saglabātas `~/.live_translator_hub/api_keys.enc`, nevis ierakstītas konfigurācijas failā
+- **Tiešā komunikācija**: Tulkošanas pieprasījumi tiek nosūtīti tieši uz AI ražotāja API, bez starpniekserveriem
+- **Domēnu izolācija**: Bloķēšanas noteikumi nepieskaras pirmkoda failiem
 
 ---
 

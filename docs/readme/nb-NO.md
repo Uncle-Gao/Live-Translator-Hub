@@ -8,11 +8,11 @@
 
 Live Translator Hub er en **Electron + React GUI-skrivebordsapplikasjon** som gir ett-klikks kinesisk oversettelse for to AI-programmeringsverktøy: Cursor og Claude. Gjennom en enhetlig oversettelsesruntime-kjerne administreres motorutrulling, API-nøkkelkonfigurasjon og ordbokgenerering for begge målapplikasjonene i ett grensesnitt.
 
-Dette prosjektet er en arkitektonisk oppgradering av [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) – fra et CLI-skript til en GUI med statuspanel og sanntidslogger, som samler oversettelsesfunksjonaliteten for Cursor og Claude i én enhetlig plattform.
+Dette prosjektet er en arkitektonisk oppgradering av [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) – fra et CLI-skript til en GUI med statuspanel og sanntidslogger, og slår sammen oversettelsesfunksjonaliteten for Cursor og Claude til én enhetlig plattform.
 
+![Skjermbilde](../../image.png)
+![Skjermbilde](../../image-1.png)
 
-![Skjermbilde](image.png)
-![Skjermbilde](image-1.png)
 ## Arkitektur
 
 ```
@@ -20,11 +20,11 @@ live-translator-ecosystem/          # npm workspaces monorepo
 ├── packages/
 │   ├── desktop-app/                # Electron + React GUI (Live Translator Hub)
 │   │   ├── electron/main.js        # Hovedprosess, IPC-kanaler og konfigurasjonspersistens
-│   │   ├── electron/preload.js     # Kommunikasjonsbro for renderingsprosess
+│   │   ├── electron/preload.js     # Kommunikasjonsbro for gjengivelsesprosess
 │   │   └── src/                    # React 19 + Tailwind v4 + Zustand
 │   ├── core/                       # Oversettelsesruntime-kjerne (translator-engine.js)
-│   ├── patcher-cursor/             # Patcher for Cursor-applikasjon
-│   ├── patcher-claude/             # Patcher for Claude-applikasjon
+│   ├── patcher-cursor/             # Cursor-applikasjonspatcher
+│   ├── patcher-claude/             # Claude-applikasjonspatcher
 │   └── dict-generator/             # AI-ordbokgenerator
 ```
 
@@ -41,25 +41,25 @@ live-translator-ecosystem/          # npm workspaces monorepo
 
 ### Enhetlig administrasjon av to motorer
 
-Administrer utrullingsstatus, ordbokversjoner og blokkeringsregler for både Cursor og Claude i samme grensesnitt, uten å bytte verktøy.
+Administrer utrullingsstatus, ordbokversjoner og blokkeringsregler for både Cursor og Claude i samme grensesnitt, uten å måtte bytte verktøy.
 
 ### Webview-gjennomtrengning i alle scenarier
 
 Gjennom Translation Bridge-arkitekturen kan AI-oversettelsesfunksjonalitet trenge gjennom fra hovedvinduet til alle nivåer av Webview-plugins (f.eks. Claude Code), og løser nettverksblokkering under strenge CSP-policyer.
 
-### Firepanelers funksjonsoppsett
+### Firepanelers funksjonslayout
 
 | Panel | Funksjon |
 | :--- | :--- |
-| **Cursor Engine** | Utplasser/gjenopprett Cursor-oversettelse, administrer domene-spesifikke blokkeringsregler for hovedvindu og Webview-plugins |
-| **Claude Engine** | Utplasser/gjenopprett Claude-oversettelse, konfigurer hoppregler |
+| **Cursor Engine** | Utrull/gjenopprett Cursor-oversettelse, administrer domene-spesifikke blokkeringsregler for hovedvindu og Webview-plugins |
+| **Claude Engine** | Utrull/gjenopprett Claude-oversettelse, konfigurer hoppregler |
 | **API Keys** | Administrer API-nøkler for flere AI-oversettelsesmotorer (støtter OpenAI, Anthropic, Google Gemini, DeepL), nøkler lagres kryptert via Electron `safeStorage` |
 | **Dict Generator** | Trekk ut UI-strenger fra målapplikasjonens kildekode, generer oversettelsesordbøker i batch via AI |
 
 ### Interaktiv feilsøking
 
-- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) veksler blå stiplet ramme for fremheving
-- I fremhevingsmodus, hold `Option` (Mac) / `Alt` (Win) og svev over kinesisk tekst for å se originalteksten
+- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) for å slå av/på blå stiplet ramme
+- I uthevet modus, hold `Option` (Mac) / `Alt` (Win) og hold musepekeren over kinesisk tekst for å se originalteksten
 
 ### Domene-spesifikke blokkeringsregler
 
@@ -67,7 +67,7 @@ Hver enhet (hovedvindu og individuelle plugins) har helt uavhengige sett med blo
 
 ### Automatiske oppdateringer
 
-Innebygd `electron-updater` støtter automatisk sjekk, nedlasting og installasjon av oppdateringer i macOS-applikasjonen.
+Innebygd `electron-updater`, støtter automatisk sjekk, nedlasting og installasjon av oppdateringer i macOS-appen.
 
 ## Kom i gang
 
@@ -86,14 +86,14 @@ npm run build -w desktop-app
 
 1. Konfigurer AI-motor-nøkler i **API Keys**-panelet
 2. Bytt til **Cursor Engine**- eller **Claude Engine**-panelet
-3. Klikk **Deploy** for å utplassere oversettelse med ett klikk
+3. Klikk **Deploy** for å rulle ut oversettelsen med ett klikk
 4. Start målapplikasjonen på nytt for å aktivere
 
 ### Systemkrav
 
 - macOS 13+ (anbefalt)
 - Node.js 18+
-- Cursor eller Claude-skrivebordsapplikasjon installert
+- Cursor- eller Claude-skrivebordsapplikasjon installert
 
 ## Sikkerhet
 

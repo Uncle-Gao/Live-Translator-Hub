@@ -6,13 +6,13 @@
 
 ## Panoramica del Progetto
 
-Live Translator Hub è un'applicazione desktop **Electron + React GUI** che fornisce la localizzazione in cinese con un clic per due strumenti di programmazione AI: Cursor e Claude. Attraverso un kernel runtime di traduzione unificato, gestisce in un'unica interfaccia la distribuzione dei motori, la configurazione delle chiavi API e la generazione dei dizionari per entrambe le applicazioni target.
+Live Translator Hub è un'applicazione desktop **Electron + React GUI** che fornisce la localizzazione in cinese con un clic per due strumenti di programmazione AI: Cursor e Claude. Attraverso un kernel runtime di traduzione unificato, gestisce in un'unica interfaccia il deployment del motore, la configurazione delle chiavi API e la generazione dei dizionari per entrambe le applicazioni target.
 
-Questo progetto è un aggiornamento architetturale di [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) – evoluto da script CLI a una GUI con pannello di stato e log in tempo reale, unificando le capacità di localizzazione di Cursor e Claude in un'unica piattaforma.
+Questo progetto è un aggiornamento architetturale di [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) — evolvendosi da script CLI a una GUI con pannello di stato e log in tempo reale, unificando le capacità di localizzazione di Cursor e Claude in un'unica piattaforma.
 
+![Screenshot](../../image.png)
+![Screenshot](../../image-1.png)
 
-![Screenshot](image.png)
-![Screenshot](image-1.png)
 ## Architettura
 
 ```
@@ -23,25 +23,25 @@ live-translator-ecosystem/          # npm workspaces monorepo
 │   │   ├── electron/preload.js     # Ponte di comunicazione per il processo di rendering
 │   │   └── src/                    # React 19 + Tailwind v4 + Zustand
 │   ├── core/                       # Kernel runtime di traduzione (translator-engine.js)
-│   ├── patcher-cursor/             # Patcher per l'applicazione Cursor
-│   ├── patcher-claude/             # Patcher per l'applicazione Claude
+│   ├── patcher-cursor/             # Patcher per applicazione Cursor
+│   ├── patcher-claude/             # Patcher per applicazione Claude
 │   └── dict-generator/             # Generatore di dizionari AI
 ```
 
 ### Runtime di Traduzione
 
-`packages/core/src/translator-engine.js` è l'unico runtime iniettato nelle applicazioni target – puro JavaScript browser, senza dipendenze da moduli. Le sue responsabilità includono:
+`packages/core/src/translator-engine.js` è l'unico runtime iniettato nelle applicazioni target — puro JavaScript browser, senza dipendenze da moduli. Le sue responsabilità includono:
 
 - **Corrispondenza dizionario**: voci statiche + pattern regex
-- **Ponte proxy di traduzione AI**: nell'ambiente Webview, utilizza `postMessage` per inoltrare le richieste di traduzione alla finestra principale, bypassando le restrizioni di rete CSP
+- **Ponte proxy traduzione AI**: nell'ambiente Webview, utilizza `postMessage` per inoltrare le richieste di traduzione alla finestra principale, bypassando le restrizioni di rete CSP
 - **Cache di traduzione**: cache persistente basata su `localStorage`, con chiave `live_i18n_cache_<entity_name>`
-- **Ricerca dizionario annidato**: supporta la modalità `enableNestedDict`
+- **Ricerca dizionario annidata**: supporta la modalità `enableNestedDict`
 
 ## Punti Salienti delle Funzionalità
 
 ### Gestione Unificata dei Due Motori
 
-Gestisci lo stato di distribuzione della localizzazione, le versioni del dizionario e le regole di blocco per Cursor e Claude dalla stessa interfaccia, senza dover cambiare strumento.
+Gestisci lo stato di deployment della localizzazione, la versione del dizionario e le regole di blocco per Cursor e Claude nella stessa interfaccia, senza dover cambiare strumento.
 
 ### Penetrazione Webview in Tutti gli Scenari
 
@@ -51,19 +51,19 @@ Grazie all'architettura Translation Bridge, la capacità di traduzione AI può p
 
 | Pannello | Funzione |
 | :--- | :--- |
-| **Cursor Engine** | Distribuisci/Ripristina la localizzazione di Cursor, gestisci le regole di blocco per dominio per finestra principale e plugin Webview |
-| **Claude Engine** | Distribuisci/Ripristina la localizzazione di Claude, configura le regole di salto |
-| **API Keys** | Gestisci le chiavi API per più motori di traduzione AI (supporta OpenAI, Anthropic, Google Gemini, DeepL), le chiavi sono crittografate tramite Electron `safeStorage` |
+| **Cursor Engine** | Distribuisce/ripristina la localizzazione di Cursor, gestisce le regole di blocco per dominio per finestra principale e plugin Webview |
+| **Claude Engine** | Distribuisce/ripristina la localizzazione di Claude, configura le regole di salto |
+| **API Keys** | Gestisce le chiavi API per più motori di traduzione AI (supporta OpenAI, Anthropic, Google Gemini, DeepL), le chiavi sono crittografate tramite Electron `safeStorage` |
 | **Dict Generator** | Estrae stringhe UI dall'applicazione target e genera in batch dizionari di traduzione tramite AI |
 
 ### Debug Interattivo
 
 - `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) per attivare/disattivare il bordo evidenziato blu tratteggiato
-- In modalità evidenziazione, tieni premuto `Option` (Mac) / `Alt` (Win) e passa il mouse sul testo cinese per vedere il testo originale
+- In modalità evidenziata, tieni premuto `Option` (Mac) / `Alt` (Win) e passa il mouse sul testo cinese per vedere il testo originale
 
 ### Regole di Blocco per Dominio
 
-Ogni entità (finestra principale e singoli plugin) possiede un set di regole di blocco completamente indipendente (selettori CSS, corrispondenza URL, corrispondenza titolo), garantendo che le aree di codice e le zone di interazione principale non vengano influenzate dalla traduzione.
+Ogni entità (finestra principale e singoli plugin) ha un set di regole di blocco completamente indipendente (selettori CSS, corrispondenza URL, corrispondenza titolo), garantendo che le aree di codice e le zone di interazione principali non siano influenzate dalla traduzione.
 
 ### Aggiornamento Automatico
 
@@ -103,4 +103,4 @@ npm run build -w desktop-app
 
 ---
 
-*Questo progetto è solo per scopi di apprendimento e scambio. La qualità della traduzione è influenzata dal modello AI selezionato.*
+*Questo progetto è solo per scopi di apprendimento e scambio. La qualità della traduzione dipende dal modello AI selezionato.*

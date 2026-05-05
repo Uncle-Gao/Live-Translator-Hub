@@ -4,15 +4,15 @@
 
 [English](../../README.md) | [日本語](ja-JP.md) | [한국어](ko-KR.md) | [Français](fr-FR.md) | [Deutsch](de-DE.md) | [Español](es-ES.md) | [Italiano](it-IT.md) | [Português](pt-BR.md) | [Português](pt-PT.md) | [Nederlands](nl-NL.md) | [Polski](pl-PL.md) | [Svenska](sv-SE.md) | [Dansk](da-DK.md) | [Suomi](fi-FI.md) | [Norsk](nb-NO.md) | [Čeština](cs-CZ.md) | [Slovenčina](sk-SK.md) | [Română](ro-RO.md) | [Ελληνικά](el-GR.md) | [Български](bg-BG.md) | [Українська](uk-UA.md) | [Русский](ru-RU.md) | [Lietuvių](lt-LT.md) | [Latviešu](lv-LV.md) | [Eesti](et-EE.md) | [Türkçe](tr-TR.md) | [Tiếng Việt](vi-VN.md) | [ไทย](th-TH.md) | [Bahasa Indonesia](id-ID.md) | [Bahasa Melayu](ms-MY.md) | [हिन्दी](hi-IN.md)
 
-## Projekt Áttekintés
+## Projekt áttekintés
 
-A Live Translator Hub egy **Electron + React GUI asztali alkalmazás**, amely egyetlen kattintással teszi lehetővé a Cursor és Claude AI programozási eszközök kínai nyelvű lokalizációját. Egy egységes fordító futásidejű magon keresztül egyetlen felületen kezeli a két célalkalmazás motorjának telepítését, API-kulcsok konfigurálását és szótárgenerálást.
+A Live Translator Hub egy **Electron + React GUI asztali alkalmazás**, amely egyetlen kattintással teszi lehetővé a Cursor és Claude AI programozási eszközök kínai nyelvű lokalizációját. Egységes fordító futásidejű magon keresztül egyetlen felületen kezeli a két célalkalmazás motorjának telepítését, API-kulcsok konfigurálását és szótárgenerálást.
 
-Ez a projekt a [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) architekturális továbbfejlesztése – CLI szkriptből állapotpanellel és valós idejű naplózással rendelkező GUI-vá fejlődött, és a Cursor és Claude lokalizációs képességeit egyesíti egy közös platformon.
+Ez a projekt a [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) architekturális továbbfejlesztése – CLI szkriptből állapotpanellel és valós idejű naplózással rendelkező GUI-vá fejlődött, és a Cursor és Claude lokalizációs képességeit egyesíti egyetlen egységes platformon.
 
+![Képernyőkép](../../image.png)
+![Képernyőkép](../../image-1.png)
 
-![Képernyőkép](image.png)
-![Képernyőkép](image-1.png)
 ## Architektúra
 
 ```
@@ -30,46 +30,46 @@ live-translator-ecosystem/          # npm workspaces monorepo
 
 ### Fordító futásidejű mag
 
-A `packages/core/src/translator-engine.js` az egyetlen futásidejű komponens, amely a célalkalmazásokba injektálódik – tiszta böngésző JavaScript, modul függőségek nélkül. Feladatai:
+A `packages/core/src/translator-engine.js` az egyetlen futásidejű mag, amely a célalkalmazásokba injektálódik – tiszta böngésző JS, modul függőségek nélkül. Feladatai:
 
-- **Szótárillesztés**: Statikus szócikkek + reguláris kifejezés minták
-- **AI fordítás proxy híd**: Webview környezetben a `postMessage` segítségével továbbítja a fordítási kéréseket a főablakba, megkerülve a CSP hálózati korlátozásokat
+- **Szótárillesztés**: statikus szócikkek + reguláris kifejezés minták
+- **AI fordítás proxy híd**: Webview környezetben `postMessage` segítségével továbbítja a fordítási kéréseket a főablakba, megkerülve a CSP hálózati korlátozásokat
 - **Fordítási gyorsítótár**: `localStorage` alapú perzisztens gyorsítótár, kulcsnév: `live_i18n_cache_<entity_name>`
-- **Beágyazott szótár keresés**: Támogatja az `enableNestedDict` módot
+- **Beágyazott szótár keresés**: támogatja az `enableNestedDict` módot
 
-## Funkciók Kiemelései
+## Funkciók kiemelései
 
 ### Két motor egységes kezelése
 
-Egyetlen felületen kezelheti a Cursor és Claude lokalizációs telepítési állapotát, szótárverzióit és kizárási szabályait, anélkül hogy eszközt kellene váltania.
+Egyetlen felületen kezelheti a Cursor és Claude lokalizációs telepítési állapotát, szótárverzióit és kizárási szabályait, anélkül hogy eszközöket kellene váltania.
 
 ### Teljes körű Webview áthatolás
 
-A Translation Bridge architektúrán keresztül az AI fordítási képesség a főablakból az összes Webview bővítmény rétegébe (pl. Claude Code) áthatol, megoldva a szigorú CSP szabályzatok által okozott hálózati blokkolást.
+A Translation Bridge architektúrán keresztül az AI fordítási képesség a főablakból áthatol az összes szintű Webview bővítménybe (pl. Claude Code), megoldva a szigorú CSP szabályzatok által okozott hálózati blokkolásokat.
 
-### Négy panel funkció elrendezés
+### Négy panel funkcióelrendezés
 
 | Panel | Funkció |
 | :--- | :--- |
 | **Cursor Engine** | Cursor lokalizáció telepítése/visszaállítása, főablak és Webview bővítmények tartományonkénti kizárási szabályainak kezelése |
 | **Claude Engine** | Claude lokalizáció telepítése/visszaállítása, kihagyási szabályok konfigurálása |
 | **API Keys** | Több AI fordítási motor API-kulcsainak kezelése (OpenAI, Anthropic, Google Gemini, DeepL támogatás), a kulcsok Electron `safeStorage` segítségével titkosítva tárolva |
-| **Dict Generator** | UI szövegek kinyerése a célalkalmazás forráskódjából, AI által tömegesen generált fordítási szótárak |
+| **Dict Generator** | UI karakterláncok kinyerése a célalkalmazás forráskódjából, AI által tömeges fordítási szótár generálása |
 
 ### Interaktív hibakeresés
 
-- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) kék szaggatott vonalú kiemelő keret be-/kikapcsolása
+- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) kék szaggatott kiemelő keret be-/kikapcsolása
 - Kiemelő módban tartsa lenyomva az `Option` (Mac) / `Alt` (Win) billentyűt, és vigye az egeret a kínai szöveg fölé az eredeti szöveg megtekintéséhez
 
 ### Tartományonkénti kizárási szabályok
 
-Minden entitás (főablak és egyes bővítmények) teljesen független kizárási szabálykészlettel rendelkezik (CSS szelektorok, URL illesztés, cím illesztés), biztosítva, hogy a kódterület és a fő interakciós terület ne legyen érintve a fordítástól.
+Minden entitás (főablak és egyes bővítmények) teljesen független kizárási szabálykészlettel rendelkezik (CSS szelektorok, URL illesztés, cím illesztés), biztosítva, hogy a kódterület és a mag interakciós területe ne legyen érintve a fordítástól.
 
 ### Automatikus frissítés
 
-Beépített `electron-updater`, támogatja a macOS alkalmazáson belüli automatikus frissítés keresést, letöltést és telepítést.
+Beépített `electron-updater`, támogatja a macOS alkalmazáson belüli automatikus ellenőrzést, letöltést és frissítések telepítését.
 
-## Gyors Kezdés
+## Gyors kezdés
 
 ```bash
 # Függőségek telepítése
@@ -82,12 +82,12 @@ npm run dev
 npm run build -w desktop-app
 ```
 
-### Használati Folyamat
+### Használati folyamat
 
 1. Az **API Keys** panelen konfigurálja az AI motor kulcsait
 2. Váltson a **Cursor Engine** vagy **Claude Engine** panelre
-3. Kattintson a **Deploy** gombra a lokalizáció egy kattintással történő telepítéséhez
-4. Indítsa újra a célalkalmazást a változások életbe lépéséhez
+3. Kattintson a **Deploy** gombra a lokalizáció egykattintásos telepítéséhez
+4. Indítsa újra a célalkalmazást a hatályba lépéshez
 
 ### Rendszerkövetelmények
 
@@ -97,8 +97,8 @@ npm run build -w desktop-app
 
 ## Biztonság
 
-- **API-kulcsok titkosított tárolása**: Electron `safeStorage` segítségével titkosítva tárolva a `~/.live_translator_hub/api_keys.enc` fájlban, nem kerül be a konfigurációs fájlba
-- **Közvetlen kommunikáció**: Fordítási kérések közvetlenül az AI szolgáltató API-jához érkeznek, nincs közvetítő szerver
+- **API-kulcsok titkosított tárolása**: Electron `safeStorage` segítségével titkosítva, a `~/.live_translator_hub/api_keys.enc` fájlba mentve, nem kerül be a konfigurációs fájlba
+- **Közvetlen kommunikáció**: Fordítási kérések közvetlenül az AI gyártó API-jához érkeznek, nincs közvetítő szerver
 - **Tartományi elkülönítés**: A kizárási szabályok nem érintik a forráskód fájlokat
 
 ---

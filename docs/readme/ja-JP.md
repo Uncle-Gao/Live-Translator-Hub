@@ -10,9 +10,9 @@ Live Translator Hub は **Electron + React GUI デスクトップアプリケー
 
 本プロジェクトは [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) のアーキテクチャアップグレード版です——CLIスクリプトからステータスパネルとリアルタイムログを備えたGUIへと進化し、Cursor と Claude の日本語化機能を1つの統一プラットフォームに統合しました。
 
+![スクリーンショット](../../image.png)
+![スクリーンショット](../../image-1.png)
 
-![スクリーンショット](image.png)
-![スクリーンショット](image-1.png)
 ## アーキテクチャ
 
 ```
@@ -33,7 +33,7 @@ live-translator-ecosystem/          # npm workspaces monorepo
 `packages/core/src/translator-engine.js` はターゲットアプリケーションに注入される唯一のランタイムです——純粋なブラウザJSであり、モジュール依存関係はありません。責務は以下の通りです：
 
 - **辞書マッチング**：静的エントリ + 正規表現パターン
-- **AI翻訳プロキシブリッジ**：Webview環境において `postMessage` を介して翻訳リクエストをメインウィンドウに転送し、CSPによるネットワーク制限を回避
+- **AI翻訳プロキシブリッジ**：Webview環境では `postMessage` を介して翻訳リクエストをメインウィンドウに転送し、CSPによるネットワーク制限を回避
 - **翻訳キャッシュ**：`localStorage` に基づく永続化キャッシュ。キー名は `live_i18n_cache_<entity_name>`
 - **ネスト辞書検索**：`enableNestedDict` モードをサポート
 
@@ -45,7 +45,7 @@ live-translator-ecosystem/          # npm workspaces monorepo
 
 ### 全シナリオWebview透過
 
-Translation Bridgeアーキテクチャにより、AI翻訳機能はメインウィンドウからすべての階層のWebviewプラグイン（Claude Codeなど）に透過的に到達でき、厳格なCSPポリシー下でのネットワーク遮断問題を解決します。
+Translation Bridgeアーキテクチャにより、AI翻訳機能はメインウィンドウからすべての階層のWebviewプラグイン（Claude Codeなど）に透過的にアクセスでき、厳格なCSPポリシー下でのネットワーク遮断問題を解決します。
 
 ### 4パネル機能レイアウト
 
@@ -59,11 +59,11 @@ Translation Bridgeアーキテクチャにより、AI翻訳機能はメインウ
 ### インタラクティブデバッグ
 
 - `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) で青色点線ハイライト枠を切り替え
-- ハイライトモード中に `Option` (Mac) / `Alt` (Win) を押しながら中国語にホバーすると原文を表示
+- ハイライトモードで `Option` (Mac) / `Alt` (Win) を押しながら中国語にホバーすると原文を表示
 
 ### ドメイン別ブロックルール
 
-各エンティティ（メインウィンドウと各プラグイン）は完全に独立したブロックルールセット（CSSセレクター、URLマッチング、タイトルマッチング）を持ち、コード領域やコアインタラクション領域が翻訳の影響を受けないようにします。
+各エンティティ（メインウィンドウと各プラグイン）は完全に独立したブロックルールセット（CSSセレクター、URLマッチング、タイトルマッチング）を持ち、コード領域とコアインタラクション領域が翻訳の影響を受けないようにします。
 
 ### 自動更新
 
@@ -84,7 +84,7 @@ npm run build -w desktop-app
 
 ### 使用手順
 
-1. **API Keys** パネルでAIエンジンのキーを設定
+1. **API Keys** パネルでAIエンジンキーを設定
 2. **Cursor Engine** または **Claude Engine** パネルに切り替え
 3. **Deploy** をクリックしてワンクリックで日本語化をデプロイ
 4. ターゲットアプリケーションを再起動して反映
@@ -93,14 +93,14 @@ npm run build -w desktop-app
 
 - macOS 13+（推奨）
 - Node.js 18+
-- Cursor または Claude デスクトップアプリケーションがインストールされていること
+- Cursor または Claude デスクトップアプリケーションがインストール済みであること
 
 ## セキュリティ
 
 - **APIキーの暗号化保存**：Electron `safeStorage` を介して `~/.live_translator_hub/api_keys.enc` に暗号化保存され、設定ファイルには書き込まれません
-- **直接通信**：翻訳リクエストはAIベンダーのAPIに直接到達し、中継サーバーは介在しません
+- **直接通信**：翻訳リクエストはAIベンダーAPIに直接到達し、中継サーバーは介在しません
 - **ドメイン分離**：ブロックルールはソースコードファイルに影響を与えません
 
 ---
 
-*本プロジェクトは交流学習目的でのみ提供されています。翻訳品質は選択されたAIモデルに依存します。*
+*本プロジェクトは学習・交流目的でのみ使用してください。翻訳品質は選択したAIモデルに依存します。*
