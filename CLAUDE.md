@@ -75,3 +75,58 @@ Generates JSON translation dictionaries by extracting UI strings from the target
 - API keys are **never** written into `config.json`; always route through `saveApiKeys`/`loadApiKeys` IPC handlers.
 - The runtime kernel (`translator-engine.js`) must remain a self-contained IIFE with no ES module syntax — it is appended raw into third-party app bundles.
 - Skip rules use two separate data shapes: workbench skips live under `config.cursor.skip._cursor_` (arrays), while Webview plugin skips live under `config.cursor.skipRules.webview.<pluginId>` (objects with `selectors`/`titles`/`urls` strings).
+
+## I18n (desktop-app UI)
+
+**Every user-visible string in `packages/desktop-app/src/` must use i18n.** No hardcoded Chinese or English text in JSX.
+
+### Adding new UI text
+
+```jsx
+// In components:
+import { useTranslation } from 'react-i18next';
+const { t } = useTranslation();
+<span>{t('myNewKey', '默认中文')}</span>
+
+// For text with inline formatting (em, span, etc.):
+import { Trans } from 'react-i18next';
+<Trans i18nKey="myNewKey" components={{ emStrong: <em className="..." /> }}>
+  Default text with <em>formatting</em>
+</Trans>
+```
+
+### After adding new keys
+
+```bash
+npm run i18n:extract -w desktop-app
+```
+
+This scans all `t()` and `<Trans>` calls, then auto-adds missing keys to:
+- `packages/desktop-app/src/locales/zh-CN.json` (primary)
+- `packages/desktop-app/src/locales/en-US.json` (secondary)
+
+The first argument to `t()` is always the key. When a key is missing in the JSON files, i18next falls back to the second argument (or the key name itself). After extraction, search for `__STRING_NOT_TRANSLATED__` in the JSON files to find keys that need manual translation.
+
+### How it works
+
+- `src/i18n.js` initializes i18next with resources loaded from all JSON files in `src/locales/` via Vite's `import.meta.glob`
+- `i18next-cli` (configured in `i18next.config.js`) scans `src/**/*.{jsx,js}` for `t()` and `<Trans>`
+- The extractor never removes keys automatically (`removeUnusedKeys: false`)
+- Plural detection is disabled — use `{{count}}` interpolation directly
+
+### Adding a new language
+
+1. Create `src/locales/<code>.json` (copy from `en-US.json` as starting point)
+2. The file is auto-loaded by `import.meta.glob`, no code changes needed
+
+### Batch translating locales
+
+```bash
+ANTHROPIC_API_KEY=sk-xxx npm run i18n:translate -w desktop-app
+# Or target specific languages:
+ANTHROPIC_API_KEY=sk-xxx npm run i18n:translate -w desktop-app -- --lang ja-JP,ko-KR
+# With DeepSeek:
+ANTHROPIC_API_KEY=sk-xxx node scripts/translate-locales.js --base-url https://api.deepseek.com --model deepseek-chat
+```
+
+The script (`scripts/translate-locales.js`) reads `en-US.json` as source, detects untranslated keys, and batch-translates them via the Anthropic Messages API.

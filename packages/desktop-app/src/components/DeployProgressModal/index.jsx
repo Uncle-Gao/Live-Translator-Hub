@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, XCircle, Loader2, MinusCircle, ArrowRightCircle } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -87,6 +88,7 @@ const StepGroup = ({ label, steps }) => (
 );
 
 const DeployProgressModal = ({ isOpen, title, steps, isDone, hasError, onClose }) => {
+  const { t } = useTranslation();
   const logsEndRef = useRef(null);
   const now = new Date();
   const defaultTime = now.toLocaleTimeString([], { hour12: false });
@@ -131,21 +133,21 @@ const DeployProgressModal = ({ isOpen, title, steps, isDone, hasError, onClose }
             <div className="flex-1 flex overflow-hidden min-h-0">
               {/* Left — steps */}
               <div className="w-[38%] border-r border-white/5 p-6 overflow-y-auto custom-scrollbar shrink-0">
-                <StepGroup label="字典准备" steps={dictSteps} />
-                <StepGroup label="部署" steps={deploySteps} />
+                <StepGroup label={t('deployProgressDictPrepare')} steps={dictSteps} />
+                <StepGroup label={t('deployProgressDeploy')} steps={deploySteps} />
               </div>
 
               {/* Right — logs */}
               <div className="flex-1 flex flex-col min-w-0">
                 <div className="h-9 border-b border-white/5 flex items-center px-5 shrink-0">
                   <span className="text-[10px] font-bold text-white/25 uppercase tracking-[0.2em]">
-                    详细日志
+                    {t('deployProgressDetailLog')}
                   </span>
                 </div>
                 <div className="flex-1 p-5 overflow-y-auto font-mono text-[11px] space-y-1 custom-scrollbar">
                   {allLogs.length === 0 ? (
                     <div className="h-full flex items-center justify-center text-white/8 italic text-xs">
-                      Waiting for task initiation...
+                      {t('deployProgressWaiting')}
                     </div>
                   ) : (
                     allLogs.map((log, i) => (
@@ -182,14 +184,14 @@ const DeployProgressModal = ({ isOpen, title, steps, isDone, hasError, onClose }
                     "text-xs font-medium",
                     hasError ? 'text-red-400' : 'text-emerald-400'
                   )}>
-                    {hasError ? '部署完成（含错误）' : '部署完成'}
+                    {hasError ? t('deployProgressDoneWithErrors') : t('deployProgressDone')}
                   </span>
                 </div>
               )}
               {!isDone && (
                 <div className="flex items-center gap-2 mr-auto">
                   <ArrowRightCircle className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
-                  <span className="text-xs text-white/30">正在进行中...</span>
+                  <span className="text-xs text-white/30">{t('deployProgressInProgress')}</span>
                 </div>
               )}
               <button
@@ -202,7 +204,7 @@ const DeployProgressModal = ({ isOpen, title, steps, isDone, hasError, onClose }
                     : "bg-white/5 text-white/15 cursor-not-allowed"
                 )}
               >
-                确定
+                {t('deployProgressConfirm')}
               </button>
             </div>
           </motion.div>

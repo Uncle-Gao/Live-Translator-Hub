@@ -26,12 +26,12 @@ const ExtensionScanner = ({ extensions, selectedIds = [], onToggle, onRefresh, i
         {isScanning ? (
           <div className="py-10 flex flex-col items-center justify-center gap-3 text-white/20">
             <RefreshCw className="w-8 h-8 animate-spin" />
-            <span className="text-xs font-bold uppercase tracking-widest">Scanning Extensions...</span>
+            <span className="text-xs font-bold uppercase tracking-widest">{t('extensionScannerScanning')}</span>
           </div>
         ) : extensions.length === 0 ? (
           <div className="py-10 border-2 border-dashed border-white/5 rounded-2xl flex flex-col items-center justify-center gap-2 text-white/20">
             <Layers className="w-8 h-8 opacity-20" />
-            <span className="text-xs font-medium">No translatable plugins found</span>
+            <span className="text-xs font-medium">{t('extensionScannerNoPlugins')}</span>
           </div>
         ) : (
           extensions.map((ext, idx) => {
@@ -68,11 +68,11 @@ const ExtensionScanner = ({ extensions, selectedIds = [], onToggle, onRefresh, i
                 <div className="flex items-center gap-3">
                   {ext.isPatched ? (
                     <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-[10px] font-bold text-blue-400 uppercase tracking-widest">
-                      Patched
+                      {t('patched')}
                     </div>
                   ) : (
                     <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/5 text-[10px] font-bold text-white/20 uppercase tracking-widest">
-                      Original
+                      {t('original')}
                     </div>
                   )}
                 </div>
@@ -83,7 +83,7 @@ const ExtensionScanner = ({ extensions, selectedIds = [], onToggle, onRefresh, i
       </div>
       
       <p className="text-[10px] text-white/20 leading-relaxed italic px-2">
-        * Only plugins with internal Webview JS components are shown here. Injection is performantly applied during deployment.
+        * {t('extensionScannerFooterNote')}
       </p>
     </div>
   );

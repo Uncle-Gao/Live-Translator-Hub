@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FileText, AlertTriangle, CheckCircle2, Key, ExternalLink, Play, Loader2, ChevronDown } from 'lucide-react';
 import useConfigStore from '../../store/configStore';
 
 const BATCH_SIZES = [20, 40, 60, 80];
 
 const DictStatus = ({ onGoToApiKeys }) => {
+  const { t } = useTranslation();
   const { config } = useConfigStore();
   const [dictInfo, setDictInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -58,7 +60,7 @@ const DictStatus = ({ onGoToApiKeys }) => {
   const handleGenerate = async () => {
     if (!engines[genEngine]?.apiKey) return;
     setGenerating(true);
-    setGenLogs([{ text: `🚀 开始为 Cursor 生成 ${lang} 字典...`, id: Date.now() }]);
+    setGenLogs([{ text: `🚀 ${t('dictStatusGenerateStart', { lang })}`, id: Date.now() }]);
     setProgress(null);
     try {
       const res = await window.liveTranslatorAPI.generateDict({
@@ -67,13 +69,13 @@ const DictStatus = ({ onGoToApiKeys }) => {
         appPath: config.cursor.appPath || null
       });
       if (res.ok) {
-        setGenLogs(prev => [...prev, { text: '✅ 字典生成完成！', id: Date.now() }]);
+        setGenLogs(prev => [...prev, { text: `✅ ${t('dictStatusGenerateSuccess')}`, id: Date.now() }]);
         await checkDict();
       } else {
-        setGenLogs(prev => [...prev, { text: `❌ 生成失败: ${res.error}`, id: Date.now() }]);
+        setGenLogs(prev => [...prev, { text: `❌ ${t('dictStatusGenerateFailed', { error: res.error })}`, id: Date.now() }]);
       }
     } catch (e) {
-      setGenLogs(prev => [...prev, { text: `❌ 异常: ${e.message}`, id: Date.now() }]);
+      setGenLogs(prev => [...prev, { text: `❌ ${t('dictStatusGenerateException', { message: e.message })}`, id: Date.now() }]);
     } finally {
       setGenerating(false);
       setProgress(null);
@@ -84,54 +86,54 @@ const DictStatus = ({ onGoToApiKeys }) => {
     <div className="bg-[#1A1C1E] border border-white/5 rounded-3xl p-6 space-y-4">
       <div className="flex items-center gap-3">
         <FileText className="w-4 h-4 text-white/30" />
-        <h3 className="text-sm font-bold uppercase tracking-widest text-white/60">字典状态</h3>
+        <h3 className="text-sm font-bold uppercase tracking-widest text-white/60">{t('dictStatusTitle')}</h3>
         <span className="text-[10px] text-white/20 ml-auto">{lang}</span>
       </div>
 
       {loading ? (
         <div className="flex items-center gap-2 text-white/30 text-xs">
           <Loader2 className="w-4 h-4 animate-spin" />
-          检查字典文件...
+          {t('dictStatusChecking')}
         </div>
       ) : dictInfo?.exists ? (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-emerald-400">
             <CheckCircle2 className="w-4 h-4" />
             <span className="text-sm font-medium">dictionary.{lang}.json</span>
-            <span className="text-[11px] text-emerald-400/50">{dictInfo.count} 条</span>
+            <span className="text-[11px] text-emerald-400/50">{t('dictStatusEntries', { count: dictInfo.count })}</span>
           </div>
-          <button onClick={checkDict} className="text-[10px] text-white/20 hover:text-white/50 transition-colors">刷新</button>
+          <button onClick={checkDict} className="text-[10px] text-white/20 hover:text-white/50 transition-colors">{t('dictStatusRefresh')}</button>
         </div>
       ) : (
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-amber-400">
             <AlertTriangle className="w-4 h-4" />
-            <span className="text-sm">dictionary.{lang}.json 不存在</span>
+            <span className="text-sm">dictionary.{lang}.json {t('dictStatusNotExists')}</span>
           </div>
 
           {/* 内嵌生成向导 */}
           <div className="bg-black/30 border border-white/5 rounded-2xl p-4 space-y-4">
-            <p className="text-xs text-white/40">需要先生成字典才能部署</p>
+            <p className="text-xs text-white/40">{t('dictStatusNeedGenerate')}</p>
 
             {!hasEngine ? (
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 text-amber-400/70">
                   <Key className="w-4 h-4 shrink-0" />
-                  <span className="text-xs">尚未配置 AI 引擎密钥</span>
+                  <span className="text-xs">{t('dictStatusNoEngineKey')}</span>
                 </div>
                 <button
                   onClick={onGoToApiKeys}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 text-amber-400 text-[11px] font-bold rounded-xl transition-all"
                 >
                   <Key className="w-3 h-3" />
-                  前往配置 <ExternalLink className="w-3 h-3" />
+                  {t('dictStatusGoConfig')} <ExternalLink className="w-3 h-3" />
                 </button>
               </div>
             ) : (
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-white/30">引擎</label>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-white/30">{t('dictStatusEngine')}</label>
                     <div className="relative">
                       <select
                         value={genEngine}
@@ -146,7 +148,7 @@ const DictStatus = ({ onGoToApiKeys }) => {
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-white/30">批次大小</label>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-white/30">{t('dictStatusBatchSize')}</label>
                     <div className="relative">
                       <select
                         value={batchSize}
@@ -172,7 +174,7 @@ const DictStatus = ({ onGoToApiKeys }) => {
                       />
                     </div>
                     <p className="text-[10px] text-blue-400/60 text-right">
-                      {Math.round((progress.current / progress.total) * 100)}%  正在翻译批次 {progress.current}/{progress.total}
+                      {Math.round((progress.current / progress.total) * 100)}%  {t('dictStatusTranslatingBatch', { current: progress.current, total: progress.total })}
                     </p>
                   </div>
                 )}
@@ -196,7 +198,7 @@ const DictStatus = ({ onGoToApiKeys }) => {
                   className="w-full flex items-center justify-center gap-2 py-2.5 bg-blue-500/10 border border-blue-500/20 hover:bg-blue-500/20 text-blue-400 text-xs font-bold rounded-xl transition-all disabled:opacity-50"
                 >
                   {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-                  {generating ? '生成中...' : '开始生成字典'}
+                  {generating ? t('dictStatusGenerating') : t('dictStatusStartGenerate')}
                 </button>
               </div>
             )}

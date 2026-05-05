@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pencil, Trash2 } from 'lucide-react';
 import { clsx } from 'clsx';
 import useConfigStore from '../../../store/configStore';
 import PluginRuleModal from './PluginRuleModal';
 
 const PluginRuleList = ({ extensions, selectedIds }) => {
+  const { t } = useTranslation();
   const { config, updateCursorSkipRules } = useConfigStore();
   const [editingPlugin, setEditingPlugin] = useState(null);
 
@@ -15,7 +17,7 @@ const PluginRuleList = ({ extensions, selectedIds }) => {
   if (selectedPlugins.length === 0) {
     return (
       <p className="text-[11px] text-white/20 italic px-1">
-        勾选上方插件后，此处会自动出现对应的规则项。
+        {t('skipRulesCheckPluginsHint')}
       </p>
     );
   }
@@ -54,7 +56,7 @@ const PluginRuleList = ({ extensions, selectedIds }) => {
                       {(rule.selectors || []).slice(0, 2).join(', ')}{(rule.selectors || []).length > 2 ? ' ...' : ''}
                     </p>
                   ) : (
-                    <p className="text-[10px] text-white/20 italic">未配置规则（全部翻译）</p>
+                    <p className="text-[10px] text-white/20 italic">{t('skipRulesNoRules')}</p>
                   )}
                 </div>
               </div>
@@ -62,14 +64,14 @@ const PluginRuleList = ({ extensions, selectedIds }) => {
                 <button
                   onClick={() => setEditingPlugin(ext)}
                   className="p-1.5 hover:bg-white/5 rounded-lg transition-all text-white/20 hover:text-white/60"
-                  title="编辑"
+                  title={t('skipRulesEdit')}
                 >
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => handleDelete(ext.id)}
                   className="p-1.5 hover:bg-red-500/10 rounded-lg transition-all text-white/20 hover:text-red-400"
-                  title="清空规则"
+                  title={t('skipRulesClearRules')}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>

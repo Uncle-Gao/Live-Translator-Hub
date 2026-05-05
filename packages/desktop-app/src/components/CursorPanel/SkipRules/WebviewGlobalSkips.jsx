@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import useConfigStore from '../../../store/configStore';
 import SkipChipInput from './SkipChipInput';
 
 const WebviewGlobalSkips = () => {
+  const { t } = useTranslation();
   const { config, updateCursorSkipRules } = useConfigStore();
   const globalSkip = config.cursor.skipRules?.webview?._global_ || {};
 
@@ -13,21 +15,21 @@ const WebviewGlobalSkips = () => {
 
   return (
     <div className="space-y-4">
-      <h4 className="text-xs font-bold text-white/50 uppercase tracking-wider">插件通用黑名单</h4>
+      <h4 className="text-xs font-bold text-white/50 uppercase tracking-wider">{t('skipRulesGlobalPlugin')}</h4>
 
       <div className="space-y-2">
-        <label className="text-[10px] text-white/20 uppercase tracking-wider">CSS 选择器</label>
+        <label className="text-[10px] text-white/20 uppercase tracking-wider">{t('skipRulesCssSelectors')}</label>
         <SkipChipInput
           type="selectors"
           items={toArray(globalSkip.selectors)}
           onChange={v => update('selectors', v)}
-          placeholder="粘贴或输入选择器，回车确认..."
+          placeholder={t('skipRulesPastePlaceholder')}
         />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1">
-          <label className="text-[10px] text-white/20 uppercase tracking-wider">跳过窗口标题</label>
+          <label className="text-[10px] text-white/20 uppercase tracking-wider">{t('skipRulesSkipTitles')}</label>
           <SkipChipInput
             type="titles"
             items={toArray(globalSkip.titles)}
@@ -36,7 +38,7 @@ const WebviewGlobalSkips = () => {
           />
         </div>
         <div className="space-y-1">
-          <label className="text-[10px] text-white/20 uppercase tracking-wider">跳过匹配网址</label>
+          <label className="text-[10px] text-white/20 uppercase tracking-wider">{t('skipRulesSkipUrls')}</label>
           <SkipChipInput
             type="urls"
             items={toArray(globalSkip.urls)}

@@ -105,7 +105,7 @@ const Sidebar = ({ activeTab, setActiveTab, cursorStatus, claudeStatus, onCheckU
                         item.status === 'installed' ? "bg-amber-500/15 text-amber-400" :
                         "bg-white/5 text-white/20"
                       )}>
-                        {item.status === 'patched' ? '已注入' : item.status === 'installed' ? '未注入' : '未安装'}
+                        {item.status === 'patched' ? t('sidebarPatched') : item.status === 'installed' ? t('sidebarUnpatched') : t('sidebarNotInstalled')}
                       </span>
                     )}
 

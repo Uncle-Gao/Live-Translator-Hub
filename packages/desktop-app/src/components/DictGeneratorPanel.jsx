@@ -42,7 +42,7 @@ export default function DictGeneratorPanel() {
 
   const handleGenerate = async () => {
     if (!apiKeys[engine]?.apiKey) {
-      alert('Please configure API Key in "AI Key Manager" first.')
+      alert(t('dictGenNoApiKey'))
       return
     }
 
@@ -81,8 +81,8 @@ export default function DictGeneratorPanel() {
             <Zap className="w-6 h-6 text-blue-400" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-white tracking-tight">Dictionary Generator</h3>
-            <p className="text-xs font-bold text-white/20 uppercase tracking-[0.2em]">Automated AI Translation Workspace</p>
+            <h3 className="text-xl font-bold text-white tracking-tight">{t('dictGenTitle')}</h3>
+            <p className="text-xs font-bold text-white/20 uppercase tracking-[0.2em]">{t('dictGenSubtitle')}</p>
           </div>
         </div>
         
@@ -90,7 +90,7 @@ export default function DictGeneratorPanel() {
           <div className="space-y-3">
             <label className="flex items-center gap-2 text-xs font-bold text-white/40 uppercase tracking-widest ml-1">
               <Monitor className="w-3.5 h-3.5" />
-              Target Application
+              {t('dictGenTargetApp')}
             </label>
             <div className="flex bg-black/40 p-1.5 rounded-2xl border border-white/5">
               {[
@@ -118,7 +118,7 @@ export default function DictGeneratorPanel() {
           <div className="space-y-3">
             <label className="flex items-center gap-2 text-xs font-bold text-white/40 uppercase tracking-widest ml-1">
               <Globe className="w-3.5 h-3.5" />
-              Target Language
+              {t('dictGenTargetLang')}
             </label>
             <select
               value={targetLang}
@@ -134,7 +134,7 @@ export default function DictGeneratorPanel() {
           <div className="space-y-3">
             <label className="flex items-center gap-2 text-xs font-bold text-white/40 uppercase tracking-widest ml-1">
               <Cpu className="w-3.5 h-3.5" />
-              Translation Engine
+              {t('dictGenTranslationEngine')}
             </label>
             <select
               value={engine}
@@ -143,7 +143,7 @@ export default function DictGeneratorPanel() {
             >
               {['openai', 'anthropic', 'gemini', 'deepl'].map(eng => (
                 <option key={eng} value={eng} disabled={!apiKeys[eng]?.apiKey} className="bg-[#1A1C1E]">
-                  {eng.toUpperCase()} {!apiKeys[eng]?.apiKey ? '(Not Configured)' : ''}
+                  {eng.toUpperCase()} {!apiKeys[eng]?.apiKey ? t('dictGenNotConfigured') : ''}
                 </option>
               ))}
             </select>
@@ -152,7 +152,7 @@ export default function DictGeneratorPanel() {
           <div className="space-y-3">
             <label className="flex items-center gap-2 text-xs font-bold text-white/40 uppercase tracking-widest ml-1">
               <Hash className="w-3.5 h-3.5" />
-              Batch Size (Concurrency)
+              {t('dictGenBatchSize')}
             </label>
             <input
               type="number"
@@ -175,7 +175,7 @@ export default function DictGeneratorPanel() {
             ) : (
               <Play className="w-5 h-5 text-white" />
             )}
-            <span className="text-sm font-bold text-white uppercase tracking-[0.2em]">Execute Generation Task</span>
+            <span className="text-sm font-bold text-white uppercase tracking-[0.2em]">{t('dictGenExecute')}</span>
           </div>
         </button>
       </div>
@@ -184,15 +184,15 @@ export default function DictGeneratorPanel() {
         <div className="h-10 bg-white/5 border-b border-white/5 flex items-center justify-between px-6 flex-shrink-0">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-            <span className="text-white/30 text-[10px] uppercase tracking-widest font-bold">Process Monitoring</span>
+            <span className="text-white/30 text-[10px] uppercase tracking-widest font-bold">{t('dictGenProcessMonitoring')}</span>
           </div>
-          <button onClick={() => setProgressLogs([])} className="text-white/20 hover:text-white/50 transition-colors">Clear Logs</button>
+          <button onClick={() => setProgressLogs([])} className="text-white/20 hover:text-white/50 transition-colors">{t('dictGenClearLogs')}</button>
         </div>
         
         <div className="flex-1 p-6 overflow-y-auto space-y-1.5 custom-scrollbar">
           {progressLogs.length === 0 ? (
             <div className="h-full flex items-center justify-center text-white/10 italic text-sm">
-              Waiting for task initiation...
+              {t('dictGenWaiting')}
             </div>
           ) : (
             progressLogs.map((log) => (
