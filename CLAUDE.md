@@ -116,8 +116,11 @@ The first argument to `t()` is always the key. When a key is missing in the JSON
 
 ### Adding a new language
 
+**Drop a JSON file into `src/locales/` — that's it. Zero code changes.**
+
 1. Create `src/locales/<code>.json` (copy from `en-US.json` as starting point)
-2. The file is auto-loaded by `import.meta.glob`, no code changes needed
+2. Run the translation script to populate it (see below)
+3. Done — `import.meta.glob` in `i18n.js` auto-discovers and loads all `*.json` files in the directory at build time. No imports to add, no constants to update.
 
 ### Batch translating locales
 
