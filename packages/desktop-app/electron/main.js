@@ -501,7 +501,12 @@ ipcMain.handle('update:download', async () => {
 
 ipcMain.handle('update:install', () => {
   if (!autoUpdater) return { ok: false, error: 'Update mechanism not available' };
+  // Remove macOS window-all-closed guard so the app can actually quit
+  app.removeAllListeners('window-all-closed');
   autoUpdater.quitAndInstall();
+  // Fallback: force exit after 3s if quitAndInstall didn't trigger
+  setTimeout(() => app.exit(0), 3000);
+  return { ok: true };
 });
 
 ipcMain.handle('update:getVersion', () => {
