@@ -37,8 +37,5 @@ linux:
   artifactName: "${productName}-${version}-linux-${arch}.${ext}"
   category: Development
 
-publish:
-  provider: github
-  owner: Uncle-Gao
-  repo: Live-Translator-Hub
-  releaseType: release
+# publish is handled by softprops/action-gh-release in CI workflow
+# to avoid "already_exists" errors on re-runs

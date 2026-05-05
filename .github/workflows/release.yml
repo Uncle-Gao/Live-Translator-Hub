@@ -50,8 +50,6 @@ jobs:
       - name: Package with electron-builder
         run: npx electron-builder --config electron-builder.yml ${{ matrix.arch-flags }}
         working-directory: packages/desktop-app
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate changelog
         if: matrix.platform == 'mac'
