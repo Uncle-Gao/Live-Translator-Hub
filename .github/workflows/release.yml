@@ -6,7 +6,35 @@ on:
       - 'v*'
 
 jobs:
-  release:
+  # Create the GitHub release first so all platform builds have a target
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --latest --strip header -o body.md
+
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: body.md
+          draft: false
+          prerelease: false
+
+  # Build all platforms in parallel, publish to the existing release
+  build:
+    needs: create-release
     strategy:
       fail-fast: false
       matrix:
@@ -52,27 +80,3 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: packages/desktop-app
-
-      - name: Generate changelog
-        if: matrix.platform == 'mac'
-        uses: orhun/git-cliff-action@v4
-        with:
-          config: cliff.toml
-          args: --latest --strip header -o body.md
-
-      - name: Upload artifacts + changelog (macOS)
-        if: matrix.platform == 'mac'
-        uses: softprops/action-gh-release@v2
-        with:
-          body_path: body.md
-          files: |
-            packages/desktop-app/release/*
-          fail_on_unmatched_files: false
-
-      - name: Upload artifacts (Win/Linux)
-        if: matrix.platform != 'mac'
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            packages/desktop-app/release/*
-          fail_on_unmatched_files: false
