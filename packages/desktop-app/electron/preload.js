@@ -48,7 +48,7 @@ contextBridge.exposeInMainWorld('liveTranslatorAPI', {
   onUpdateAvailable:     (cb) => ipcRenderer.on('update:available', (_e, info) => cb(info)),
   onUpdateNotAvailable:  (cb) => ipcRenderer.on('update:not-available', () => cb()),
   onUpdateProgress:      (cb) => ipcRenderer.on('update:download-progress', (_e, p) => cb(p)),
-  onUpdateDownloaded:    (cb) => ipcRenderer.on('update:downloaded', () => cb()),
+  onUpdateDownloaded:    (cb) => ipcRenderer.on('update:downloaded', (_e, info) => cb(info)),
   onUpdateError:         (cb) => ipcRenderer.on('update:error', (_e, err) => cb(err)),
 
   removeUpdateListeners: () => {

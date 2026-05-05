@@ -154,5 +154,7 @@
   "updateLatest": "You're up to date",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Update ready, restart to install",
+    "updateReadyMacOS": "Update downloaded, install the new version",
+    "updateOpenDmgBtn": "Open Installer",
   "waitingExecution": "Waiting for execution..."
 }

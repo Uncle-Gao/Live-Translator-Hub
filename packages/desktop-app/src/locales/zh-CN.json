@@ -154,5 +154,7 @@
   "updateLatest": "已是最新版本",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "更新已就绪，重启后生效",
+    "updateReadyMacOS": "更新已下载，请安装新版本",
+    "updateOpenDmgBtn": "打开安装包",
   "waitingExecution": "等待任务执行..."
 }

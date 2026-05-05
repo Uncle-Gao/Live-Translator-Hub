@@ -16,7 +16,7 @@ function formatBytes(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 }
 
-export default function UpdateNotification({ state, info, progress, onDownload, onInstall, onDismiss }) {
+export default function UpdateNotification({ state, info, progress, isMac, onDownload, onInstall, onDismiss }) {
   const { t } = useTranslation();
 
   const variants = {
@@ -36,8 +36,8 @@ export default function UpdateNotification({ state, info, progress, onDownload, 
     downloaded: {
       bg: 'from-emerald-500/20 to-emerald-600/10 border-emerald-500/30',
       icon: Download,
-      title: t('updateReady'),
-      btn: t('updateInstallBtn'),
+      title: isMac ? t('updateReadyMacOS') : t('updateReady'),
+      btn: isMac ? t('updateOpenDmgBtn') : t('updateInstallBtn'),
       action: onInstall,
     },
   };

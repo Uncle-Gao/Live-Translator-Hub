@@ -5,6 +5,7 @@ const fs   = require('fs');
 app.setName('Live Translator Hub');
 
 let autoUpdater = null;
+let downloadedUpdateFile = null;
 try { ({ autoUpdater } = require('electron-updater')); } catch { /* dev mode without package */ }
 
 // Fix: macOS 13 + Electron 34 AppKit state-restoration crash (NSPersistentUIRequiresSecureCoding)
@@ -237,8 +238,12 @@ function setupAutoUpdater() {
     });
   });
 
-  autoUpdater.on('update-downloaded', () => {
-    if (mainWindow) mainWindow.webContents.send('update:downloaded');
+  autoUpdater.on('update-downloaded', (info) => {
+    downloadedUpdateFile = info.downloadedFile;
+    if (mainWindow) mainWindow.webContents.send('update:downloaded', {
+      platform: process.platform,
+      downloadedFile: info.downloadedFile,
+    });
   });
 
   autoUpdater.on('error', (error) => {
@@ -501,11 +506,17 @@ ipcMain.handle('update:download', async () => {
 
 ipcMain.handle('update:install', () => {
   if (!autoUpdater) return { ok: false, error: 'Update mechanism not available' };
-  // Remove macOS window-all-closed guard so the app can actually quit
-  app.removeAllListeners('window-all-closed');
-  autoUpdater.quitAndInstall();
-  // Fallback: force exit after 3s if quitAndInstall didn't trigger
-  setTimeout(() => app.exit(0), 3000);
+  if (process.platform === 'darwin' && downloadedUpdateFile) {
+    // macOS DMG: open the DMG for manual drag-to-install, then quit
+    shell.openPath(downloadedUpdateFile).catch(() => {});
+    app.removeAllListeners('window-all-closed');
+    setTimeout(() => app.exit(0), 500);
+  } else {
+    // Windows/Linux: auto-update via electron-updater
+    app.removeAllListeners('window-all-closed');
+    autoUpdater.quitAndInstall();
+    setTimeout(() => app.exit(0), 3000);
+  }
   return { ok: true };
 });
 

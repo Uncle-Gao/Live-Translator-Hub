@@ -22,6 +22,7 @@ function App() {
   const [updateState, setUpdateState] = useState('idle')
   const [updateInfo, setUpdateInfo] = useState(null)
   const [updateProgress, setUpdateProgress] = useState(null)
+  const [isUpdateMac, setIsUpdateMac] = useState(false)
   
   const scrollRef = useRef(null)
   const bounceY = useOverscrollBounce(scrollRef)
@@ -55,7 +56,10 @@ function App() {
         setUpdateProgress(progress)
         setUpdateState('downloading')
       })
-      window.liveTranslatorAPI.onUpdateDownloaded(() => setUpdateState('downloaded'))
+      window.liveTranslatorAPI.onUpdateDownloaded((info) => {
+        if (info?.platform === 'darwin') setIsUpdateMac(true)
+        setUpdateState('downloaded')
+      })
       window.liveTranslatorAPI.onUpdateError(() => {
         setUpdateState('idle')
       })
@@ -146,6 +150,7 @@ function App() {
           state={updateState}
           info={updateInfo}
           progress={updateProgress}
+          isMac={isUpdateMac}
           onDownload={() => window.liveTranslatorAPI?.downloadUpdate()}
           onInstall={() => window.liveTranslatorAPI?.installUpdate()}
           onDismiss={() => setUpdateState('idle')}
