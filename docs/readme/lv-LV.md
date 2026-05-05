@@ -10,8 +10,6 @@ Live Translator Hub ir **Electron + React GUI darbvirsmas lietotne**, kas nodro�
 
 Šis projekts ir [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) arhitektūras jauninājums — no CLI skripta evolūcija uz GUI ar statusa paneli un reāllaika žurnāliem, apvienojot Cursor un Claude lokalizācijas iespējas vienotā platformā.
 
-![Ekrānuzņēmums](image.png)
-![Ekrānuzņēmums](image-1.png)
 
 ## Arhitektūra
 

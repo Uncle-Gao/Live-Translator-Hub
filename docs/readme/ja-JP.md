@@ -10,8 +10,6 @@ Live Translator Hub は **Electron + React GUI デスクトップアプリケー
 
 本プロジェクトは [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) のアーキテクチャアップグレード版です——CLIスクリプトからステータスパネルとリアルタイムログを備えたGUIへと進化し、Cursor と Claude の日本語化機能を1つの統一プラットフォームに統合しました。
 
-![スクリーンショット](image.png)
-![スクリーンショット](image-1.png)
 
 ## アーキテクチャ
 

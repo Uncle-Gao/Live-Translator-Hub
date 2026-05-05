@@ -10,8 +10,6 @@ Live Translator Hub ialah aplikasi **desktop GUI Electron + React** yang menyedi
 
 Projek ini merupakan peningkatan seni bina [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) — berkembang daripada skrip CLI kepada GUI dengan panel status dan log masa nyata, serta menggabungkan keupayaan penyetempatan Cina Cursor dan Claude ke dalam satu platform bersatu.
 
-![Tangkapan skrin](image.png)
-![Tangkapan skrin](image-1.png)
 
 ## Seni Bina
 

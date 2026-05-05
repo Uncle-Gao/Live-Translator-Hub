@@ -10,8 +10,6 @@ Live Translator Hub is een **Electron + React GUI desktopapplicatie** die eenvou
 
 Dit project is een architectuurupgrade van [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) – geëvolueerd van een CLI-script naar een GUI met statuspaneel en realtime logs, waarbij de vertaalmogelijkheden van Cursor en Claude worden samengevoegd in één uniform platform.
 
-![Screenshot](image.png)
-![Screenshot](image-1.png)
 
 ## Architectuur
 

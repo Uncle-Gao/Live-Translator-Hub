@@ -10,8 +10,6 @@ Live Translator Hub 是一个 **Electron + React GUI 桌面应用**，为 Cursor
 
 本项目是 [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) 的架构升级版——从 CLI 脚本进化为带状态面板与实时日志的 GUI，并将 Cursor 与 Claude 的汉化能力合并为同一个统一平台。
 
-![截图](image.png)
-![截图](image-1.png)
 
 ## 架构
 

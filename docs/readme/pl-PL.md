@@ -10,8 +10,6 @@
 
 Ten projekt jest ulepszoną architektonicznie wersją [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) – ewolucją ze skryptu CLI w GUI z panelem stanu i logami na żywo, łączącą możliwości sinizacji Cursor i Claude w jedną ujednoliconą platformę.
 
-![Zrzut ekranu](image.png)
-![Zrzut ekranu](image-1.png)
 
 ## Architektura
 

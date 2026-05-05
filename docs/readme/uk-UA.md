@@ -10,8 +10,6 @@ Live Translator Hub — це **настільний застосунок Electro
 
 Цей проєкт є архітектурним оновленням [Live-Translator-Hub](https://github.com/Uncle-Gao/Live-Translator-Hub) — еволюція від CLI-скрипта до GUI з панеллю стану та логами в реальному часі, що об'єднує можливості зріднення Cursor та Claude в єдину платформу.
 
-![Скріншот](image.png)
-![Скріншот](image-1.png)
 
 ## Архітектура
 
