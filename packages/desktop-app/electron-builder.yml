@@ -5,6 +5,12 @@ copyright: "Copyright 2026"
 directories:
   output: release
 
+publish:
+  provider: github
+  owner: Uncle-Gao
+  repo: Live-Translator-Hub
+  releaseType: release
+
 files:
   - dist/**/*
   - dist-electron/**/*

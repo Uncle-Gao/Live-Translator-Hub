@@ -49,6 +49,8 @@ jobs:
 
       - name: Package with electron-builder
         run: npx electron-builder --config electron-builder.yml ${{ matrix.arch-flags }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: packages/desktop-app
 
       - name: Generate changelog
