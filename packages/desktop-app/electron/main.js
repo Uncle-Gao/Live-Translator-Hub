@@ -201,6 +201,13 @@ function createWindow() {
 function setupAutoUpdater() {
   if (!autoUpdater || process.env.VITE_DEV_SERVER_URL) return;
 
+  autoUpdater.setFeedURL({
+    provider: 'github',
+    owner: 'Uncle-Gao',
+    repo: 'Live-Translator-Hub',
+    releaseType: 'release',
+  });
+
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = true;
   autoUpdater.allowDowngrade = false;

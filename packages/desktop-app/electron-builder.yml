@@ -43,9 +43,3 @@ linux:
     - deb
   artifactName: "${productName}-${version}-linux-${arch}.${ext}"
   category: Development
-
-publish:
-  provider: github
-  owner: Uncle-Gao
-  repo: Live-Translator-Hub
-  releaseType: release
