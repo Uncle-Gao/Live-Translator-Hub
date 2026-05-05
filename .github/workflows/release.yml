@@ -47,7 +47,7 @@ jobs:
         run: npm run dist -w desktop-app
 
       - name: Package with electron-builder
-        run: npx electron-builder --config packages/desktop-app/electron-builder.yml ${{ matrix.arch-flags }}
+        run: npx electron-builder --config electron-builder.yml ${{ matrix.arch-flags }}
         working-directory: packages/desktop-app
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
