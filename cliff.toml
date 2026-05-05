@@ -2,10 +2,18 @@
 # https://git-cliff.org/docs/configuration
 
 [changelog]
-header = """
+header = """\
 # Changelog / 更新日志
+"""
 
-## Download / 下载指引
+body = """\
+{% if version -%}
+## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else -%}
+## [Unreleased]
+{% endif %}
+
+### Download / 下载指引
 
 | Platform / 平台 | Arch / 架构 | Download / 下载 |
 |:---|:---|:---|
@@ -17,16 +25,6 @@ header = """
 > **macOS**: If prompted that the developer cannot be verified, go to **System Settings → Privacy & Security** and click "Open Anyway".
 > **Windows**: If SmartScreen blocks the app, click "More info" → "Run anyway".
 > **Linux**: Run `chmod +x` on the AppImage before executing.
-
----
-"""
-
-body = """
-{% if version -%}
-## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
-{% else -%}
-## [Unreleased]
-{% endif %}
 
 ### Changelog
 
