@@ -49,6 +49,7 @@ const TAGLINES = {
   'id-ID': '> Mesin lokalisasi waktu nyata berbasis GUI untuk aplikasi desktop Cursor dan Claude — dengan penetrasi plugin Webview dan terjemahan asinkron berbasis AI.',
   'ms-MY': '> Enjin penyetempatan masa nyata berasaskan GUI untuk aplikasi desktop Cursor dan Claude — dengan penembusan pemalam Webview dan terjemahan tak segerak berasaskan AI.',
   'hi-IN': '> Cursor और Claude डेस्कटॉप ऐप्स के लिए GUI-संचालित रीयल-टाइम स्थानीयकरण इंजन — Webview प्लगइन प्रवेश और AI-संचालित अतुल्यकालिक अनुवाद के साथ।',
+  'zh-CN': '> 覆盖 Cursor 与 Claude 桌面应用的 GUI 全场景实时汉化引擎，支持 Webview 插件穿透与 AI 异步翻译。',
 };
 
 const LANGS = [
@@ -84,6 +85,7 @@ const LANGS = [
   { code: 'id-ID', name: 'Indonesian', native: 'Bahasa Indonesia' },
   { code: 'ms-MY', name: 'Malay', native: 'Bahasa Melayu' },
   { code: 'hi-IN', name: 'Hindi', native: 'हिन्दी' },
+  { code: 'zh-CN', name: 'Chinese', native: '中文' },
 ];
 
 function buildSelector(currentLang) {
@@ -200,7 +202,12 @@ async function translateOne(lang) {
     tagline = TAGLINES.en;
   }
 
-  const translatedBody = body ? await translate(lang, body) : body;
+  let translatedBody = body ? await translate(lang, body) : body;
+
+  // Root README needs image.png (same dir); locale files need ../../image.png
+  if (lang === 'en') {
+    translatedBody = translatedBody.replace(/\]\(\.\.\/\.\.\/image/g, '](image');
+  }
 
   const outputPath = lang === 'en'
     ? path.join(ROOT, 'README.md')

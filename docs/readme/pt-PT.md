@@ -2,7 +2,7 @@
 
 > Um motor de localização em tempo real com GUI para as aplicações de desktop Cursor e Claude — com penetração de plugins Webview e tradução assíncrona por IA.
 
-[English](../../README.md) | [日本語](ja-JP.md) | [한국어](ko-KR.md) | [Français](fr-FR.md) | [Deutsch](de-DE.md) | [Español](es-ES.md) | [Italiano](it-IT.md) | [Português](pt-BR.md) | [Nederlands](nl-NL.md) | [Polski](pl-PL.md) | [Svenska](sv-SE.md) | [Dansk](da-DK.md) | [Suomi](fi-FI.md) | [Norsk](nb-NO.md) | [Čeština](cs-CZ.md) | [Slovenčina](sk-SK.md) | [Română](ro-RO.md) | [Magyar](hu-HU.md) | [Ελληνικά](el-GR.md) | [Български](bg-BG.md) | [Українська](uk-UA.md) | [Русский](ru-RU.md) | [Lietuvių](lt-LT.md) | [Latviešu](lv-LV.md) | [Eesti](et-EE.md) | [Türkçe](tr-TR.md) | [Tiếng Việt](vi-VN.md) | [ไทย](th-TH.md) | [Bahasa Indonesia](id-ID.md) | [Bahasa Melayu](ms-MY.md) | [हिन्दी](hi-IN.md)
+[English](../../README.md) | [日本語](ja-JP.md) | [한국어](ko-KR.md) | [Français](fr-FR.md) | [Deutsch](de-DE.md) | [Español](es-ES.md) | [Italiano](it-IT.md) | [Português](pt-BR.md) | [Nederlands](nl-NL.md) | [Polski](pl-PL.md) | [Svenska](sv-SE.md) | [Dansk](da-DK.md) | [Suomi](fi-FI.md) | [Norsk](nb-NO.md) | [Čeština](cs-CZ.md) | [Slovenčina](sk-SK.md) | [Română](ro-RO.md) | [Magyar](hu-HU.md) | [Ελληνικά](el-GR.md) | [Български](bg-BG.md) | [Українська](uk-UA.md) | [Русский](ru-RU.md) | [Lietuvių](lt-LT.md) | [Latviešu](lv-LV.md) | [Eesti](et-EE.md) | [Türkçe](tr-TR.md) | [Tiếng Việt](vi-VN.md) | [ไทย](th-TH.md) | [Bahasa Indonesia](id-ID.md) | [Bahasa Melayu](ms-MY.md) | [हिन्दी](hi-IN.md) | [中文](zh-CN.md)
 
 ## Visão Geral do Projeto
 
@@ -30,7 +30,7 @@ live-translator-ecosystem/          # npm workspaces monorepo
 
 ### Runtime de Tradução
 
-`packages/core/src/translator-engine.js` é o único runtime injetado nas aplicações alvo — JavaScript puro do navegador, sem dependências de módulos. As suas responsabilidades incluem:
+`packages/core/src/translator-engine.js` é o único runtime injetado nas aplicações alvo — JavaScript puro para navegador, sem dependências de módulos. As suas responsabilidades incluem:
 
 - **Correspondência de dicionário**: entradas estáticas + padrões regex
 - **Ponte de proxy de tradução AI**: no ambiente Webview, encaminha pedidos de tradução para a janela principal via `postMessage`, contornando as restrições de rede CSP
@@ -41,7 +41,7 @@ live-translator-ecosystem/          # npm workspaces monorepo
 
 ### Gestão Unificada de Dois Motores
 
-Numa única interface, gere o estado de implantação da tradução, versões de dicionário e regras de bloqueio para Cursor e Claude separadamente, sem necessidade de alternar ferramentas.
+Numa única interface, gere separadamente o estado de implantação da tradução, versões de dicionário e regras de bloqueio para Cursor e Claude, sem necessidade de alternar entre ferramentas.
 
 ### Penetração Webview em Todos os Cenários
 
@@ -51,8 +51,8 @@ Através da arquitetura Translation Bridge, a capacidade de tradução AI pode p
 
 | Painel | Função |
 | :--- | :--- |
-| **Cursor Engine** | Implementar/Reverter tradução do Cursor, gerir regras de bloqueio por domínio para a janela principal e plugins Webview |
-| **Claude Engine** | Implementar/Reverter tradução do Claude, configurar regras de omissão |
+| **Cursor Engine** | Implantar/restaurar tradução do Cursor, gerir regras de bloqueio separadas para a janela principal e plugins Webview |
+| **Claude Engine** | Implantar/restaurar tradução do Claude, configurar regras de omissão |
 | **API Keys** | Gerir chaves de API para múltiplos motores de tradução AI (suporta OpenAI, Anthropic, Google Gemini, DeepL), chaves armazenadas encriptadas via `safeStorage` do Electron |
 | **Dict Generator** | Extrair strings de UI do código fonte da aplicação alvo e gerar dicionários de tradução em lote via AI |
 
@@ -63,11 +63,11 @@ Através da arquitetura Translation Bridge, a capacidade de tradução AI pode p
 
 ### Regras de Bloqueio por Domínio
 
-Cada entidade (janela principal e cada plugin) possui conjuntos de regras de bloqueio completamente independentes (seletores CSS, correspondência de URL, correspondência de título), garantindo que as áreas de código e interação principal não sejam afetadas pela tradução.
+Cada entidade (janela principal e cada plugin) tem o seu próprio conjunto de regras de bloqueio completamente independente (seletores CSS, correspondência de URL, correspondência de título), garantindo que as áreas de código e interação principal não são afetadas pela tradução.
 
 ### Atualização Automática
 
-Inclui `electron-updater`, suporta verificação, download e instalação automática de atualizações dentro da aplicação no macOS.
+Inclui `electron-updater`, suporta verificação, descarga e instalação automática de atualizações dentro da aplicação no macOS.
 
 ## Início Rápido
 
@@ -86,7 +86,7 @@ npm run build -w desktop-app
 
 1. Configure as chaves do motor AI no painel **API Keys**
 2. Mude para o painel **Cursor Engine** ou **Claude Engine**
-3. Clique em **Deploy** para implementar a tradução com um clique
+3. Clique em **Deploy** para implantar a tradução com um clique
 4. Reinicie a aplicação alvo para que as alterações tenham efeito
 
 ### Requisitos de Sistema
@@ -103,4 +103,4 @@ npm run build -w desktop-app
 
 ---
 
-*Este projeto é apenas para fins de aprendizagem e troca. A qualidade da tradução é influenciada pelo modelo AI selecionado.*
+*Este projeto é apenas para fins de aprendizagem e troca de ideias. A qualidade da tradução é influenciada pelo modelo AI selecionado.*

@@ -2,7 +2,7 @@
 
 > Eine GUI-gestützte Echtzeit-Lokalisierungs-Engine für Cursor- und Claude-Desktop-Apps — mit Webview-Plug-in-Durchdringung und KI-gestützter asynchroner Übersetzung.
 
-[English](../../README.md) | [日本語](ja-JP.md) | [한국어](ko-KR.md) | [Français](fr-FR.md) | [Español](es-ES.md) | [Italiano](it-IT.md) | [Português](pt-BR.md) | [Português](pt-PT.md) | [Nederlands](nl-NL.md) | [Polski](pl-PL.md) | [Svenska](sv-SE.md) | [Dansk](da-DK.md) | [Suomi](fi-FI.md) | [Norsk](nb-NO.md) | [Čeština](cs-CZ.md) | [Slovenčina](sk-SK.md) | [Română](ro-RO.md) | [Magyar](hu-HU.md) | [Ελληνικά](el-GR.md) | [Български](bg-BG.md) | [Українська](uk-UA.md) | [Русский](ru-RU.md) | [Lietuvių](lt-LT.md) | [Latviešu](lv-LV.md) | [Eesti](et-EE.md) | [Türkçe](tr-TR.md) | [Tiếng Việt](vi-VN.md) | [ไทย](th-TH.md) | [Bahasa Indonesia](id-ID.md) | [Bahasa Melayu](ms-MY.md) | [हिन्दी](hi-IN.md)
+[English](../../README.md) | [日本語](ja-JP.md) | [한국어](ko-KR.md) | [Français](fr-FR.md) | [Español](es-ES.md) | [Italiano](it-IT.md) | [Português](pt-BR.md) | [Português](pt-PT.md) | [Nederlands](nl-NL.md) | [Polski](pl-PL.md) | [Svenska](sv-SE.md) | [Dansk](da-DK.md) | [Suomi](fi-FI.md) | [Norsk](nb-NO.md) | [Čeština](cs-CZ.md) | [Slovenčina](sk-SK.md) | [Română](ro-RO.md) | [Magyar](hu-HU.md) | [Ελληνικά](el-GR.md) | [Български](bg-BG.md) | [Українська](uk-UA.md) | [Русский](ru-RU.md) | [Lietuvių](lt-LT.md) | [Latviešu](lv-LV.md) | [Eesti](et-EE.md) | [Türkçe](tr-TR.md) | [Tiếng Việt](vi-VN.md) | [ไทย](th-TH.md) | [Bahasa Indonesia](id-ID.md) | [Bahasa Melayu](ms-MY.md) | [हिन्दी](hi-IN.md) | [中文](zh-CN.md)
 
 ## Projektübersicht
 
@@ -30,7 +30,7 @@ live-translator-ecosystem/          # npm workspaces monorepo
 
 ### Übersetzungs-Laufzeit
 
-`packages/core/src/translator-engine.js` ist die einzige Laufzeit, die in die Zielanwendungen injiziert wird – reines Browser-JavaScript, keine Modulabhängigkeiten. Zu den Aufgaben gehören:
+`packages/core/src/translator-engine.js` ist die einzige Laufzeit, die in die Zielanwendungen injiziert wird – reines Browser-JS, keine Modulabhängigkeiten. Zu den Aufgaben gehören:
 
 - **Wörterbuchabgleich**: Statische Einträge + Regex-Muster
 - **KI-Übersetzungs-Proxy-Brücke**: In der Webview-Umgebung werden Übersetzungsanfragen über `postMessage` an das Hauptfenster weitergeleitet, um CSP-bedingte Netzwerkbeschränkungen zu umgehen
@@ -58,8 +58,8 @@ Durch die Translation-Bridge-Architektur kann die KI-Übersetzungsfähigkeit vom
 
 ### Interaktives Debugging
 
-- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) zum Umschalten des blauen, gestrichelten Hervorhebungsrahmens
-- Im Hervorhebungsmodus `Option` (Mac) / `Alt` (Win) gedrückt halten und über chinesischen Text fahren, um den Originaltext anzuzeigen
+- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) zum Umschalten des blauen, gestrichelten Highlight-Rahmens
+- Im Highlight-Modus `Option` (Mac) / `Alt` (Win) gedrückt halten und über chinesischen Text fahren, um den Originaltext anzuzeigen
 
 ### Bereichsspezifische Ausschlussregeln
 
@@ -67,7 +67,7 @@ Jede Entität (Hauptfenster und einzelne Plugins) verfügt über einen vollstän
 
 ### Automatische Updates
 
-Integriertes `electron-updater` für die automatische Suche, den Download und die Installation von Updates innerhalb der macOS-Anwendung.
+Integriertes `electron-updater` für automatische Suche, Download und Installation von Updates innerhalb der macOS-Anwendung.
 
 ## Schnellstart
 
@@ -84,8 +84,8 @@ npm run build -w desktop-app
 
 ### Nutzungsablauf
 
-1. Konfigurieren Sie die KI-Engine-Schlüssel im Panel **API Keys**
-2. Wechseln Sie zum Panel **Cursor Engine** oder **Claude Engine**
+1. Konfigurieren Sie die KI-Engine-Schlüssel im **API Keys**-Panel
+2. Wechseln Sie zum **Cursor Engine**- oder **Claude Engine**-Panel
 3. Klicken Sie auf **Deploy**, um die Lokalisierung mit einem Klick bereitzustellen
 4. Starten Sie die Zielanwendung neu, um die Änderungen zu übernehmen
 
@@ -98,8 +98,8 @@ npm run build -w desktop-app
 ## Sicherheit
 
 - **Verschlüsselte API-Schlüsselspeicherung**: Über Electron `safeStorage` verschlüsselt in `~/.live_translator_hub/api_keys.enc` gespeichert, nicht in Konfigurationsdateien
-- **Direkte Kommunikation**: Übersetzungsanfragen gehen direkt an die API der KI-Anbieter, kein zwischengeschalteter Server
-- **Bereichsisolierung**: Ausschlussregeln berühren keine Quelldateien
+- **Direkte Kommunikation**: Übersetzungsanfragen gehen direkt an die KI-Anbieter-APIs, kein zwischengeschalteter Server
+- **Bereichsisolation**: Ausschlussregeln berühren keine Quelldateien
 
 ---
 

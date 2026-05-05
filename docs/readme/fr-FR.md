@@ -2,7 +2,7 @@
 
 > Un moteur de localisation en temps réel avec GUI pour les applications de bureau Cursor et Claude — avec pénétration des plugins Webview et traduction asynchrone par IA.
 
-[English](../../README.md) | [日本語](ja-JP.md) | [한국어](ko-KR.md) | [Deutsch](de-DE.md) | [Español](es-ES.md) | [Italiano](it-IT.md) | [Português](pt-BR.md) | [Português](pt-PT.md) | [Nederlands](nl-NL.md) | [Polski](pl-PL.md) | [Svenska](sv-SE.md) | [Dansk](da-DK.md) | [Suomi](fi-FI.md) | [Norsk](nb-NO.md) | [Čeština](cs-CZ.md) | [Slovenčina](sk-SK.md) | [Română](ro-RO.md) | [Magyar](hu-HU.md) | [Ελληνικά](el-GR.md) | [Български](bg-BG.md) | [Українська](uk-UA.md) | [Русский](ru-RU.md) | [Lietuvių](lt-LT.md) | [Latviešu](lv-LV.md) | [Eesti](et-EE.md) | [Türkçe](tr-TR.md) | [Tiếng Việt](vi-VN.md) | [ไทย](th-TH.md) | [Bahasa Indonesia](id-ID.md) | [Bahasa Melayu](ms-MY.md) | [हिन्दी](hi-IN.md)
+[English](../../README.md) | [日本語](ja-JP.md) | [한국어](ko-KR.md) | [Deutsch](de-DE.md) | [Español](es-ES.md) | [Italiano](it-IT.md) | [Português](pt-BR.md) | [Português](pt-PT.md) | [Nederlands](nl-NL.md) | [Polski](pl-PL.md) | [Svenska](sv-SE.md) | [Dansk](da-DK.md) | [Suomi](fi-FI.md) | [Norsk](nb-NO.md) | [Čeština](cs-CZ.md) | [Slovenčina](sk-SK.md) | [Română](ro-RO.md) | [Magyar](hu-HU.md) | [Ελληνικά](el-GR.md) | [Български](bg-BG.md) | [Українська](uk-UA.md) | [Русский](ru-RU.md) | [Lietuvių](lt-LT.md) | [Latviešu](lv-LV.md) | [Eesti](et-EE.md) | [Türkçe](tr-TR.md) | [Tiếng Việt](vi-VN.md) | [ไทย](th-TH.md) | [Bahasa Indonesia](id-ID.md) | [Bahasa Melayu](ms-MY.md) | [हिन्दी](hi-IN.md) | [中文](zh-CN.md)
 
 ## Aperçu du projet
 
@@ -45,21 +45,21 @@ Gérez l'état de déploiement de sinisation, les versions de dictionnaire et le
 
 ### Pénétration Webview tous scénarios
 
-Grâce à l'architecture Translation Bridge, les capacités de traduction IA peuvent pénétrer de la fenêtre principale à tous les niveaux de plugins Webview (comme Claude Code), contournant les problèmes d'interception réseau sous des politiques CSP strictes.
+Grâce à l'architecture Translation Bridge, la capacité de traduction IA peut pénétrer de la fenêtre principale à tous les niveaux de plugins Webview (comme Claude Code), contournant les problèmes d'interception réseau sous des politiques CSP strictes.
 
 ### Disposition fonctionnelle à quatre panneaux
 
 | Panneau | Fonction |
 | :--- | :--- |
-| **Cursor Engine** | Déployer/Restaurer la sinisation de Cursor, gérer les règles de blocage par domaine pour la fenêtre principale et les plugins Webview |
-| **Claude Engine** | Déployer/Restaurer la sinisation de Claude, configurer les règles de saut |
+| **Cursor Engine** | Déployer/restaurer la sinisation de Cursor, gérer les règles de blocage par domaine pour la fenêtre principale et les plugins Webview |
+| **Claude Engine** | Déployer/restaurer la sinisation de Claude, configurer les règles de saut |
 | **API Keys** | Gérer les clés API de plusieurs moteurs de traduction IA (prend en charge OpenAI, Anthropic, Google Gemini, DeepL), les clés sont stockées cryptées via Electron `safeStorage` |
-| **Dict Generator** | Extraire les chaînes UI de l'application source, générer des dictionnaires de traduction par lots via IA |
+| **Dict Generator** | Extraire les chaînes UI du code source de l'application cible et générer des dictionnaires de traduction par lots via IA |
 
 ### Débogage interactif
 
-- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) pour basculer les bordures de surbrillance en pointillés bleus
-- En mode surbrillance, maintenez `Option` (Mac) / `Alt` (Win) et survolez le texte chinois pour voir l'original
+- `Cmd + Option + Shift + B` (Mac) / `Ctrl + Alt + Shift + B` (Win) pour basculer la bordure de surbrillance en pointillés bleus
+- En mode surbrillance, maintenez `Option` (Mac) / `Alt` (Win) et survolez le texte chinois pour voir le texte original
 
 ### Règles de blocage par domaine
 
@@ -82,7 +82,7 @@ npm run dev
 npm run build -w desktop-app
 ```
 
-### Processus d'utilisation
+### Flux d'utilisation
 
 1. Configurez les clés du moteur IA dans le panneau **API Keys**
 2. Passez au panneau **Cursor Engine** ou **Claude Engine**
