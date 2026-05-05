@@ -1,0 +1,50 @@
+name: Build and Release Desktop App
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release-macos:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Sync version from git tag
+        run: |
+          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          cd packages/desktop-app
+          npm version "$TAG_VERSION" --no-git-tag-version --allow-same-version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build desktop app
+        run: npm run build -w desktop-app
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate changelog
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --latest --strip header -o body.md
+
+      - name: Upload artifacts to release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: body.md
+          files: |
+            packages/desktop-app/release/*.dmg
+            packages/desktop-app/release/*.yml
+            packages/desktop-app/release/*.zip

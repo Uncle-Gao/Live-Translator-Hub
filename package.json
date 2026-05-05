@@ -1,46 +1,12 @@
 {
-  "name": "cursor-live-translator",
-  "version": "2.5.0",
-  "description": "Cursor-Live-Translator: AI-Powered Real-time Localization Engine",
-  "main": "cursor_zh_pro.js",
-  "bin": "cursor_zh_pro.js",
-  "keywords": [
-    "cursor",
-    "localization",
-    "chinese",
-    "translation",
-    "hacker",
-    "checksum",
-    "patch"
+  "name": "live-translator-hub",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Live Translator Hub Monorepo",
+  "workspaces": [
+    "packages/*"
   ],
   "scripts": {
-    "start": "node cursor_zh_pro.js",
-    "build": "pkg . --targets node18-win-x64,node18-macos-x64,node18-linux-x64 --out-path dist --no-bytecode --public"
-  },
-  "pkg": {
-    "scripts": [],
-    "assets": [
-      "i18n/*.json",
-      "cursor-i18n-runtime.js"
-    ],
-    "targets": [
-      "node18-win-x64",
-      "node18-macos-x64",
-      "node18-linux-x64"
-    ],
-    "outputPath": "dist"
-  },
-  "author": "Uncle-Gao",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Uncle-Gao/cursor-live-translator.git"
-  },
-  "bugs": {
-    "url": "https://github.com/Uncle-Gao/cursor-live-translator/issues"
-  },
-  "homepage": "https://github.com/Uncle-Gao/cursor-live-translator#readme",
-  "devDependencies": {
-    "pkg": "^5.8.1"
+    "dev": "npm run dev -w desktop-app"
   }
 }
