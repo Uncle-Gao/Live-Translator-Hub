@@ -29,6 +29,34 @@ npm run build -w @live-translator/patcher-cursor
 npm run build -w @live-translator/patcher-claude
 ```
 
+## Release / Publishing
+
+**Never build locally for releases.** Publishing is done via GitHub Actions CI.
+
+### Workflow
+
+1. Bump version in `packages/desktop-app/package.json`
+2. Commit and push to `master`
+3. Create and push an annotated tag (`v<version>`), e.g. `v3.0.1`
+
+```bash
+git tag -a v3.0.1 -m "v3.0.1 — <summary>" && git push origin v3.0.1
+```
+
+### What happens
+
+- Pushing a `v*` tag triggers `.github/workflows/release.yml`
+- CI builds macOS (x64+arm64), Windows (x64), and Linux (x64) in parallel
+- `git-cliff` auto-generates changelog from commit history
+- Release is created with all platform artifacts + changelog attached
+
+### After release
+
+- Update `electron-updater` publish config in `electron-builder.yml` if target repo/URL changed
+- Verify auto-update via the app's built-in update check
+
+```
+
 ## Architecture
 
 This is a **npm workspaces monorepo** with four packages under `packages/`:
