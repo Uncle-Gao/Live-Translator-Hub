@@ -17,6 +17,7 @@ app.commandLine.appendSwitch('disable-features', 'HardwareVideoDecoder');
 const CONFIG_DIR      = path.join(app.getPath('home'), '.live_translator_hub');
 const API_KEYS_PATH   = path.join(CONFIG_DIR, 'api_keys.enc');
 const CONFIG_FILE_PATH = path.join(CONFIG_DIR, 'config.json');
+const DICTS_DIR       = path.join(CONFIG_DIR, 'dicts');
 
 function ensureConfigDir() {
   if (!fs.existsSync(CONFIG_DIR)) fs.mkdirSync(CONFIG_DIR, { recursive: true });
@@ -303,25 +304,22 @@ ipcMain.handle('i18n:getClaudeStatus', async () => {
 
 ipcMain.handle('i18n:getAvailableLanguages', async (_, targetApp) => {
   const langs = new Set(['zh-CN']);
+  const scanDir = (dir, patternFn) => {
+    if (!fs.existsSync(dir)) return;
+    fs.readdirSync(dir).forEach(f => {
+      const lang = patternFn(f);
+      if (lang) langs.add(lang);
+    });
+  };
   try {
     if (targetApp === 'cursor') {
-      const dir = path.resolve(__dirname, '../../patcher-cursor/i18n');
-      if (fs.existsSync(dir)) {
-        const files = fs.readdirSync(dir);
-        files.forEach(f => {
-          const m = f.match(/^dictionary\.(.+)\.json$/);
-          if (m && m[1] !== 'json') langs.add(m[1]);
-        });
-      }
+      const pattern = (f) => { const m = f.match(/^dictionary\.(.+)\.json$/); return m && m[1] !== 'json' ? m[1] : null; };
+      scanDir(path.join(DICTS_DIR, 'cursor'), pattern);
+      scanDir(path.resolve(__dirname, '../../patcher-cursor/i18n'), pattern);
     } else {
-      const dir = path.resolve(__dirname, '../../patcher-claude');
-      if (fs.existsSync(dir)) {
-        const files = fs.readdirSync(dir);
-        files.forEach(f => {
-          const m = f.match(/^(.+)\.json$/);
-          if (m && !['package', 'package-lock'].includes(m[1])) langs.add(m[1]);
-        });
-      }
+      const pattern = (f) => { const m = f.match(/^(.+)\.json$/); return m && !['package', 'package-lock'].includes(m[1]) ? m[1] : null; };
+      scanDir(path.join(DICTS_DIR, 'claude'), pattern);
+      scanDir(path.resolve(__dirname, '../../patcher-claude'), pattern);
     }
   } catch (err) {
     console.error('Failed to scan languages', err);
@@ -436,6 +434,7 @@ ipcMain.handle('dict:generate', async (_, { app: targetApp, lang, engine, batchS
       lang,
       batchSize: batchSize || 40,
       apiConfig: engineConfig,
+      outputDir: DICTS_DIR,
     });
 
     gen.on('progress', (msg) => {
@@ -452,7 +451,9 @@ ipcMain.handle('dict:generate', async (_, { app: targetApp, lang, engine, batchS
 ipcMain.handle('dict:status', async (_, { app: targetApp, lang }) => {
   try {
     if (targetApp === 'claude-strings') {
-      const stringsPath = path.resolve(__dirname, '../../patcher-claude/Localizable.strings.zh-CN');
+      const userPath = path.join(DICTS_DIR, 'claude', 'Localizable.strings.zh-CN');
+      const stringsPath = fs.existsSync(userPath) ? userPath
+        : path.resolve(__dirname, '../../patcher-claude/Localizable.strings.zh-CN');
       if (!fs.existsSync(stringsPath)) return { exists: false };
       const content = fs.readFileSync(stringsPath, 'utf8');
       const count = (content.match(/^"[^"]+"\s*=/gm) || []).length;
@@ -462,18 +463,26 @@ ipcMain.handle('dict:status', async (_, { app: targetApp, lang }) => {
     let dictPath;
     let fallback = false;
     if (targetApp === 'cursor') {
-      dictPath = path.resolve(__dirname, '../../patcher-cursor/i18n', `dictionary.${lang}.json`);
-      if (!fs.existsSync(dictPath)) {
-        const fallbackPath = path.resolve(__dirname, '../../patcher-cursor/i18n', 'dictionary.json');
-        if (fs.existsSync(fallbackPath)) {
-          dictPath = fallbackPath;
-          fallback = true;
-        }
+      const userDir = path.join(DICTS_DIR, 'cursor');
+      const userPath = path.join(userDir, `dictionary.${lang}.json`);
+      const userFallback = path.join(userDir, 'dictionary.json');
+      const asarPath = path.resolve(__dirname, '../../patcher-cursor/i18n', `dictionary.${lang}.json`);
+      const asarFallback = path.resolve(__dirname, '../../patcher-cursor/i18n', 'dictionary.json');
+      if (fs.existsSync(userPath)) {
+        dictPath = userPath;
+      } else if (fs.existsSync(userFallback)) {
+        dictPath = userFallback; fallback = true;
+      } else if (fs.existsSync(asarPath)) {
+        dictPath = asarPath;
+      } else if (fs.existsSync(asarFallback)) {
+        dictPath = asarFallback; fallback = true;
       }
     } else {
-      dictPath = path.resolve(__dirname, '../../patcher-claude', `${lang}.json`);
+      const userPath = path.join(DICTS_DIR, 'claude', `${lang}.json`);
+      dictPath = fs.existsSync(userPath) ? userPath
+        : path.resolve(__dirname, '../../patcher-claude', `${lang}.json`);
     }
-    if (!fs.existsSync(dictPath)) return { exists: false };
+    if (!dictPath || !fs.existsSync(dictPath)) return { exists: false };
     const dict = JSON.parse(fs.readFileSync(dictPath, 'utf8'));
     const count = Object.keys(dict).length;
     return { exists: true, count, path: dictPath, fallback };

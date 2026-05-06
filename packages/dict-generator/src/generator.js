@@ -57,12 +57,13 @@ class Generator extends EventEmitter {
    * @param {number} [config.batchSize]  每批翻译条数，默认 40
    * @param {object} config.apiConfig    传递给 adapter 的配置（apiKey, model, baseURL 等）
    */
-  constructor({ engine, lang, batchSize = 40, apiConfig }) {
+  constructor({ engine, lang, batchSize = 40, apiConfig, outputDir }) {
     super();
     this.engine    = engine;
     this.lang      = lang;
     this.batchSize = batchSize;
     this.apiConfig = apiConfig;
+    this.outputDir = outputDir || null;
 
     const langInfo = findLanguage(lang);
     if (!langInfo) throw new Error(`Unsupported language: ${lang}`);
@@ -92,7 +93,8 @@ class Generator extends EventEmitter {
 
     // 格式化并写入
     const outputDict = cursorFormatter.format(rawDict, resultMap);
-    const outputPath = path.join(CURSOR_I18N_DIR, `dictionary.${this.lang}.json`);
+    const baseDir = this.outputDir ? path.join(this.outputDir, 'cursor') : CURSOR_I18N_DIR;
+    const outputPath = path.join(baseDir, `dictionary.${this.lang}.json`);
     const missing = this._countMissing(sourceKeys, resultMap);
 
     if (missing > 0) {
@@ -119,7 +121,8 @@ class Generator extends EventEmitter {
     const resultMap = await this._translateItems(items);
 
     const outputDict = claudeFormatter.format(enMap, resultMap);
-    const outputPath = path.join(CLAUDE_DIR, `${this.lang}.json`);
+    const baseDir = this.outputDir ? path.join(this.outputDir, 'claude') : CLAUDE_DIR;
+    const outputPath = path.join(baseDir, `${this.lang}.json`);
     const missing = this._countMissing(sourceKeys, resultMap);
 
     if (missing > 0) {
@@ -145,7 +148,8 @@ class Generator extends EventEmitter {
     const resultMap = await this._translateItems(items);
 
     const outputContent = stringsFormatter.format(lines, entries, resultMap);
-    const outputPath = path.join(CLAUDE_DIR, `Localizable.strings.${this.lang}`);
+    const baseDir = this.outputDir ? path.join(this.outputDir, 'claude') : CLAUDE_DIR;
+    const outputPath = path.join(baseDir, `Localizable.strings.${this.lang}`);
     const missing = this._countMissing(sourceKeys, resultMap);
 
     if (missing > 0) {

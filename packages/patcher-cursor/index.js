@@ -93,12 +93,18 @@ function getPaths(customRoot = null) {
 function loadI18n(lang) {
     let resultDict = {};
     try {
-        let dictPath = path.join(__dirname, 'i18n', `dictionary.${lang}.json`);
-        if (!fs.existsSync(dictPath)) {
-            dictPath = path.join(__dirname, 'i18n', 'dictionary.json');
-        }
-        if (fs.existsSync(dictPath)) {
-            resultDict = JSON.parse(fs.readFileSync(dictPath, 'utf8'));
+        const userDir = path.join(os.homedir(), '.live_translator_hub', 'dicts', 'cursor');
+        const candidates = [
+            path.join(userDir, `dictionary.${lang}.json`),
+            path.join(userDir, 'dictionary.json'),
+            path.join(__dirname, 'i18n', `dictionary.${lang}.json`),
+            path.join(__dirname, 'i18n', 'dictionary.json'),
+        ];
+        for (const dictPath of candidates) {
+            if (fs.existsSync(dictPath)) {
+                resultDict = JSON.parse(fs.readFileSync(dictPath, 'utf8'));
+                break;
+            }
         }
     } catch (err) {
         console.error('❌ 加载 i18n 数据失败:', err.message);

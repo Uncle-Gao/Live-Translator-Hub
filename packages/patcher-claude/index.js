@@ -87,14 +87,22 @@ const ZH_CN_SOURCE = path.join(_pkgDir, 'zh-CN.json');
 const STRINGS_SOURCE = path.join(_pkgDir, 'Localizable.strings.zh-CN');
 
 function resolveDictSource(targetLanguage) {
+    const userDir = path.join(os.homedir(), '.live_translator_hub', 'dicts', 'claude');
+    const resolvePath = (filename) => {
+        const userPath = path.join(userDir, filename);
+        if (fs.existsSync(userPath)) return userPath;
+        const pkgPath = path.join(_pkgDir, filename);
+        if (fs.existsSync(pkgPath)) return pkgPath;
+        return null;
+    };
     if (!targetLanguage || targetLanguage === 'zh-CN') {
-        return { dictPath: ZH_CN_SOURCE, isChinese: true };
+        return { dictPath: resolvePath('zh-CN.json') || ZH_CN_SOURCE, isChinese: true };
     }
-    const langDict = path.join(_pkgDir, `${targetLanguage}.json`);
-    if (fs.existsSync(langDict)) {
-        return { dictPath: langDict, isChinese: false };
+    const dictPath = resolvePath(`${targetLanguage}.json`);
+    if (dictPath) {
+        return { dictPath, isChinese: false };
     }
-    return { dictPath: ZH_CN_SOURCE, isChinese: false, fallback: true };
+    return { dictPath: resolvePath('zh-CN.json') || ZH_CN_SOURCE, isChinese: false, fallback: true };
 }
 
 // Search for a marker string inside a (potentially huge) binary file.
