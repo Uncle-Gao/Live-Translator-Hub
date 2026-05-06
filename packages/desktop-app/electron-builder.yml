@@ -36,6 +36,7 @@ win:
   target:
     - nsis
   artifactName: "${productName}-${version}-win-${arch}.${ext}"
+  generateBlockMap: false
 
 nsis:
   oneClick: false
