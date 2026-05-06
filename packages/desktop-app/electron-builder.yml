@@ -34,7 +34,6 @@ win:
   icon: build/icon-win.ico
   target:
     - nsis
-    - zip
   artifactName: "${productName}-${version}-win-${arch}.${ext}"
 
 nsis:
