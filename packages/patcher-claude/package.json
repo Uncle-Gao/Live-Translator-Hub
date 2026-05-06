@@ -15,6 +15,7 @@
   "author": "Uncle-Gao",
   "license": "MIT",
   "dependencies": {
+    "@electron/asar": "^3.3.1",
     "@live-translator/core": "*",
     "sudo-prompt": "^9.2.1"
   }

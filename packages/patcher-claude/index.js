@@ -4,6 +4,7 @@ const os = require('os');
 const { execSync } = require('child_process');
 const crypto = require('crypto');
 const sudo = require('sudo-prompt');
+const asar = require('@electron/asar');
 
 const TEMP_DIR = path.join(os.tmpdir(), 'claude-unified-workspace');
 const NEW_ASAR = path.join(os.tmpdir(), 'app.asar.new');
@@ -328,7 +329,7 @@ class ClaudePatcher {
         }
 
         onProgress(`从 ${path.basename(extractionSource)} 提取应用包...`);
-        execSync(`npx -y @electron/asar extract "${extractionSource}" "${TEMP_DIR}"`);
+        asar.extractAll(extractionSource, TEMP_DIR);
 
         onProgress('编译并组装引擎代码...');
         const engineCode = fs.readFileSync(ENGINE_SOURCE, 'utf8');
@@ -379,7 +380,7 @@ class ClaudePatcher {
         onProgress('重新封包应用...');
         if (fs.existsSync(NEW_ASAR)) fs.unlinkSync(NEW_ASAR);
         if (fs.existsSync(NEW_UNPACKED)) fs.rmSync(NEW_UNPACKED, { recursive: true, force: true });
-        execSync(`npx -y @electron/asar pack "${TEMP_DIR}" "${NEW_ASAR}" --unpack "{*.node,*.dll,*.dylib,*.so,*.exe,spawn-helper}"`);
+        await asar.createPackageWithOptions(TEMP_DIR, NEW_ASAR, { unpack: '{*.node,*.dll,*.dylib,*.so,*.exe,spawn-helper}' });
 
         const newAsarBuffer = fs.readFileSync(NEW_ASAR);
         const headerSize = newAsarBuffer.readUInt32LE(12);
