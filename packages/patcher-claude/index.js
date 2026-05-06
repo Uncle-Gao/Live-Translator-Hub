@@ -84,8 +84,18 @@ try {
 } catch {
     _pkgDir = __dirname;
 }
-const ZH_CN_SOURCE = path.join(_pkgDir, 'zh-CN.json');
-const STRINGS_SOURCE = path.join(_pkgDir, 'Localizable.strings.zh-CN');
+let ZH_CN_SOURCE = path.join(_pkgDir, 'zh-CN.json');
+let STRINGS_SOURCE = path.join(_pkgDir, 'Localizable.strings.zh-CN');
+
+// When loaded from within an ASAR archive (e.g., the Live Translator Hub desktop app),
+// resource files are inaccessible to shell cp/mv commands. Copy them to temp so the
+// generated deploy scripts can reference real filesystem paths.
+if (_pkgDir.includes('.asar')) {
+    ZH_CN_SOURCE = path.join(os.tmpdir(), 'live-translator-patcher-claude-zh-CN.json');
+    STRINGS_SOURCE = path.join(os.tmpdir(), 'live-translator-patcher-claude-Localizable.strings.zh-CN');
+    fs.writeFileSync(ZH_CN_SOURCE, fs.readFileSync(path.join(_pkgDir, 'zh-CN.json')));
+    fs.writeFileSync(STRINGS_SOURCE, fs.readFileSync(path.join(_pkgDir, 'Localizable.strings.zh-CN')));
+}
 
 function resolveDictSource(targetLanguage) {
     const userDir = path.join(os.homedir(), '.live_translator_hub', 'dicts', 'claude');
