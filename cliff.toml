@@ -17,10 +17,10 @@ body = """\
 
 | Platform / 平台 | Arch / 架构 | Download / 下载 |
 |:---|:---|:---|
-| macOS | x64 (Intel) | [Live Translator Hub-{{ version | trim_start_matches(pat="v") }}-mac-x64.dmg](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live%20Translator%20Hub-{{ version | trim_start_matches(pat="v") }}-mac-x64.dmg) |
-| macOS | arm64 (Apple Silicon) | [Live Translator Hub-{{ version | trim_start_matches(pat="v") }}-mac-arm64.dmg](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live%20Translator%20Hub-{{ version | trim_start_matches(pat="v") }}-mac-arm64.dmg) |
-| Windows | x64 | [Live Translator Hub-{{ version | trim_start_matches(pat="v") }}-win-x64.exe](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live%20Translator%20Hub-{{ version | trim_start_matches(pat="v") }}-win-x64.exe) |
-| Linux | x64 | [Live Translator Hub-{{ version | trim_start_matches(pat="v") }}-linux-x64.AppImage](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live%20Translator%20Hub-{{ version | trim_start_matches(pat="v") }}-linux-x64.AppImage) |
+| macOS | x64 (Intel) | [Live-Translator-Hub-{{ version | trim_start_matches(pat="v") }}-mac-x64.dmg](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live-Translator-Hub-{{ version | trim_start_matches(pat="v") }}-mac-x64.dmg) |
+| macOS | arm64 (Apple Silicon) | [Live-Translator-Hub-{{ version | trim_start_matches(pat="v") }}-mac-arm64.dmg](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live-Translator-Hub-{{ version | trim_start_matches(pat="v") }}-mac-arm64.dmg) |
+| Windows | x64 | [Live-Translator-Hub-{{ version | trim_start_matches(pat="v") }}-win-x64.exe](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live-Translator-Hub-{{ version | trim_start_matches(pat="v") }}-win-x64.exe) |
+| Linux | x64 | [Live-Translator-Hub-{{ version | trim_start_matches(pat="v") }}-linux-x86_64.AppImage](https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/v{{ version | trim_start_matches(pat="v") }}/Live-Translator-Hub-{{ version | trim_start_matches(pat="v") }}-linux-x86_64.AppImage) |
 
 > **macOS**: If prompted that the developer cannot be verified, go to **System Settings → Privacy & Security** and click "Open Anyway".
 > **Windows**: If SmartScreen blocks the app, click "More info" → "Run anyway".
