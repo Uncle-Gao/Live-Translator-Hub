@@ -15,6 +15,7 @@
   "author": "Uncle-Gao",
   "license": "MIT",
   "dependencies": {
+    "@live-translator/core": "*",
     "sudo-prompt": "^9.2.1"
   }
 }
