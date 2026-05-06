@@ -5,8 +5,6 @@ copyright: "Copyright 2026"
 directories:
   output: release
 
-generateBlockMap: false
-
 publish:
   provider: github
   owner: Uncle-Gao
