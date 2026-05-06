@@ -5,6 +5,8 @@ copyright: "Copyright 2026"
 directories:
   output: release
 
+generateBlockMap: false
+
 publish:
   provider: github
   owner: Uncle-Gao
@@ -26,7 +28,6 @@ mac:
   target:
     - dmg
   artifactName: "${productName}-${version}-mac-${arch}.${ext}"
-  generateBlockMap: false
   hardenedRuntime: false
   gatekeeperAssess: false
   identity: null
@@ -36,7 +37,6 @@ win:
   target:
     - nsis
   artifactName: "${productName}-${version}-win-${arch}.${ext}"
-  generateBlockMap: false
 
 nsis:
   oneClick: false
