@@ -142,7 +142,7 @@ const ClaudePanel = ({ status, setShowSudoOverlay, refreshStatus, setActiveTab }
       const deployConfig = {
         ...config.claude,
         engines: config.apiKeys.engines,
-        resetCache: true
+        cacheVersion: config.claude.cacheVersion
       };
 
       setStep('patch', { status: 'running', logs: ['注入翻译补丁...'] });

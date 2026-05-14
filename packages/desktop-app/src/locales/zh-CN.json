@@ -156,5 +156,7 @@
   "updateReady": "更新已就绪，重启后生效",
     "updateReadyMacOS": "更新已下载，请安装新版本",
     "updateOpenDmgBtn": "打开安装包",
-  "waitingExecution": "等待任务执行..."
+  "waitingExecution": "等待任务执行...",
+  "resetCacheOnDeploy": "清空 AI 翻译缓存（仅一次）",
+  "resetCacheDesc": "部署后首次启动时清除 AI 翻译缓存，之后正常累积"
 }

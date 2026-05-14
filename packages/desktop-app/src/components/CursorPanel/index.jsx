@@ -203,7 +203,7 @@ const CursorPanel = ({ status, setShowSudoOverlay, refreshStatus, setActiveTab }
         ...config.cursor,
         engines: config.apiKeys.engines,
         skipRules: config.cursor.skipRules,
-        resetCache: true
+        cacheVersion: config.cursor.cacheVersion
       };
       await saveConfig();
 

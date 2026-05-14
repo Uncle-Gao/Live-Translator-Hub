@@ -28,41 +28,54 @@ try {
   CACHE = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
 } catch (e) { }
 
-if (CONFIG.resetCache) {
+const CACHE_VERSION_KEY = CACHE_KEY + '_version';
+const cacheVersion = CONFIG.cacheVersion || 0;
+if (cacheVersion && localStorage.getItem(CACHE_VERSION_KEY) !== String(cacheVersion)) {
   localStorage.removeItem(CACHE_KEY);
   CACHE = {};
-  console.log('%c[I18N] 已执行缓存物理重置', 'color:#f59e0b;font-weight:bold');
+  localStorage.setItem(CACHE_VERSION_KEY, cacheVersion);
+  console.log('%c[I18N] 已执行翻译缓存清除（版本更新）', 'color:#f59e0b;font-weight:bold');
 }
 
 function logCacheStatus() {
-  if (!IS_WORKBENCH && Object.keys(CACHE).length === 0) return;
-  try {
-    const serialized = JSON.stringify(CACHE);
-    const blob = new Blob([serialized]);
-    const kb = (blob.size / 1024).toFixed(2);
-    const limitKB = 5120; // 5MB
-    const percent = ((kb / limitKB) * 100).toFixed(2);
+  const count = Object.keys(CACHE).length;
+  if (!IS_WORKBENCH && count === 0) return;
+  const estKB = (count * 100 / 1024).toFixed(2);
+  const limitKB = 5120;
+  const percent = ((estKB / limitKB) * 100).toFixed(2);
 
-    let color = '#10b981';
-    if (percent > 80) color = '#ef4444';
-    else if (percent > 50) color = '#f59e0b';
+  let color = '#10b981';
+  if (percent > 80) color = '#ef4444';
+  else if (percent > 50) color = '#f59e0b';
 
-    console.log(
-      `%c[I18N]${CONFIG.name ? ` [${CONFIG.name}]` : ''}%c 翻译缓存占用: %c${kb} KB / ${limitKB} KB (${percent}%)`,
-      'color:#3b82f6;font-weight:bold',
-      'color:inherit',
-      `color:${color};font-weight:bold`
-    );
-  } catch (e) {
-    console.warn('[I18N] 无法计算缓存体积:', e.message);
-  }
+  console.log(
+    `%c[I18N]${CONFIG.name ? ` [${CONFIG.name}]` : ''}%c 翻译缓存占用: ~%c${estKB} KB / ${limitKB} KB (${percent}%) (${count} 条)`,
+    'color:#3b82f6;font-weight:bold',
+    'color:inherit',
+    `color:${color};font-weight:bold`
+  );
 }
 
 // === 3. 异步翻译管线 (智能防抖与批处理) ===
 const PENDING_JOBS = new Set();
 const IN_FLIGHT_JOBS = new Set();
+const PENDING_ELEMENTS = new Set();
 let globalBatchTimer = null;
 const REQUEST_INTERVAL = 2000;
+
+let cacheDirty = false;
+let cachePersistTimer = null;
+function scheduleCachePersist() {
+  cacheDirty = true;
+  if (cachePersistTimer) clearTimeout(cachePersistTimer);
+  cachePersistTimer = setTimeout(() => flushCache(), 5000);
+}
+function flushCache() {
+  if (!cacheDirty) return;
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify(CACHE)); } catch (e) {}
+  cacheDirty = false;
+  cachePersistTimer = null;
+}
 let DEBUG_STYLE = `
   body.i18n-debug-active .i18n-debug-highlight {
     outline: 1px dashed #3b82f6 !important;
@@ -136,7 +149,8 @@ Strings: ${JSON.stringify(texts)}`;
         messages: [{ role: 'system', content: prompt }],
         response_format: { type: "json_object" },
         max_tokens: 4096,
-        temperature: 0.3
+        temperature: 0.3,
+        thinking: { type: "disabled" }
       })
     });
 
@@ -269,11 +283,7 @@ function applyTranslations(newMap) {
     IN_FLIGHT_JOBS.delete(k);
     PENDING_JOBS.delete(k);
   }
-  try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify(CACHE));
-  } catch (e) {
-    console.error('%c[I18N] 写入缓存失败 (可能超 5MB 限制):', 'color:#ef4444;font-weight:bold', e.message);
-  }
+  scheduleCachePersist();
   logCacheStatus();
 
   if (FEATURES.enableTranslationBridge && IS_WORKBENCH) {
@@ -291,7 +301,14 @@ function applyTranslations(newMap) {
   }
 
   logCacheStatus();
-  requestAnimationFrame(() => walkAndTranslate(document.body));
+  requestAnimationFrame(() => {
+    if (PENDING_ELEMENTS.size > 0) {
+      for (const el of PENDING_ELEMENTS) {
+        if (el.isConnected) walkAndTranslate(el);
+      }
+      PENDING_ELEMENTS.clear();
+    }
+  });
 }
 
 function scheduleTranslation(text) {
@@ -392,32 +409,33 @@ function isExcluded(node) {
   return false;
 }
 
-function processNode(node) {
-  if (isExcluded(node)) return;
+function processNode(node, skipExclusion) {
+  if (!skipExclusion && isExcluded(node)) return;
   const raw = node.textContent.trim();
   const trans = getTranslation(raw);
   const parent = node.parentElement;
 
-  if (trans && node.textContent !== node.textContent.replace(raw, trans)) {
+  if (trans && node.textContent.includes(raw)) {
     if (parent) {
       parent.classList.add('i18n-debug-highlight');
       if (FEATURES.enableLoadingAnimation) parent.classList.remove('i18n-loading');
       parent.setAttribute('data-i18n-original', raw);
     }
     node.textContent = node.textContent.replace(raw, trans);
-  } else if (parent && FEATURES.enableLoadingAnimation && (PENDING_JOBS.has(raw) || IN_FLIGHT_JOBS.has(raw))) {
-    if (!parent.classList.contains('i18n-loading')) {
+  } else if (parent && (PENDING_JOBS.has(raw) || IN_FLIGHT_JOBS.has(raw))) {
+    if (FEATURES.enableLoadingAnimation && !parent.classList.contains('i18n-loading')) {
       parent.classList.add('i18n-loading');
     }
+    PENDING_ELEMENTS.add(parent);
   }
 }
 
-function processTitle(el) {
-  if (isExcluded(el)) return;
+function processTitle(el, skipExclusion) {
+  if (!skipExclusion && isExcluded(el)) return;
   const title = el.getAttribute('title');
   if (!title) return;
   const target = getTranslation(title.trim());
-  if (target && title !== title.replace(title.trim(), target)) {
+  if (target && title.includes(title.trim())) {
     el.classList.add('i18n-debug-highlight');
     el.setAttribute('data-i18n-original-title', title);
     el.setAttribute('title', title.replace(title.trim(), target));
@@ -428,18 +446,18 @@ function processTitle(el) {
 let mutationBuffer = [];
 let rafId = null;
 
-function walkAndTranslate(root) {
+function walkAndTranslate(root, skipExclusion) {
   if (!root || !root.isConnected) return;
   if (root.nodeType === Node.TEXT_NODE) {
-    processNode(root);
+    processNode(root, skipExclusion);
   } else if (root.nodeType === Node.ELEMENT_NODE) {
     if (SKIP_TAGS.has(root.tagName)) return;
-    if (root.hasAttribute('title')) processTitle(root);
+    if (root.hasAttribute('title')) processTitle(root, skipExclusion);
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, (n) => {
       return (n.parentElement && SKIP_TAGS.has(n.parentElement.tagName)) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
     });
     let textNode;
-    while ((textNode = walker.nextNode())) processNode(textNode);
+    while ((textNode = walker.nextNode())) processNode(textNode, skipExclusion);
   }
 }
 
@@ -467,6 +485,8 @@ function init() {
   
   if (window.__LIVE_I18N_INIT_DONE__) return;
   window.__LIVE_I18N_INIT_DONE__ = true;
+
+  window.addEventListener('beforeunload', () => { flushCache(); });
 
   initRegexRules();
 
@@ -549,7 +569,7 @@ function init() {
   }
 
   observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['title'] });
-  walkAndTranslate(document.body);
+  walkAndTranslate(document.body, true);
   logCacheStatus();
   if (IS_WORKBENCH) {
      console.log(`%c[Live-Translator-Core]%c ${CONFIG.name ? `[${CONFIG.name}] ` : ''}动力系统就绪 | V3 (Eng: ${CONFIG.engineId || CONFIG.apiType})`, 'color:#8b5cf6;font-weight:bold', '');

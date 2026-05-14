@@ -267,7 +267,7 @@ class CursorPatcher {
             gemini: apiType === 'gemini' ? activeEngine : null,
             deepl: apiType === 'deepl' ? activeEngine : null,
             skip: { ...(config.skip?._cursor_ || {}), selectors: skipSelectors },
-            resetCache: !!config.resetCache,
+            cacheVersion: config.cacheVersion || 0,
             features: Object.assign({ enableDictionary: true, enableNestedDict: true, enableRegex: true, enableTranslationBridge: true, enableLoadingAnimation: true }, config.features || {})
         };
         const I18N_DICT = loadI18n(targetLang);

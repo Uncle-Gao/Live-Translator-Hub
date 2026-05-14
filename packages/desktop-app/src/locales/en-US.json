@@ -156,5 +156,7 @@
   "updateReady": "Update ready, restart to install",
     "updateReadyMacOS": "Update downloaded, install the new version",
     "updateOpenDmgBtn": "Open Installer",
-  "waitingExecution": "Waiting for execution..."
+  "waitingExecution": "Waiting for execution...",
+  "resetCacheOnDeploy": "Clear AI translation cache (one-time)",
+  "resetCacheDesc": "Clear AI translation cache on first launch after deploy, then accumulate normally"
 }

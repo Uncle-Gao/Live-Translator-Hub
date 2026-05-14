@@ -151,6 +151,18 @@ const DeployConfig = ({ extensions, selectedPluginIds, onTogglePlugin, onRefresh
                   className="w-5 h-5 rounded-lg bg-black/40 border-white/10 text-blue-500 focus:ring-blue-500/20 disabled:opacity-60"
                 />
               </label>
+              <label className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-2xl cursor-pointer hover:bg-white/[0.08] transition-all group">
+                <div>
+                  <span className="text-sm font-medium text-white/60 group-hover:text-white/90">{t('resetCacheOnDeploy', '清空 AI 翻译缓存（仅一次）')}</span>
+                  <p className="text-[10px] text-white/30 mt-0.5">{t('resetCacheDesc', '清除 localStorage 中的 AI 翻译缓存，下次启动时重新翻译')}</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={!!cursor.cacheVersion}
+                  onChange={e => updateCursorConfig({ cacheVersion: e.target.checked ? Date.now() : 0 })}
+                  className="w-5 h-5 rounded-lg bg-black/40 border-white/10 text-blue-500 focus:ring-blue-500/20 shrink-0 ml-3"
+                />
+              </label>
               {Object.entries({
                 enableRegex: t('enableRegex', '启用正则匹配'),
                 enableTranslationBridge: t('enableTranslationBridge', '跨 Webview 桥接'),

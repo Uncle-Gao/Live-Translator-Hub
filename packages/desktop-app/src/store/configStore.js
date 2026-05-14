@@ -33,6 +33,7 @@ const useConfigStore = create((set, get) => ({
       },
       selectedPlugins: [],
       injectWebview: true,
+      cacheVersion: 0,
       skipRules: {
         webview: {
           _global_: { selectors: '', titles: '', urls: '' }
@@ -71,6 +72,7 @@ const useConfigStore = create((set, get) => ({
           urls: []
         }
       },
+      cacheVersion: 0,
     },
     apiKeys: {
       engines: {},

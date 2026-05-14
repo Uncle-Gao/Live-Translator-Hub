@@ -361,7 +361,7 @@ class ClaudePatcher {
                 titles: config.skip?._claude_?.titles || [],
                 urls: config.skip?._claude_?.urls || []
             },
-            resetCache: !!config.resetCache,
+            cacheVersion: config.cacheVersion || 0,
             features: Object.assign({
                 enableDictionary: true,
                 enableNestedDict: true,
