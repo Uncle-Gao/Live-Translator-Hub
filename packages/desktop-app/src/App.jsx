@@ -24,6 +24,7 @@ function App() {
   const [updateProgress, setUpdateProgress] = useState(null)
   const [isUpdateMac, setIsUpdateMac] = useState(false)
   const [updateError, setUpdateError] = useState(null)
+  const [canManualInstall, setCanManualInstall] = useState(false)
   
   const scrollRef = useRef(null)
   const bounceY = useOverscrollBounce(scrollRef)
@@ -48,30 +49,31 @@ function App() {
       window.liveTranslatorAPI.onSudoPrompt(() => setShowSudoOverlay(true))
 
       window.liveTranslatorAPI.onUpdateChecking(() => {
-        setUpdateError(null)
+        setUpdateError(null); setCanManualInstall(false)
         setUpdateState('checking')
       })
       window.liveTranslatorAPI.onUpdateAvailable((info) => {
-        setUpdateError(null)
+        setUpdateError(null); setCanManualInstall(false)
         setUpdateInfo(info)
         setUpdateState('available')
       })
       window.liveTranslatorAPI.onUpdateNotAvailable(() => {
-        setUpdateError(null)
+        setUpdateError(null); setCanManualInstall(false)
         setUpdateState('idle')
       })
       window.liveTranslatorAPI.onUpdateProgress((progress) => {
-        setUpdateError(null)
+        setUpdateError(null); setCanManualInstall(false)
         setUpdateProgress(progress)
         setUpdateState('downloading')
       })
       window.liveTranslatorAPI.onUpdateDownloaded((info) => {
-        setUpdateError(null)
+        setUpdateError(null); setCanManualInstall(false)
         if (info?.platform === 'darwin') setIsUpdateMac(true)
         setUpdateState('downloaded')
       })
       window.liveTranslatorAPI.onUpdateError((err) => {
         setUpdateError(err?.message || null)
+        setCanManualInstall(!!err?.canManualInstall)
         setUpdateState('error')
       })
     }
@@ -164,9 +166,10 @@ function App() {
           progress={updateProgress}
           isMac={isUpdateMac}
           error={updateError}
+          canManualInstall={canManualInstall}
           onDownload={() => window.liveTranslatorAPI?.downloadUpdate()}
           onInstall={() => window.liveTranslatorAPI?.installUpdate()}
-          onDismiss={() => { setUpdateError(null); setUpdateState('idle'); }}
+          onDismiss={() => { setUpdateError(null); setCanManualInstall(false); setUpdateState('idle'); }}
         />
 
         <Header title={getTitle()} />

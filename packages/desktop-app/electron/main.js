@@ -6,6 +6,7 @@ app.setName('Live Translator Hub');
 
 let autoUpdater = null;
 let downloadedUpdateFile = null;
+let squirrelInstallFailed = false;
 try { ({ autoUpdater } = require('electron-updater')); } catch { /* dev mode without package */ }
 
 // Fix: macOS 13 + Electron 34 AppKit state-restoration crash (NSPersistentUIRequiresSecureCoding)
@@ -249,9 +250,12 @@ function setupAutoUpdater() {
 
   autoUpdater.on('error', (error) => {
     console.error('[autoUpdater]', error);
+    // If we have a downloaded file when error fires, it's Squirrel install failure
+    squirrelInstallFailed = !!downloadedUpdateFile;
     if (mainWindow) mainWindow.webContents.send('update:error', {
       message: error.message,
       code: error.code,
+      canManualInstall: squirrelInstallFailed,
     });
   });
 
@@ -513,20 +517,50 @@ ipcMain.handle('update:download', async () => {
   }
 });
 
+// ─── macOS manual install fallback (when Squirrel fails) ──────────────────
+async function manualInstallMac(downloadedFile) {
+  const sudo = require('sudo-prompt');
+  const { execSync } = require('child_process');
+  const tmpDir = path.join(app.getPath('temp'), `lth-update-${Date.now()}`);
+
+  fs.mkdirSync(tmpDir, { recursive: true });
+  execSync(`unzip -oq "${downloadedFile}" -d "${tmpDir}"`, { timeout: 30000 });
+
+  const items = fs.readdirSync(tmpDir);
+  const appBundle = items.find(i => i.endsWith('.app'));
+  if (!appBundle) throw new Error('.app bundle not found in update');
+
+  const source = path.join(tmpDir, appBundle);
+  const dest = path.join('/Applications', appBundle);
+
+  return new Promise((resolve, reject) => {
+    sudo.exec(`cp -Rf "${source}" "${dest}"`, { name: 'Live Translator Hub' }, err => {
+      if (err) reject(err); else resolve();
+    });
+  });
+}
+
 ipcMain.handle('update:install', () => {
   if (!autoUpdater) return { ok: false, error: 'Update mechanism not available' };
   if (process.platform === 'darwin' && downloadedUpdateFile) {
-    // macOS DMG: open the DMG for manual drag-to-install, then quit
-    shell.openPath(downloadedUpdateFile).catch(() => {});
     app.removeAllListeners('window-all-closed');
-    setTimeout(() => app.exit(0), 500);
+    if (!squirrelInstallFailed) {
+      // Squirrel auto-install (works for signed apps or permissive macOS)
+      autoUpdater.quitAndInstall();
+      return { ok: true };
+    }
+    // Squirrel failed — extract ZIP and copy .app to /Applications
+    manualInstallMac(downloadedUpdateFile)
+      .then(() => process.nextTick(() => app.exit(0)))
+      .catch(err => console.error('[manualInstall] failed:', err));
+    return { ok: true };
   } else {
     // Windows/Linux: auto-update via electron-updater
     app.removeAllListeners('window-all-closed');
     autoUpdater.quitAndInstall();
     setTimeout(() => app.exit(0), 3000);
+    return { ok: true };
   }
-  return { ok: true };
 });
 
 ipcMain.handle('update:getVersion', () => {

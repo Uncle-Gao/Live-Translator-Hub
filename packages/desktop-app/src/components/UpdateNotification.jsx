@@ -16,7 +16,7 @@ function formatBytes(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 }
 
-export default function UpdateNotification({ state, info, progress, isMac, error, onDownload, onInstall, onDismiss }) {
+export default function UpdateNotification({ state, info, progress, isMac, error, canManualInstall, onDownload, onInstall, onDismiss }) {
   const { t } = useTranslation();
 
   const variants = {
@@ -102,6 +102,14 @@ export default function UpdateNotification({ state, info, progress, isMac, error
               className="px-4 py-1.5 rounded-lg text-xs font-bold bg-white/10 hover:bg-white/20 text-white transition-colors shrink-0"
             >
               {active.btn}
+            </button>
+          )}
+          {state === 'error' && canManualInstall && (
+            <button
+              onClick={onInstall}
+              className="px-4 py-1.5 rounded-lg text-xs font-bold bg-red-500/20 hover:bg-red-500/30 text-red-300 transition-colors shrink-0"
+            >
+              {t('updateInstallBtn')}
             </button>
           )}
           {!active.progress && (
