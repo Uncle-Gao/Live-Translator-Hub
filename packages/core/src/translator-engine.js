@@ -19,6 +19,8 @@ const SKIP_TAGS = new Set(['SCRIPT', 'STYLE', 'TEXTAREA', 'INPUT', 'CODE', 'PRE'
 const SKIP_TITLES = CONFIG.skip?.titles || [];
 const SKIP_URLS = CONFIG.skip?.urls || [];
 const SKIP_SELECTORS = CONFIG.skip?.selectors || [];
+const panelBypassSelectors = new Set();
+const panelSkipSelectors = new Set();
 const CACHE_KEY = 'live_i18n_cache_' + (CONFIG.name ? String(CONFIG.name).replace(/[^a-zA-Z0-9]/g, '_') : 'default');
 const IS_WORKBENCH = window.self === window.top;
 
@@ -90,6 +92,123 @@ let DEBUG_STYLE = `
     box-shadow: 0 4px 12px rgba(0,0,0,0.3); backdrop-filter: blur(4px);
     border: 1px solid rgba(255,255,255,0.1); max-width: 450px;
     word-break: break-word; line-height: 1.4;
+  }
+  .i18n-skip-preview {
+    outline: 2px dashed #ef4444 !important;
+    outline-offset: 1px !important;
+    background-color: rgba(239, 68, 68, 0.12) !important;
+  }
+  body.i18n-debug-active .i18n-debug-highlight.i18n-skip-preview,
+  body.i18n-debug-active .i18n-skip-preview {
+    outline: 2px dashed #ef4444 !important;
+    outline-offset: 1px !important;
+    background-color: rgba(239, 68, 68, 0.12) !important;
+  }
+  #i18n-skip-panel {
+    position: fixed; top: 12px; right: 12px; z-index: 2147483647;
+    width: 280px; max-height: 480px;
+    background: rgba(15, 23, 42, 0.96); border: 1px solid rgba(239,68,68,0.4);
+    border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    display: flex; flex-direction: column; font-family: monospace;
+    font-size: 11px; color: #e2e8f0; overflow: hidden;
+  }
+  #i18n-panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 10px; background: rgba(239,68,68,0.15);
+    border-bottom: 1px solid rgba(239,68,68,0.2); flex-shrink: 0;
+    font-size: 11px; font-weight: bold; color: #fca5a5;
+  }
+  #i18n-panel-close {
+    background: none; border: none; color: #94a3b8; cursor: pointer;
+    font-size: 13px; line-height: 1; padding: 0 2px;
+  }
+  #i18n-panel-close:hover { color: #ef4444; }
+  #i18n-panel-body {
+    flex: 1; overflow-y: auto; padding: 6px 0;
+  }
+  .i18n-panel-section {
+    padding: 2px 10px 4px; font-size: 10px;
+    color: rgba(148,163,184,0.5); text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .i18n-rule-item {
+    display: flex; align-items: center; gap: 6px;
+    padding: 3px 10px; cursor: default;
+  }
+  .i18n-rule-item:hover { background: rgba(255,255,255,0.04); }
+  .i18n-rule-checkbox { cursor: pointer; flex-shrink: 0; accent-color: #ef4444; }
+  .i18n-rule-label {
+    flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    color: #cbd5e1; font-size: 11px;
+  }
+  .i18n-rule-label.inherited { color: #64748b; }
+  .i18n-rule-lock { color: #475569; font-size: 10px; flex-shrink: 0; }
+  .i18n-rule-delete {
+    background: none; border: none; color: #475569; cursor: pointer;
+    font-size: 11px; line-height: 1; padding: 0 2px; flex-shrink: 0;
+  }
+  .i18n-rule-delete:hover { color: #ef4444; }
+  #i18n-panel-footer {
+    display: flex; gap: 6px; padding: 8px 10px;
+    border-top: 1px solid rgba(255,255,255,0.06); flex-shrink: 0;
+  }
+  #i18n-panel-footer button {
+    flex: 1; padding: 5px 0; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 5px; background: rgba(255,255,255,0.05);
+    color: #94a3b8; cursor: pointer; font-size: 10px;
+    font-family: monospace; transition: all 0.15s;
+  }
+  #i18n-panel-footer button:hover { background: rgba(255,255,255,0.1); color: #e2e8f0; }
+  #i18n-panel-copy:hover { border-color: rgba(34,197,94,0.4); color: #86efac !important; }
+  #i18n-panel-clear:hover { border-color: rgba(239,68,68,0.4); color: #fca5a5 !important; }
+  #i18n-selector-chooser {
+    position: fixed; z-index: 2147483648; min-width: 240px; max-width: 420px;
+    background: rgba(15, 23, 42, 0.97); border: 1px solid rgba(249,115,22,0.5);
+    border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    font-family: monospace; font-size: 11px; overflow: hidden; display: none;
+  }
+  #i18n-chooser-title {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 10px; color: #64748b; font-size: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    word-break: break-all; cursor: move;
+  }
+  #i18n-ch-close {
+    cursor: pointer; flex-shrink: 0; color: #64748b; transition: color 0.15s;
+  }
+  #i18n-ch-close:hover { color: #ef4444 !important; }
+
+  .i18n-chooser-item {
+    padding: 6px 10px; color: #cbd5e1; cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.04); word-break: break-all;
+  }
+  .i18n-chooser-item:last-child { border-bottom: none; }
+  .i18n-chooser-item:hover { background: rgba(249,115,22,0.15); color: #fdba74; }
+  .i18n-chooser-item.active { background: rgba(249,115,22,0.15); color: #fdba74; }
+  .i18n-chooser-item-best::before { content: "▶ "; color: #f97316; }
+  #i18n-chooser-nav {
+    display: flex; gap: 6px; padding: 8px 10px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  #i18n-chooser-actions {
+    display: flex; gap: 6px; padding: 8px 10px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  #i18n-chooser-nav button,
+  #i18n-chooser-actions button {
+    flex: 1; padding: 5px 0; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 5px; background: rgba(255,255,255,0.05);
+    color: #94a3b8; cursor: pointer; font-size: 10px;
+    font-family: monospace; transition: all 0.15s;
+  }
+  #i18n-chooser-nav button:hover,
+  #i18n-chooser-actions button:hover { background: rgba(255,255,255,0.1); color: #e2e8f0; }
+  #i18n-chooser-confirm:hover { border-color: rgba(34,197,94,0.4); color: #86efac !important; }
+  #i18n-pick-toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #16a34a; color: #fff; font: bold 12px/1 monospace;
+    padding: 7px 18px; border-radius: 20px; z-index: 2147483647;
+    pointer-events: none; opacity: 0; transition: opacity 0.25s;
   }
 `;
 
@@ -394,17 +513,22 @@ function isExcluded(node) {
   if (!node) return false;
   const el = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
   if (!el) return false;
+  if (el.closest('#i18n-skip-panel, #i18n-selector-chooser, #i18n-pick-toast, #i18n-hover-tooltip')) return true;
 
   for (const selector of SKIP_SELECTORS) {
     if (!selector || typeof selector !== 'string') continue;
     try {
       if (el.closest(selector)) {
+        if (panelBypassSelectors.has(selector)) continue;
         if (node.nodeType === Node.ELEMENT_NODE) {
           console.warn(`[Live-Translator] 屏蔽区域匹配成功: ${selector}`, node);
         }
         return true;
       }
     } catch (e) { }
+  }
+  for (const selector of panelSkipSelectors) {
+    try { if (el.closest(selector)) return true; } catch (e) {}
   }
   return false;
 }
@@ -464,7 +588,11 @@ function walkAndTranslate(root, skipExclusion) {
 function handleMutations() {
   rafId = null;
   const nodes = mutationBuffer.splice(0, mutationBuffer.length);
-  nodes.forEach(n => { if (n.isConnected) walkAndTranslate(n); });
+  nodes.forEach(n => {
+    if (!n.isConnected) return;
+    walkAndTranslate(n);
+    if (document.body.classList.contains('i18n-debug-active')) syncRedOverlays(n);
+  });
 }
 
 const observer = new MutationObserver((mutations) => {
@@ -479,6 +607,119 @@ const observer = new MutationObserver((mutations) => {
   }
   if (hasAct && !rafId) rafId = requestAnimationFrame(handleMutations);
 });
+
+function getPickSelectors(el) {
+  const results = [];
+  for (const attr of el.attributes) {
+    if (attr.name.startsWith('data-') && !attr.name.startsWith('data-i18n') &&
+        attr.value && attr.value.length < 60)
+      results.push(`[${attr.name}="${attr.value}"]`);
+  }
+  if (el.id) results.push(`#${el.id}`);
+  const ariaLabel = el.getAttribute('aria-label');
+  if (ariaLabel && ariaLabel.length < 40) results.push(`[aria-label="${ariaLabel}"]`);
+  const role = el.getAttribute('role');
+  if (role) results.push(`[role="${role}"]`);
+  const stableClasses = [...el.classList].filter(c =>
+    !c.startsWith('i18n-') && c.length > 3 &&
+    !/^(flex|grid|block|inline|hidden|relative|absolute|fixed|static|sticky)$/.test(c)
+  );
+  if (stableClasses.length) results.push('.' + stableClasses.slice(0, 3).join('.'));
+  return results;
+}
+
+function getAncestorChain(el) {
+  const parts = [];
+  let cur = el.parentElement;
+  let depth = 0;
+  while (cur && cur !== document.body && depth < 3) {
+    const tag = cur.tagName.toLowerCase();
+    const cls = [...cur.classList]
+      .filter(c => !c.startsWith('i18n-') && c.length > 3).slice(0, 2).join('.');
+    parts.unshift(cls ? `${tag}.${cls}` : tag);
+    cur = cur.parentElement;
+    depth++;
+  }
+  return parts.join(' > ');
+}
+
+function getActivePreviewSelectors() {
+  const selectors = [];
+  for (const selector of SKIP_SELECTORS) {
+    if (selector && !panelBypassSelectors.has(selector)) selectors.push(selector);
+  }
+  for (const selector of panelSkipSelectors) {
+    if (selector) selectors.push(selector);
+  }
+  return selectors;
+}
+
+function syncRedOverlays(root) {
+  const base = root
+    ? (root.nodeType === Node.ELEMENT_NODE ? root : root.parentElement)
+    : document.body;
+  if (!base) return;
+
+  if (!root) {
+    document.querySelectorAll('.i18n-skip-preview').forEach(el => {
+      el.classList.remove('i18n-skip-preview');
+    });
+  } else if (base.classList) {
+    base.classList.remove('i18n-skip-preview');
+    base.querySelectorAll('.i18n-skip-preview').forEach(el => {
+      el.classList.remove('i18n-skip-preview');
+    });
+  }
+
+  for (const selector of getActivePreviewSelectors()) {
+    try {
+      if (base.matches && base.matches(selector)) base.classList.add('i18n-skip-preview');
+      base.querySelectorAll(selector).forEach(el => {
+        el.classList.add('i18n-skip-preview');
+      });
+    } catch (e) {}
+  }
+}
+
+function applyRedOverlay() {
+  syncRedOverlays();
+}
+
+function removeRedOverlay() {
+  syncRedOverlays();
+}
+
+function restoreElementText(el) {
+  const original = el.getAttribute('data-i18n-original');
+  if (!original) return;
+  const trans = getTranslation(original);
+  if (!trans) return;
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  let node;
+  while ((node = walker.nextNode())) {
+    if (node.textContent.includes(trans)) {
+      node.textContent = node.textContent.replace(trans, original);
+    }
+  }
+}
+
+function restoreOriginalInArea(selector) {
+  try {
+    document.querySelectorAll(selector).forEach(root => {
+      restoreElementText(root);
+      root.querySelectorAll('[data-i18n-original]').forEach(el => restoreElementText(el));
+      root.querySelectorAll('[data-i18n-original-title]').forEach(el => {
+        el.setAttribute('title', el.getAttribute('data-i18n-original-title'));
+      });
+    });
+  } catch (e) {}
+}
+
+function retranslateArea(selector) {
+  try {
+    document.querySelectorAll(selector).forEach(el => walkAndTranslate(el));
+  } catch (e) {}
+}
 
 function init() {
   if (SKIP_URLS.some(u => location.href.includes(u)) || SKIP_TITLES.some(t => document.title.includes(t))) return;
@@ -498,6 +739,180 @@ function init() {
   tooltip.id = 'i18n-hover-tooltip';
   document.body.appendChild(tooltip);
 
+  const skipPanel = document.createElement('div');
+  skipPanel.id = 'i18n-skip-panel';
+  skipPanel.style.display = 'none';
+  skipPanel.innerHTML = `
+    <div id="i18n-panel-header">
+      <span>⛔ 屏蔽规则预览</span>
+      <button id="i18n-panel-close">✕</button>
+    </div>
+    <div id="i18n-panel-body">
+      <div class="i18n-panel-section">当前配置</div>
+      <ul id="i18n-panel-inherited" style="list-style:none;margin:0;padding:0"></ul>
+      <div class="i18n-panel-section" style="margin-top:4px">已拾取</div>
+      <ul id="i18n-panel-picked" style="list-style:none;margin:0;padding:0"></ul>
+    </div>
+    <div id="i18n-panel-footer">
+      <button id="i18n-panel-copy">复制已选</button>
+      <button id="i18n-panel-clear">清除已拾取</button>
+    </div>
+  `;
+  document.body.appendChild(skipPanel);
+
+  const pickToast = document.createElement('div');
+  pickToast.id = 'i18n-pick-toast';
+  document.body.appendChild(pickToast);
+
+  let toastTimer = null;
+  const pickedRules = new Map();
+
+  function showPickToast(text) {
+    pickToast.textContent = text;
+    pickToast.style.opacity = '1';
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { pickToast.style.opacity = '0'; }, 2500);
+  }
+
+  function makePanelRuleItem(selector, type) {
+    const li = document.createElement('li');
+    li.className = 'i18n-rule-item';
+    li.dataset.selector = selector;
+    li.dataset.type = type;
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.className = 'i18n-rule-checkbox';
+    cb.checked = true;
+
+    const label = document.createElement('span');
+    label.className = 'i18n-rule-label' + (type === 'inherited' ? ' inherited' : '');
+    label.textContent = selector;
+    label.title = selector;
+
+    li.appendChild(cb);
+    li.appendChild(label);
+
+    if (type === 'picked') {
+      const del = document.createElement('button');
+      del.className = 'i18n-rule-delete';
+      del.textContent = '✕';
+      del.title = '删除此规则';
+      li.appendChild(del);
+    } else {
+      const lock = document.createElement('span');
+      lock.className = 'i18n-rule-lock';
+      lock.textContent = '🔒';
+      li.appendChild(lock);
+    }
+
+    return li;
+  }
+
+  function populateInheritedRules() {
+    const ul = document.getElementById('i18n-panel-inherited');
+    if (!ul) return;
+    ul.innerHTML = '';
+    SKIP_SELECTORS.forEach(selector => {
+      if (!selector) return;
+      ul.appendChild(makePanelRuleItem(selector, 'inherited'));
+    });
+  }
+
+  function addPickedRule(selector) {
+    if (pickedRules.has(selector)) return;
+    pickedRules.set(selector, { active: true });
+    panelSkipSelectors.add(selector);
+    applyRedOverlay(selector);
+    restoreOriginalInArea(selector);
+    const ul = document.getElementById('i18n-panel-picked');
+    if (ul) ul.appendChild(makePanelRuleItem(selector, 'picked'));
+  }
+
+  function removePickedRule(selector) {
+    if (!pickedRules.has(selector)) return;
+    pickedRules.delete(selector);
+    panelSkipSelectors.delete(selector);
+    removeRedOverlay(selector);
+    retranslateArea(selector);
+    const ul = document.getElementById('i18n-panel-picked');
+    if (ul) {
+      const li = ul.querySelector(`[data-selector="${CSS.escape(selector)}"]`);
+      if (li) li.remove();
+    }
+  }
+
+  function onRuleCheckboxChange(li, checked) {
+    const selector = li.dataset.selector;
+    const type = li.dataset.type;
+    if (type === 'inherited') {
+      if (checked) {
+        panelBypassSelectors.delete(selector);
+        applyRedOverlay(selector);
+        restoreOriginalInArea(selector);
+      } else {
+        panelBypassSelectors.add(selector);
+        removeRedOverlay(selector);
+        retranslateArea(selector);
+      }
+    } else {
+      if (checked) {
+        pickedRules.set(selector, { active: true });
+        panelSkipSelectors.add(selector);
+        applyRedOverlay(selector);
+        restoreOriginalInArea(selector);
+      } else {
+        pickedRules.set(selector, { active: false });
+        panelSkipSelectors.delete(selector);
+        removeRedOverlay(selector);
+        retranslateArea(selector);
+      }
+    }
+  }
+
+  skipPanel.addEventListener('change', (e) => {
+    if (e.target.classList.contains('i18n-rule-checkbox')) {
+      const li = e.target.closest('.i18n-rule-item');
+      if (li) onRuleCheckboxChange(li, e.target.checked);
+    }
+  });
+
+  skipPanel.addEventListener('click', (e) => {
+    if (e.target.id === 'i18n-panel-close') {
+      skipPanel.style.display = 'none';
+      document.querySelectorAll('.i18n-skip-preview').forEach(el => el.classList.remove('i18n-skip-preview'));
+    } else if (e.target.id === 'i18n-panel-copy') {
+      const lines = [];
+      skipPanel.querySelectorAll('.i18n-rule-item').forEach(li => {
+        const cb = li.querySelector('.i18n-rule-checkbox');
+        if (cb && cb.checked) lines.push(li.dataset.selector);
+      });
+      const text = lines.join('\n');
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text)
+          .then(() => showPickToast(`已复制 ${lines.length} 条规则`))
+          .catch(() => showPickToast('复制失败'));
+      } else {
+        try {
+          const ta = document.createElement('textarea');
+          Object.assign(ta.style, { position: 'fixed', opacity: '0' });
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          showPickToast(`已复制 ${lines.length} 条规则`);
+        } catch (_) { showPickToast('复制失败'); }
+      }
+    } else if (e.target.id === 'i18n-panel-clear') {
+      [...pickedRules.keys()].forEach(s => removePickedRule(s));
+      showPickToast('已清除所有已拾取规则');
+    } else if (e.target.classList.contains('i18n-rule-delete')) {
+      const li = e.target.closest('.i18n-rule-item');
+      if (li) removePickedRule(li.dataset.selector);
+    }
+  });
+
   window.addEventListener('keydown', (e) => {
     const isToggle = (e.metaKey || e.ctrlKey) && e.altKey && e.shiftKey && e.code === 'KeyB';
     if (isToggle) {
@@ -511,6 +926,26 @@ function init() {
         }
       }
       console.log('[I18N] 调试模式已同步切换:', newState);
+      if (newState) {
+        skipPanel.style.display = 'flex';
+        populateInheritedRules();
+        SKIP_SELECTORS.forEach(s => { if (s) applyRedOverlay(s); });
+      } else {
+        [...panelBypassSelectors].forEach(selector => applyRedOverlay(selector));
+        panelBypassSelectors.clear();
+        [...SKIP_SELECTORS].forEach(selector => {
+          if (selector) restoreOriginalInArea(selector);
+        });
+        [...panelSkipSelectors].forEach(selector => retranslateArea(selector));
+        panelSkipSelectors.clear();
+        skipPanel.style.display = 'none';
+        document.querySelectorAll('.i18n-skip-preview').forEach(el => el.classList.remove('i18n-skip-preview'));
+        chooser.style.display = 'none';
+        chooserPath = [];
+        chooserIndex = 0;
+        chooserSelectors = [];
+        chooserSelectedIndex = 0;
+      }
     }
   });
 
@@ -527,6 +962,191 @@ function init() {
     };
     broadcast(window);
   }
+
+  const chooser = document.createElement('div');
+  chooser.id = 'i18n-selector-chooser';
+  chooser.style.display = 'none';
+  document.body.appendChild(chooser);
+
+  let chooserPath = [];
+  let chooserIndex = 0;
+  let chooserSelectors = [];
+  let chooserSelectedIndex = 0;
+  let chooserDrag = null;
+  let chooserPosition = null;
+
+  function moveChooser(left, top) {
+    chooser.style.left = `${Math.max(8, Math.min(left, window.innerWidth - chooser.offsetWidth - 8))}px`;
+    chooser.style.top = `${Math.max(8, Math.min(top, window.innerHeight - chooser.offsetHeight - 8))}px`;
+    chooserPosition = { left: chooser.offsetLeft, top: chooser.offsetTop };
+  }
+
+  document.addEventListener('pointermove', (ev) => {
+    if (!chooserDrag) return;
+    moveChooser(ev.clientX - chooserDrag.offsetX, ev.clientY - chooserDrag.offsetY);
+  });
+
+  function clearDrag() { chooserDrag = null; }
+  document.addEventListener('pointerup', clearDrag);
+  document.addEventListener('mouseup', clearDrag);
+
+  function updateChooserPreview() {
+    const activeEl = chooserPath[chooserIndex];
+    if (!activeEl) return;
+    syncRedOverlays();
+    activeEl.classList.add('i18n-skip-preview');
+  }
+
+  function renderChooser() {
+    const activeEl = chooserPath[chooserIndex];
+    if (!activeEl) return;
+    chooserSelectors = getPickSelectors(activeEl).slice(0, 5);
+    if (!chooserSelectors.length) {
+      chooser.style.display = 'none';
+      return;
+    }
+    chooser.style.display = 'block';
+    if (chooserSelectedIndex >= chooserSelectors.length) chooserSelectedIndex = 0;
+    const ancestor = getAncestorChain(activeEl);
+    chooser.innerHTML = '';
+
+    const title = document.createElement('div');
+    title.id = 'i18n-chooser-title';
+    const closeBtn = document.createElement('span');
+    closeBtn.id = 'i18n-ch-close';
+    closeBtn.textContent = '✕';
+    closeBtn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      chooser.style.display = 'none';
+      syncRedOverlays();
+    });
+    title.textContent = `${ancestor ? `祖先: ${ancestor} | ` : ''}当前: <${activeEl.tagName.toLowerCase()}${activeEl.id ? `#${activeEl.id}` : ''}>`;
+    title.appendChild(closeBtn);
+    title.addEventListener('pointerdown', (ev) => {
+      chooserDrag = {
+        offsetX: ev.clientX - chooser.offsetLeft,
+        offsetY: ev.clientY - chooser.offsetTop,
+      };
+      ev.preventDefault();
+      ev.stopPropagation();
+    });
+    chooser.appendChild(title);
+
+    const nav = document.createElement('div');
+    nav.id = 'i18n-chooser-nav';
+    const upBtn = document.createElement('button');
+    upBtn.id = 'i18n-chooser-up';
+    upBtn.textContent = '选择父/祖';
+    upBtn.disabled = chooserIndex >= chooserPath.length - 1;
+    const downBtn = document.createElement('button');
+    downBtn.id = 'i18n-chooser-down';
+    downBtn.textContent = '选择子/孙';
+    downBtn.disabled = chooserIndex === 0;
+    nav.appendChild(upBtn);
+    nav.appendChild(downBtn);
+    chooser.appendChild(nav);
+
+    chooserSelectors.forEach((s, i) => {
+      const item = document.createElement('div');
+      item.className = 'i18n-chooser-item' + (i === 0 ? ' i18n-chooser-item-best' : '') + (i === chooserSelectedIndex ? ' active' : '');
+      item.textContent = s;
+      item.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        chooserSelectedIndex = i;
+        renderChooser();
+      });
+      chooser.appendChild(item);
+    });
+
+    const actions = document.createElement('div');
+    actions.id = 'i18n-chooser-actions';
+    const confirmBtn = document.createElement('button');
+    confirmBtn.id = 'i18n-chooser-confirm';
+    confirmBtn.textContent = '确定添加';
+    actions.appendChild(confirmBtn);
+    chooser.appendChild(actions);
+
+    upBtn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      if (chooserIndex < chooserPath.length - 1) {
+        chooserIndex++;
+        chooserSelectedIndex = 0;
+        renderChooser();
+        updateChooserPreview();
+      }
+    });
+
+    downBtn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      if (chooserIndex > 0) {
+        chooserIndex--;
+        chooserSelectedIndex = 0;
+        renderChooser();
+        updateChooserPreview();
+      }
+    });
+
+    confirmBtn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const selector = chooserSelectors[chooserSelectedIndex];
+      if (!selector) return;
+      chooser.style.display = 'none';
+      addPickedRule(selector);
+      syncRedOverlays();
+      showPickToast(`已添加: ${selector}`);
+    });
+  }
+
+  function showChooser(el, cx, cy) {
+    chooserPath = [];
+    let cur = el.nodeType === Node.ELEMENT_NODE ? el : el.parentElement;
+    while (cur && cur !== document.body && chooserPath.length < 6) {
+      chooserPath.push(cur);
+      cur = cur.parentElement;
+    }
+    chooserIndex = 0;
+    chooserSelectedIndex = 0;
+    renderChooser();
+    if (chooser.style.display === 'none') return;
+    chooser.style.display = 'block';
+    if (chooserPosition) {
+      moveChooser(chooserPosition.left, chooserPosition.top);
+    } else {
+      moveChooser(cx + 8, cy + 8);
+    }
+    updateChooserPreview();
+  }
+
+  document.body.addEventListener('click', (e) => {
+    if (!document.body.classList.contains('i18n-debug-active') || !e.altKey) return;
+    if (e.target === chooser || chooser.contains(e.target)) return;
+    if (e.target === skipPanel || skipPanel.contains(e.target)) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if (chooser.style.display !== 'none') {
+      showChooser(e.target, e.clientX, e.clientY);
+      return;
+    }
+    showChooser(e.target, e.clientX, e.clientY);
+  }, true);
+
+  // chooser 不再自动关闭，用户通过 ✕ 或"确定添加"手动关闭
+
+  // 拦截 chooser / 面板上的 mousedown 和 pointerdown，防止底层菜单
+  // 因捕获到"外部点击"而自动关闭（排除标题栏，标题栏需要 pointerdown 做拖拽）
+  function isDragHandle(el) {
+    return el && (el.id === 'i18n-chooser-title' || el.closest('#i18n-chooser-title'));
+  }
+  document.addEventListener('mousedown', (e) => {
+    if ((chooser.contains(e.target) || skipPanel.contains(e.target)) && !isDragHandle(e.target)) {
+      e.stopImmediatePropagation();
+    }
+  }, true);
+  document.addEventListener('pointerdown', (e) => {
+    if ((chooser.contains(e.target) || skipPanel.contains(e.target)) && !isDragHandle(e.target)) {
+      e.stopImmediatePropagation();
+    }
+  }, true);
 
   document.body.addEventListener('mouseover', (e) => {
     if (!document.body.classList.contains('i18n-debug-active') || !e.altKey) return;
