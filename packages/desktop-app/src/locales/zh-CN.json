@@ -66,6 +66,8 @@
   "dictStatusTranslatingBatch": "正在翻译批次 {{current}}/{{total}}",
   "enableNestedDict": "嵌套字典寻址",
   "enableRegex": "启用正则匹配",
+  "enableThirdPartyInferenceMode": "在第三方推理模式中启用",
+  "enableThirdPartyInferenceModeDesc": "为 Claude 本地/第三方推理模式追加当前翻译 API 域名到 CSP，仅影响 Claude 部署",
   "enableTranslationBridge": "跨 Webview 桥接",
   "engineLabel": "{{name}} 引擎",
   "engineNone": "无 (仅静态字典)",
@@ -102,6 +104,8 @@
   "pluginScanner": "Webview 插件扫描器",
   "preset": "预设",
   "refreshPluginList": "刷新插件列表",
+  "resetCacheDesc": "部署后首次启动时清除 AI 翻译缓存，之后正常累积",
+  "resetCacheOnDeploy": "清空 AI 翻译缓存（仅一次）",
   "restoreBtn": "恢复官方原版",
   "restoreOfficial": "恢复官方原版",
   "runtimeEngine": "运行时翻译引擎",
@@ -153,11 +157,9 @@
   "updateError": "更新失败，请稍后重试",
   "updateInstallBtn": "立即重启",
   "updateLatest": "已是最新版本",
+  "updateOpenDmgBtn": "打开安装包",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "更新已就绪，重启后生效",
-    "updateReadyMacOS": "更新已下载，请安装新版本",
-    "updateOpenDmgBtn": "打开安装包",
-  "waitingExecution": "等待任务执行...",
-  "resetCacheOnDeploy": "清空 AI 翻译缓存（仅一次）",
-  "resetCacheDesc": "部署后首次启动时清除 AI 翻译缓存，之后正常累积"
+  "updateReadyMacOS": "更新已下载，请安装新版本",
+  "waitingExecution": "等待任务执行..."
 }

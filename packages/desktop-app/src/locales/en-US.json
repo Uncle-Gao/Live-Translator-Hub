@@ -66,6 +66,8 @@
   "dictStatusTranslatingBatch": "Translating batch {{current}}/{{total}}",
   "enableNestedDict": "Nested Dictionary Lookup",
   "enableRegex": "Enable Regex Matching",
+  "enableThirdPartyInferenceMode": "Enable in third-party inference mode",
+  "enableThirdPartyInferenceModeDesc": "Add the current translation API domain to Claude CSP for local/third-party inference mode. Claude deployment only.",
   "enableTranslationBridge": "Cross-Webview Bridge",
   "engineLabel": "{{name}} Engine",
   "engineNone": "None (Static Dict Only)",
@@ -102,6 +104,8 @@
   "pluginScanner": "Webview Plugin Scanner",
   "preset": "Preset",
   "refreshPluginList": "Refresh Plugin List",
+  "resetCacheDesc": "Clear AI translation cache on first launch after deploy, then accumulate normally",
+  "resetCacheOnDeploy": "Clear AI translation cache (one-time)",
   "restoreBtn": "Restore Original",
   "restoreOfficial": "Restore Original",
   "runtimeEngine": "Runtime Engine",
@@ -153,11 +157,9 @@
   "updateError": "Update failed, please try again later",
   "updateInstallBtn": "Restart Now",
   "updateLatest": "You're up to date",
+  "updateOpenDmgBtn": "Open Installer",
   "updateProgress": "{{percent}}% ({{speed}})",
   "updateReady": "Update ready, restart to install",
-    "updateReadyMacOS": "Update downloaded, install the new version",
-    "updateOpenDmgBtn": "Open Installer",
-  "waitingExecution": "Waiting for execution...",
-  "resetCacheOnDeploy": "Clear AI translation cache (one-time)",
-  "resetCacheDesc": "Clear AI translation cache on first launch after deploy, then accumulate normally"
+  "updateReadyMacOS": "Update downloaded, install the new version",
+  "waitingExecution": "Waiting for execution..."
 }

@@ -73,6 +73,7 @@ const useConfigStore = create((set, get) => ({
         }
       },
       cacheVersion: 0,
+      enableThirdPartyInferenceMode: false,
     },
     apiKeys: {
       engines: {},
