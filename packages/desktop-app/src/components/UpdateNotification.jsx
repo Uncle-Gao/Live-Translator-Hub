@@ -16,7 +16,7 @@ function formatBytes(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 }
 
-export default function UpdateNotification({ state, info, progress, isMac, onDownload, onInstall, onDismiss }) {
+export default function UpdateNotification({ state, info, progress, isMac, error, onDownload, onInstall, onDismiss }) {
   const { t } = useTranslation();
 
   const variants = {
@@ -39,6 +39,11 @@ export default function UpdateNotification({ state, info, progress, isMac, onDow
       title: isMac ? t('updateReadyMacOS') : t('updateReady'),
       btn: isMac ? t('updateOpenDmgBtn') : t('updateInstallBtn'),
       action: onInstall,
+    },
+    error: {
+      bg: 'from-red-500/20 to-red-600/10 border-red-500/30',
+      icon: X,
+      title: error || t('updateError'),
     },
   };
 
@@ -64,6 +69,7 @@ export default function UpdateNotification({ state, info, progress, isMac, onDow
             'w-8 h-8 rounded-lg flex items-center justify-center shrink-0',
             state === 'available' ? 'bg-blue-500/20 text-blue-400' :
             state === 'downloading' ? 'bg-purple-500/20 text-purple-400' :
+            state === 'error' ? 'bg-red-500/20 text-red-400' :
             'bg-emerald-500/20 text-emerald-400'
           )}>
             <Icon className={cn('w-4 h-4', state === 'downloading' && 'animate-spin')} />

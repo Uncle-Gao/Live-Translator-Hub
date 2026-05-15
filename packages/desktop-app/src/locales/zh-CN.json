@@ -150,6 +150,7 @@
   "updateDismiss": "忽略",
   "updateDownloadBtn": "下载更新",
   "updateDownloading": "正在下载更新...",
+  "updateError": "更新失败，请稍后重试",
   "updateInstallBtn": "立即重启",
   "updateLatest": "已是最新版本",
   "updateProgress": "{{percent}}% ({{speed}})",

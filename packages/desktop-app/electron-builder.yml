@@ -25,6 +25,7 @@ mac:
   icon: build/icon-mac.icns
   target:
     - dmg
+    - zip
   artifactName: "${productName}-${version}-mac-${arch}.${ext}"
   hardenedRuntime: false
   gatekeeperAssess: false

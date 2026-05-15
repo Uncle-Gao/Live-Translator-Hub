@@ -150,6 +150,7 @@
   "updateDismiss": "Dismiss",
   "updateDownloadBtn": "Download Update",
   "updateDownloading": "Downloading update...",
+  "updateError": "Update failed, please try again later",
   "updateInstallBtn": "Restart Now",
   "updateLatest": "You're up to date",
   "updateProgress": "{{percent}}% ({{speed}})",

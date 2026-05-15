@@ -23,6 +23,7 @@ function App() {
   const [updateInfo, setUpdateInfo] = useState(null)
   const [updateProgress, setUpdateProgress] = useState(null)
   const [isUpdateMac, setIsUpdateMac] = useState(false)
+  const [updateError, setUpdateError] = useState(null)
   
   const scrollRef = useRef(null)
   const bounceY = useOverscrollBounce(scrollRef)
@@ -46,22 +47,32 @@ function App() {
     if (window.liveTranslatorAPI) {
       window.liveTranslatorAPI.onSudoPrompt(() => setShowSudoOverlay(true))
 
-      window.liveTranslatorAPI.onUpdateChecking(() => setUpdateState('checking'))
+      window.liveTranslatorAPI.onUpdateChecking(() => {
+        setUpdateError(null)
+        setUpdateState('checking')
+      })
       window.liveTranslatorAPI.onUpdateAvailable((info) => {
+        setUpdateError(null)
         setUpdateInfo(info)
         setUpdateState('available')
       })
-      window.liveTranslatorAPI.onUpdateNotAvailable(() => setUpdateState('idle'))
+      window.liveTranslatorAPI.onUpdateNotAvailable(() => {
+        setUpdateError(null)
+        setUpdateState('idle')
+      })
       window.liveTranslatorAPI.onUpdateProgress((progress) => {
+        setUpdateError(null)
         setUpdateProgress(progress)
         setUpdateState('downloading')
       })
       window.liveTranslatorAPI.onUpdateDownloaded((info) => {
+        setUpdateError(null)
         if (info?.platform === 'darwin') setIsUpdateMac(true)
         setUpdateState('downloaded')
       })
-      window.liveTranslatorAPI.onUpdateError(() => {
-        setUpdateState('idle')
+      window.liveTranslatorAPI.onUpdateError((err) => {
+        setUpdateError(err?.message || null)
+        setUpdateState('error')
       })
     }
     return () => {
@@ -74,6 +85,7 @@ function App() {
 
   const handleCheckUpdate = async () => {
     if (!window.liveTranslatorAPI?.checkForUpdates) return
+    setUpdateError(null)
     setUpdateState('checking')
     try {
       const result = await window.liveTranslatorAPI.checkForUpdates()
@@ -151,9 +163,10 @@ function App() {
           info={updateInfo}
           progress={updateProgress}
           isMac={isUpdateMac}
+          error={updateError}
           onDownload={() => window.liveTranslatorAPI?.downloadUpdate()}
           onInstall={() => window.liveTranslatorAPI?.installUpdate()}
-          onDismiss={() => setUpdateState('idle')}
+          onDismiss={() => { setUpdateError(null); setUpdateState('idle'); }}
         />
 
         <Header title={getTitle()} />
