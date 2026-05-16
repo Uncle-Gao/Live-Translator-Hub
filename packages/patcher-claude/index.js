@@ -144,6 +144,13 @@ function resolveResourcesPath(customRoot = null) {
             path.join(customRoot, 'resources'),
             customRoot,
         ].filter(Boolean);
+        // Also scan app-* subdirs in case user selected the Squirrel parent dir
+        try {
+            fs.readdirSync(customRoot)
+                .filter(d => d.startsWith('app-'))
+                .sort().reverse()
+                .forEach(d => candidates.push(path.join(customRoot, d, 'resources')));
+        } catch {}
         return candidates.find(p => fs.existsSync(path.join(p, 'app.asar'))) || null;
     }
 
