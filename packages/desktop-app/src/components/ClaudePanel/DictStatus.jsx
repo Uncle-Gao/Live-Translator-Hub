@@ -54,6 +54,7 @@ const DictStatus = () => {
     // checkDicts is async — setState calls happen after await, not synchronously
     // eslint-disable-next-line react-hooks/set-state-in-effect
     checkDicts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
 
   return (

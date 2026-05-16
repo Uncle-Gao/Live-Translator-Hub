@@ -38,6 +38,7 @@ function App() {
 
   useEffect(() => {
     loadConfig()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {

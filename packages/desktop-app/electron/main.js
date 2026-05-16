@@ -29,7 +29,7 @@ function loadConfig() {
     if (fs.existsSync(CONFIG_FILE_PATH)) {
       return JSON.parse(fs.readFileSync(CONFIG_FILE_PATH, 'utf8'));
     }
-  } catch (e) {}
+  } catch { /* ignore */ }
   return {};
 }
 
@@ -55,7 +55,7 @@ function loadApiKeys() {
     if (fs.existsSync(plainPath)) {
       return JSON.parse(fs.readFileSync(plainPath, 'utf8'));
     }
-  } catch (e) {}
+  } catch { /* ignore */ }
   return {};
 }
 
@@ -134,11 +134,11 @@ function migrateFromLegacy() {
 }
 
 function safeReadJSON(filePath) {
-  try { return JSON.parse(fs.readFileSync(filePath, 'utf8')); } catch (e) { return null; }
+  try { return JSON.parse(fs.readFileSync(filePath, 'utf8')); } catch { return null; }
 }
 
 function deleteDir(dir) {
-  try { if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}
+  try { if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true, force: true }); } catch { /* ignore */ }
 }
 
 // ─── Menu ─────────────────────────────────────────────────────────────────────

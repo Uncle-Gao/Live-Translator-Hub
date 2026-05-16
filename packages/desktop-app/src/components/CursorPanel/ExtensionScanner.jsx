@@ -1,6 +1,5 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Layers, ShieldCheck, ShieldAlert, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { Layers, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { clsx } from 'clsx';
 
 const ExtensionScanner = ({ extensions, selectedIds = [], onToggle, onRefresh, isScanning }) => {
