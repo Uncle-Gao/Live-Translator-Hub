@@ -383,7 +383,9 @@ ipcMain.handle('app:browsePath', async (_, targetApp) => {
   const result = await dialog.showOpenDialog({
     properties: ['openDirectory'],
     title: targetApp === 'cursor' ? '选择 Cursor 应用目录' : '选择 Claude 应用目录',
-    defaultPath: process.platform === 'darwin' ? '/Applications' : process.env.PROGRAMFILES,
+    defaultPath: process.platform === 'darwin'
+      ? '/Applications'
+      : path.join(process.env.LOCALAPPDATA || process.env.PROGRAMFILES || 'C:\\', 'Programs'),
   });
   if (result.canceled || !result.filePaths[0]) return null;
   return result.filePaths[0];

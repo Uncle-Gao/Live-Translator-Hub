@@ -45,6 +45,10 @@ function getPluginPaths() {
 
 function getPaths(customRoot = null) {
     let appRoot = customRoot;
+    if (appRoot && !fs.existsSync(path.join(appRoot, 'product.json'))) {
+        const sub = path.join(appRoot, 'resources', 'app');
+        if (fs.existsSync(path.join(sub, 'product.json'))) appRoot = sub;
+    }
     if (!appRoot) {
         const platform = process.platform;
         if (platform === 'win32') {
