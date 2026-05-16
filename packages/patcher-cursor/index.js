@@ -55,9 +55,19 @@ function getPaths(customRoot = null) {
             const localAppData = process.env.LOCALAPPDATA || path.join(process.env.USERPROFILE || '', 'AppData', 'Local');
             const programFiles = process.env.PROGRAMFILES || 'C:\\Program Files';
             const possibleWinPaths = [
+                // Squirrel installer: %LOCALAPPDATA%\cursor\app-<version>\resources\app
+                ...(() => {
+                    const squirrelDir = path.join(localAppData, 'cursor');
+                    try {
+                        return fs.readdirSync(squirrelDir)
+                            .filter(d => d.startsWith('app-'))
+                            .sort().reverse()
+                            .map(d => path.join(squirrelDir, d, 'resources', 'app'));
+                    } catch { return []; }
+                })(),
+                // NSIS installer
                 path.join(localAppData, 'Programs', 'cursor', 'resources', 'app'),
                 path.join(programFiles, 'Cursor', 'resources', 'app'),
-                path.join(process.env.USERPROFILE || '', 'AppData', 'Local', 'Programs', 'cursor', 'resources', 'app')
             ];
             appRoot = possibleWinPaths.find(p => fs.existsSync(path.join(p, 'product.json'))) || '';
         } else if (platform === 'darwin') {
