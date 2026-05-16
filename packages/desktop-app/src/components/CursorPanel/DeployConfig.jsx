@@ -96,7 +96,8 @@ const DeployConfig = ({ extensions, selectedPluginIds, onTogglePlugin, onRefresh
           ) : (
             <div className="space-y-1.5">
               {extensions.map(ext => {
-                const isSelected = selectedPluginIds.includes(ext.id);
+                const pluginIds = [ext.id, ...(ext.legacyIds || [])];
+                const isSelected = pluginIds.some(id => selectedPluginIds.includes(id));
                 return (
                   <label
                     key={ext.id}
@@ -105,7 +106,7 @@ const DeployConfig = ({ extensions, selectedPluginIds, onTogglePlugin, onRefresh
                     <input
                       type="checkbox"
                       checked={isSelected}
-                      onChange={() => onTogglePlugin(ext.id)}
+                      onChange={() => onTogglePlugin(ext.id, ext.legacyIds || [])}
                       className="w-4 h-4 rounded bg-black/40 border-white/10 text-purple-500"
                     />
                     <span className={`text-xs font-medium flex-1 ${isSelected ? 'text-purple-300' : 'text-white/50'}`}>

@@ -9,11 +9,36 @@ const DEFAULT_SKIPS = [
     ".aislash-editor-input", ".composer-file-list-item", ".agent-sidebar-cell-content-wrapper"
 ];
 
+function compareVersions(a = '', b = '') {
+    if (a === 'unknown' && b !== 'unknown') return -1;
+    if (b === 'unknown' && a !== 'unknown') return 1;
+
+    const parse = (version) => String(version)
+        .split(/[.-]/)
+        .map(part => {
+            const number = Number(part);
+            return Number.isNaN(number) ? part : number;
+        });
+    const left = parse(a);
+    const right = parse(b);
+    const length = Math.max(left.length, right.length);
+
+    for (let i = 0; i < length; i++) {
+        const l = left[i] ?? 0;
+        const r = right[i] ?? 0;
+        if (l === r) continue;
+        if (typeof l === 'number' && typeof r === 'number') return l - r;
+        return String(l).localeCompare(String(r), undefined, { numeric: true, sensitivity: 'base' });
+    }
+
+    return 0;
+}
+
 function getPluginPaths() {
     const extDir = path.join(os.homedir(), '.cursor', 'extensions');
     if (!fs.existsSync(extDir)) return [];
 
-    const plugins = [];
+    const pluginsById = new Map();
     const dirs = fs.readdirSync(extDir);
     for (const dir of dirs) {
         const webviewJs = path.join(extDir, dir, 'webview', 'index.js');
@@ -22,25 +47,41 @@ function getPluginPaths() {
             let version = 'unknown';
             let name = dir;
             let displayName = dir;
+            let publisher = '';
             if (fs.existsSync(packageJsonPath)) {
                 try {
                     const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
                     version = pkg.version || version;
                     name = pkg.name || dir;
                     displayName = pkg.displayName || pkg.name || dir;
+                    publisher = pkg.publisher || '';
                 } catch (e) {}
             }
-            plugins.push({
-                id: dir,
+            const fallbackName = dir.replace(/-\d+(?:\.\d+)+(?:[-.].*)?$/, '');
+            const extensionId = publisher && name ? `${publisher}.${name}` : (name === dir ? fallbackName : name);
+            const plugin = {
+                id: extensionId,
+                dirId: dir,
+                legacyIds: [dir],
                 name: name,
                 displayName: displayName,
                 version: version,
                 webviewJs: webviewJs,
                 dir: path.join(extDir, dir)
-            });
+            };
+
+            const existing = pluginsById.get(extensionId);
+            if (!existing || compareVersions(existing.version, version) < 0) {
+                pluginsById.set(extensionId, {
+                    ...plugin,
+                    legacyIds: Array.from(new Set([...(existing?.legacyIds || []), dir]))
+                });
+            } else if (existing) {
+                existing.legacyIds = Array.from(new Set([...(existing.legacyIds || []), dir]));
+            }
         }
     }
-    return plugins;
+    return Array.from(pluginsById.values());
 }
 
 function getPaths(customRoot = null) {
@@ -317,7 +358,9 @@ class CursorPatcher {
             const plugins = getPluginPaths();
             const globalWebviewSkip = config.skipRules?.webview?.['_global_'] || {};
             for (const plugin of plugins) {
-                const pluginSkip = config.skipRules?.webview?.[plugin.id] || {};
+                const pluginSkip = config.skipRules?.webview?.[plugin.id]
+                    || (plugin.legacyIds || []).map(id => config.skipRules?.webview?.[id]).find(Boolean)
+                    || {};
                 const mergedSkip = {
                     selectors: Array.from(new Set([...(globalWebviewSkip.selectors || []), ...(pluginSkip.selectors || [])])),
                     titles: Array.from(new Set([...(globalWebviewSkip.titles || []), ...(pluginSkip.titles || [])])),

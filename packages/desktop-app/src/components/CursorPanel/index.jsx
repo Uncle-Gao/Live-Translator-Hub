@@ -338,10 +338,12 @@ const CursorPanel = ({ status, setShowSudoOverlay, refreshStatus, setActiveTab }
     }
   };
 
-  const handleTogglePlugin = (id) => {
+  const handleTogglePlugin = (id, aliases = []) => {
     const current = config.cursor.selectedPlugins || [];
-    const next = current.includes(id)
-      ? current.filter(i => i !== id)
+    const ids = [id, ...aliases];
+    const isSelected = ids.some(item => current.includes(item));
+    const next = isSelected
+      ? current.filter(item => !ids.includes(item))
       : [...current, id];
     updateCursorConfig({ selectedPlugins: next });
   };

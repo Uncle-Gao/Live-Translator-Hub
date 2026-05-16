@@ -12,7 +12,12 @@ const PluginRuleList = ({ extensions, selectedIds }) => {
 
   const webviewRules = config.cursor.skipRules?.webview || {};
 
-  const selectedPlugins = extensions.filter(ext => selectedIds.includes(ext.id));
+  const getPluginIds = (plugin) => [plugin.id, ...(plugin.legacyIds || [])];
+  const getPluginRule = (plugin) => getPluginIds(plugin)
+    .map(id => webviewRules[id])
+    .find(Boolean) || {};
+
+  const selectedPlugins = extensions.filter(ext => getPluginIds(ext).some(id => selectedIds.includes(id)));
 
   if (selectedPlugins.length === 0) {
     return (
@@ -34,7 +39,7 @@ const PluginRuleList = ({ extensions, selectedIds }) => {
     <>
       <div className="space-y-2">
         {selectedPlugins.map(ext => {
-          const rule = webviewRules[ext.id] || {};
+          const rule = getPluginRule(ext);
           const hasSelectors = (rule.selectors || []).length > 0;
 
           return (
@@ -84,7 +89,7 @@ const PluginRuleList = ({ extensions, selectedIds }) => {
       {editingPlugin && (
         <PluginRuleModal
           plugin={editingPlugin}
-          rule={webviewRules[editingPlugin.id] || {}}
+          rule={getPluginRule(editingPlugin)}
           onSave={(rule) => handleSave(editingPlugin.id, rule)}
           onClose={() => setEditingPlugin(null)}
         />
