@@ -51,6 +51,7 @@ const ClaudePanel = ({ status, setShowSudoOverlay, refreshStatus, setActiveTab }
         setShowSudoOverlay?.(false);
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status?.versionMismatch]);
 
   const executeDeploy = async () => {

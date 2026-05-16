@@ -73,6 +73,7 @@ const useConfigStore = create((set, get) => ({
         }
       },
       cacheVersion: 0,
+      enableThirdPartyInferenceMode: false,
     },
     apiKeys: {
       engines: {},
@@ -116,6 +117,7 @@ const useConfigStore = create((set, get) => ({
     };
     
     // We don't save apiKeys to config.json, they are handled separately via saveApiKeys
+    // eslint-disable-next-line no-unused-vars
     const { apiKeys, ...configToSave } = newConfig;
     
     try {

@@ -5,6 +5,7 @@ const { execSync } = require('child_process');
 const crypto = require('crypto');
 const sudo = require('sudo-prompt');
 const asar = require('@electron/asar');
+const { patchExtractedClaudeCsp } = require('./csp-patcher');
 
 const TEMP_DIR = path.join(os.tmpdir(), 'claude-unified-workspace');
 const NEW_ASAR = path.join(os.tmpdir(), 'app.asar.new');
@@ -340,6 +341,15 @@ class ClaudePatcher {
 
         onProgress(`从 ${path.basename(extractionSource)} 提取应用包...`);
         asar.extractAll(extractionSource, TEMP_DIR);
+
+        const cspResult = patchExtractedClaudeCsp(TEMP_DIR, config);
+        if (cspResult.enabled && cspResult.origin) {
+            onProgress(cspResult.changed
+                ? `已启用第三方推理模式，允许 Claude 页面访问: ${cspResult.origin}`
+                : `第三方推理模式已存在允许项: ${cspResult.origin}`);
+        } else if (cspResult.enabled) {
+            onProgress('第三方推理模式已启用，但未检测到可追加到 CSP 的安全 API 域名。');
+        }
 
         onProgress('编译并组装引擎代码...');
         const engineCode = fs.readFileSync(ENGINE_SOURCE, 'utf8');

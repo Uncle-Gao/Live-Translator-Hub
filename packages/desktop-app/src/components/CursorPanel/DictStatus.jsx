@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FileText, AlertTriangle, CheckCircle2, Key, ExternalLink, Play, Loader2, ChevronDown } from 'lucide-react';
 import useConfigStore from '../../store/configStore';
@@ -18,7 +18,7 @@ const DictStatus = ({ onGoToApiKeys }) => {
   const logsEndRef = useRef(null);
 
   const lang = config.cursor.targetLanguage;
-  const engines = config.apiKeys.engines || {};
+  const engines = useMemo(() => config.apiKeys.engines || {}, [config.apiKeys.engines]);
   const activeId = config.apiKeys.activeId;
   const hasEngine = activeId && activeId !== 'none' && engines[activeId]?.apiKey;
 
@@ -40,6 +40,7 @@ const DictStatus = ({ onGoToApiKeys }) => {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { checkDict(); }, [lang]);
 
   useEffect(() => {

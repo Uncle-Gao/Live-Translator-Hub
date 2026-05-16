@@ -107,6 +107,18 @@ const DeployConfig = () => {
                   className="w-5 h-5 rounded-lg bg-black/40 border-white/10 text-purple-500 focus:ring-purple-500/20 shrink-0 ml-3"
                 />
               </label>
+              <label className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-2xl cursor-pointer hover:bg-white/[0.08] transition-all group">
+                <div>
+                  <span className="text-sm font-medium text-white/60 group-hover:text-white/90">{t('enableThirdPartyInferenceMode', '在第三方推理模式中启用')}</span>
+                  <p className="text-[10px] text-white/30 mt-0.5">{t('enableThirdPartyInferenceModeDesc', '为 Claude 本地/第三方推理模式追加当前翻译 API 域名到 CSP，仅影响 Claude 部署')}</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={!!claude.enableThirdPartyInferenceMode}
+                  onChange={e => updateClaudeConfig({ enableThirdPartyInferenceMode: e.target.checked })}
+                  className="w-5 h-5 rounded-lg bg-black/40 border-white/10 text-purple-500 focus:ring-purple-500/20 shrink-0 ml-3"
+                />
+              </label>
               {Object.entries({
                 enableRegex: t('enableRegex', '启用正则匹配'),
                 enableNestedDict: t('enableNestedDict', '嵌套字典寻址'),

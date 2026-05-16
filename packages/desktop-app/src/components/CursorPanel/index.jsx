@@ -90,6 +90,7 @@ const CursorPanel = ({ status, setShowSudoOverlay, refreshStatus, setActiveTab }
     }
   };
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchExtensions(); }, []);
 
   // 版本不匹配 → 自动备份当前官方原版
@@ -98,6 +99,7 @@ const CursorPanel = ({ status, setShowSudoOverlay, refreshStatus, setActiveTab }
       backupTriggered.current = true;
       window.liveTranslatorAPI?.createBackupCursor?.().then(() => refreshStatus?.());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status?.versionMismatch]);
 
   const executeDeploy = async () => {
@@ -281,7 +283,7 @@ const CursorPanel = ({ status, setShowSudoOverlay, refreshStatus, setActiveTab }
     try {
       await window.liveTranslatorAPI.createBackupCursor();
       if (refreshStatus) await refreshStatus();
-    } catch (e) {
+    } catch {
       // errors shown in modal
     } finally {
       setIsBackingUp(false);

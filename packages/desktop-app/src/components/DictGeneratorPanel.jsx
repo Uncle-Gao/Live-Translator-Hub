@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Zap, Monitor, Cpu, Globe, Hash, Play, Loader2, CheckCircle2, XCircle } from 'lucide-react'
+import { Zap, Monitor, Cpu, Globe, Hash, Play, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { clsx } from 'clsx'
 import useConfigStore from '../store/configStore'
@@ -23,6 +23,7 @@ export default function DictGeneratorPanel() {
   useEffect(() => {
     const firstEng = Object.keys(apiKeys).find(k => apiKeys[k]?.apiKey)
     if (firstEng && !engine) setEngine(firstEng)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiKeys])
 
   useEffect(() => {
