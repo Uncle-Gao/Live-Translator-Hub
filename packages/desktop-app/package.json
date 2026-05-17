@@ -1,7 +1,7 @@
 {
   "name": "desktop-app",
   "private": true,
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "AI-powered UI localization for Cursor and Claude desktop apps",
   "author": "Uncle-Gao <login_user1@outlook.com>",
   "homepage": "https://github.com/Uncle-Gao/Live-Translator-Hub",
