@@ -1,12 +1,13 @@
 const { app, BrowserWindow, ipcMain, safeStorage, dialog, nativeTheme, shell, Menu } = require('electron');
 const path = require('path');
 const fs   = require('fs');
+const https = require('https');
 
 app.setName('Live Translator Hub');
 
 let autoUpdater = null;
 let downloadedUpdateFile = null;
-let squirrelInstallFailed = false;
+let latestUpdateInfo = null;
 try { ({ autoUpdater } = require('electron-updater')); } catch { /* dev mode without package */ }
 
 // Fix: macOS 13 + Electron 34 AppKit state-restoration crash (NSPersistentUIRequiresSecureCoding)
@@ -19,6 +20,7 @@ const CONFIG_DIR      = path.join(app.getPath('home'), '.live_translator_hub');
 const API_KEYS_PATH   = path.join(CONFIG_DIR, 'api_keys.enc');
 const CONFIG_FILE_PATH = path.join(CONFIG_DIR, 'config.json');
 const DICTS_DIR       = path.join(CONFIG_DIR, 'dicts');
+const MAC_UPDATE_CACHE_DIR = path.join(app.getPath('home'), 'Library', 'Caches', 'desktop-app-updater', 'manual');
 
 function ensureConfigDir() {
   if (!fs.existsSync(CONFIG_DIR)) fs.mkdirSync(CONFIG_DIR, { recursive: true });
@@ -222,6 +224,7 @@ function setupAutoUpdater() {
   });
 
   autoUpdater.on('update-available', (info) => {
+    latestUpdateInfo = info;
     if (mainWindow) mainWindow.webContents.send('update:available', {
       version: info.version,
       releaseDate: info.releaseDate,
@@ -230,6 +233,7 @@ function setupAutoUpdater() {
   });
 
   autoUpdater.on('update-not-available', () => {
+    latestUpdateInfo = null;
     if (mainWindow) mainWindow.webContents.send('update:not-available');
   });
 
@@ -252,12 +256,10 @@ function setupAutoUpdater() {
 
   autoUpdater.on('error', (error) => {
     console.error('[autoUpdater]', error);
-    // If we have a downloaded file when error fires, it's Squirrel install failure
-    squirrelInstallFailed = !!downloadedUpdateFile;
     if (mainWindow) mainWindow.webContents.send('update:error', {
       message: error.message,
       code: error.code,
-      canManualInstall: squirrelInstallFailed,
+      canManualInstall: false,
     });
   });
 
@@ -266,6 +268,132 @@ function setupAutoUpdater() {
       console.error('[autoUpdater] checkForUpdates failed:', err.message);
     });
   }, 5000);
+}
+
+function getMacDmgCachePath(version, fileName) {
+  const safeName = (fileName || `Live Translator Hub-${version}-mac-${process.arch}.dmg`).replace(/[/:]/g, '-');
+  return path.join(MAC_UPDATE_CACHE_DIR, safeName);
+}
+
+function githubReleaseAssetUrl(version, fileName) {
+  const tag = version.startsWith('v') ? version : `v${version}`;
+  const encodedName = fileName.split('/').map(encodeURIComponent).join('/');
+  return `https://github.com/Uncle-Gao/Live-Translator-Hub/releases/download/${encodeURIComponent(tag)}/${encodedName}`;
+}
+
+function findMacDmgAsset(updateInfo) {
+  const files = Array.isArray(updateInfo?.files) ? updateInfo.files : [];
+  const dmgFiles = files
+    .map(file => file?.url || file?.path || '')
+    .filter(url => /\.dmg($|\?)/i.test(url));
+
+  const archMatch = dmgFiles.find(url => url.includes(process.arch));
+  const fileName = path.basename(decodeURIComponent(archMatch || dmgFiles[0] || `Live Translator Hub-${updateInfo.version}-mac-${process.arch}.dmg`));
+  const rawUrl = archMatch || dmgFiles[0];
+
+  if (rawUrl && /^https?:\/\//i.test(rawUrl)) {
+    return { fileName, url: rawUrl };
+  }
+
+  return {
+    fileName,
+    url: githubReleaseAssetUrl(updateInfo.version, rawUrl || fileName),
+  };
+}
+
+function cleanupOldMacDmgFiles(keepFile) {
+  try {
+    if (!fs.existsSync(MAC_UPDATE_CACHE_DIR)) return;
+    for (const name of fs.readdirSync(MAC_UPDATE_CACHE_DIR)) {
+      const file = path.join(MAC_UPDATE_CACHE_DIR, name);
+      if (file !== keepFile && name.toLowerCase().endsWith('.dmg')) {
+        fs.unlinkSync(file);
+      }
+    }
+  } catch (err) {
+    console.warn('[manualMacUpdate] cleanup failed:', err.message);
+  }
+}
+
+function downloadFile(url, destination, onProgress, redirectCount = 0) {
+  if (redirectCount > 5) {
+    return Promise.reject(new Error('Too many redirects while downloading update'));
+  }
+
+  return new Promise((resolve, reject) => {
+    const request = https.get(url, response => {
+      const statusCode = response.statusCode || 0;
+      if (statusCode >= 300 && statusCode < 400 && response.headers.location) {
+        response.resume();
+        const nextUrl = new URL(response.headers.location, url).toString();
+        downloadFile(nextUrl, destination, onProgress, redirectCount + 1).then(resolve, reject);
+        return;
+      }
+
+      if (statusCode !== 200) {
+        response.resume();
+        reject(new Error(`Download failed with HTTP ${statusCode}`));
+        return;
+      }
+
+      const total = Number(response.headers['content-length'] || 0);
+      let transferred = 0;
+      const startedAt = Date.now();
+      const file = fs.createWriteStream(destination);
+
+      response.on('data', chunk => {
+        transferred += chunk.length;
+        const elapsedSeconds = Math.max((Date.now() - startedAt) / 1000, 0.001);
+        onProgress?.({
+          percent: total ? (transferred / total) * 100 : 0,
+          transferred,
+          total,
+          bytesPerSecond: transferred / elapsedSeconds,
+        });
+      });
+
+      response.pipe(file);
+      file.on('finish', () => file.close(resolve));
+      file.on('error', reject);
+    });
+
+    request.on('error', reject);
+  });
+}
+
+async function downloadMacDmgUpdate() {
+  if (!latestUpdateInfo) {
+    const result = await autoUpdater.checkForUpdates();
+    latestUpdateInfo = result?.updateInfo || result?.versionInfo;
+  }
+  if (!latestUpdateInfo?.version) throw new Error('No macOS update metadata available');
+
+  const asset = findMacDmgAsset(latestUpdateInfo);
+  fs.mkdirSync(MAC_UPDATE_CACHE_DIR, { recursive: true });
+
+  const destination = getMacDmgCachePath(latestUpdateInfo.version, asset.fileName);
+  const tempDestination = `${destination}.download`;
+  if (fs.existsSync(tempDestination)) fs.unlinkSync(tempDestination);
+
+  try {
+    await downloadFile(asset.url, tempDestination, progress => {
+      if (mainWindow) mainWindow.webContents.send('update:download-progress', progress);
+    });
+  } catch (err) {
+    if (fs.existsSync(tempDestination)) fs.unlinkSync(tempDestination);
+    throw err;
+  }
+
+  fs.renameSync(tempDestination, destination);
+  cleanupOldMacDmgFiles(destination);
+  downloadedUpdateFile = destination;
+
+  if (mainWindow) mainWindow.webContents.send('update:downloaded', {
+    platform: process.platform,
+    downloadedFile: destination,
+  });
+
+  return destination;
 }
 
 // ─── Lifecycle & IPC ────────────────────────────────────────────────────────
@@ -507,6 +635,7 @@ ipcMain.handle('update:check', async () => {
   if (!autoUpdater) return { ok: false, error: 'Update mechanism not available' };
   try {
     const result = await autoUpdater.checkForUpdates();
+    latestUpdateInfo = result?.updateInfo || result?.versionInfo || latestUpdateInfo;
     return { ok: true, ...result };
   } catch (err) {
     return { ok: false, error: err.message };
@@ -516,50 +645,31 @@ ipcMain.handle('update:check', async () => {
 ipcMain.handle('update:download', async () => {
   if (!autoUpdater) return { ok: false, error: 'Update mechanism not available' };
   try {
+    if (process.platform === 'darwin') {
+      const downloadedFile = await downloadMacDmgUpdate();
+      return { ok: true, downloadedFile };
+    }
     await autoUpdater.downloadUpdate();
     return { ok: true };
   } catch (err) {
+    if (mainWindow) mainWindow.webContents.send('update:error', {
+      message: err.message,
+      canManualInstall: false,
+    });
     return { ok: false, error: err.message };
   }
 });
 
-// ─── macOS manual install fallback (when Squirrel fails) ──────────────────
-async function manualInstallMac(downloadedFile) {
-  const sudo = require('sudo-prompt');
-  const { execSync } = require('child_process');
-  const tmpDir = path.join(app.getPath('temp'), `lth-update-${Date.now()}`);
-
-  fs.mkdirSync(tmpDir, { recursive: true });
-  execSync(`unzip -oq "${downloadedFile}" -d "${tmpDir}"`, { timeout: 30000 });
-
-  const items = fs.readdirSync(tmpDir);
-  const appBundle = items.find(i => i.endsWith('.app'));
-  if (!appBundle) throw new Error('.app bundle not found in update');
-
-  const source = path.join(tmpDir, appBundle);
-  const dest = path.join('/Applications', appBundle);
-
-  return new Promise((resolve, reject) => {
-    sudo.exec(`cp -Rf "${source}" "${dest}"`, { name: 'Live Translator Hub' }, err => {
-      if (err) reject(err); else resolve();
-    });
-  });
-}
-
-ipcMain.handle('update:install', () => {
+ipcMain.handle('update:install', async () => {
   if (!autoUpdater) return { ok: false, error: 'Update mechanism not available' };
-  if (process.platform === 'darwin' && downloadedUpdateFile) {
-    app.removeAllListeners('window-all-closed');
-    if (!squirrelInstallFailed) {
-      // Squirrel auto-install (works for signed apps or permissive macOS)
-      autoUpdater.quitAndInstall();
-      return { ok: true };
-    }
-    // Squirrel failed — extract ZIP and copy .app to /Applications
-    manualInstallMac(downloadedUpdateFile)
-      .then(() => process.nextTick(() => app.exit(0)))
-      .catch(err => console.error('[manualInstall] failed:', err));
-    return { ok: true };
+  if (process.platform === 'darwin') {
+    if (!downloadedUpdateFile) return { ok: false, error: 'No macOS installer has been downloaded' };
+    const error = await shell.openPath(downloadedUpdateFile);
+    if (error && mainWindow) mainWindow.webContents.send('update:error', {
+      message: error,
+      canManualInstall: false,
+    });
+    return error ? { ok: false, error } : { ok: true };
   } else {
     // Windows/Linux: auto-update via electron-updater
     app.removeAllListeners('window-all-closed');
