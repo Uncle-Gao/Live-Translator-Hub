@@ -20,6 +20,24 @@ const DEFAULT_PROTECTION = {
 
 let configPersistTimer = null;
 
+function mergeDefaultList(saved, defaults) {
+  return Array.from(new Set([
+    ...(Array.isArray(saved) ? saved : []),
+    ...defaults
+  ]));
+}
+
+function normalizeProtection(savedProtection = {}) {
+  return {
+    ...DEFAULT_PROTECTION,
+    ...savedProtection,
+    terms: mergeDefaultList(savedProtection.terms, protectionDefaults.terms),
+    patterns: mergeDefaultList(savedProtection.patterns, protectionDefaults.patterns),
+    disabledTerms: Array.isArray(savedProtection.disabledTerms) ? savedProtection.disabledTerms : [],
+    disabledPatterns: Array.isArray(savedProtection.disabledPatterns) ? savedProtection.disabledPatterns : []
+  };
+}
+
 function scheduleConfigPersist(config) {
   if (!window.liveTranslatorAPI?.saveConfig) return;
   if (configPersistTimer) clearTimeout(configPersistTimer);
@@ -122,7 +140,7 @@ const useConfigStore = create((set, get) => ({
         config: {
           ...state.config,
           ...savedConfig,
-          protection: { ...DEFAULT_PROTECTION, ...savedProtection },
+          protection: normalizeProtection(savedProtection),
           cursor: {
             ...state.config.cursor,
             ...savedCursor,

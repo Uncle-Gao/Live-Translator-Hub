@@ -18,6 +18,13 @@ function activeSkipItems(rule = {}, field) {
     return values.filter(item => !disabled.has(item));
 }
 
+function mergeDefaultList(saved, defaults) {
+    return Array.from(new Set([
+        ...(Array.isArray(saved) ? saved : []),
+        ...defaults
+    ]));
+}
+
 // 执行脚本：先直接运行；若被 macOS TCC 拦截则调 onTCCBlocked 并每 3 秒自动重试
 async function _execScript(scriptPath, platform, _sudoOptions, hooks) {
     const { onProgress = () => {}, onTCCBlocked = () => {} } = hooks;
@@ -386,8 +393,8 @@ class ClaudePatcher {
                 urls: activeSkipItems(config.skip?._claude_, 'urls')
             },
             protection: {
-                terms: Array.isArray(config.protection?.terms) ? config.protection.terms : protectionDefaults.terms,
-                patterns: Array.isArray(config.protection?.patterns) ? config.protection.patterns : protectionDefaults.patterns,
+                terms: mergeDefaultList(config.protection?.terms, protectionDefaults.terms),
+                patterns: mergeDefaultList(config.protection?.patterns, protectionDefaults.patterns),
                 disabledTerms: Array.isArray(config.protection?.disabledTerms) ? config.protection.disabledTerms : [],
                 disabledPatterns: Array.isArray(config.protection?.disabledPatterns) ? config.protection.disabledPatterns : []
             },

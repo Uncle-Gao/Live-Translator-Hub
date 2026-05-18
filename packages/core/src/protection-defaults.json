@@ -19,6 +19,7 @@
   "patterns": [
     "\\bGPT[-\\s]?\\d+(?:\\.\\d+)?[A-Za-z-]*(?:\\s+(?:mini|nano|turbo|preview|realtime|chat|instruct))?\\b",
     "\\bClaude\\s+(?:Opus|Sonnet|Haiku)(?:\\s+\\d+(?:\\.\\d+)?)?\\b",
+    "\\b(?:Opus|Sonnet|Haiku)(?:\\s+\\d+(?:\\.\\d+)?)?\\b",
     "\\bGemini\\s+\\d+(?:\\.\\d+)?(?:\\s+(?:Pro|Flash|Flash-Lite|Ultra|Nano|Experimental|Preview|Thinking))?\\b",
     "\\bDeepSeek[-\\s]?(?:V\\d+(?:\\.\\d+)?|R\\d+(?:\\.\\d+)?|Coder|Chat|Reasoner)\\b",
     "\\bQwen\\d*(?:\\.\\d+)?(?:[-\\s]?(?:Coder|VL|Max|Plus|Turbo|Omni|Instruct|Chat))?\\b",

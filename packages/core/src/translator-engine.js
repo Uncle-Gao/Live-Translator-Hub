@@ -330,7 +330,7 @@ function isFileNameLike(text) {
 
 function protectTextForTranslation(text) {
   if (!FEATURES.enableProtectedTermGuard || !text || text.length < 2) {
-    return { text, restore: value => value };
+    return { text, protectedValues: [], restore: value => value };
   }
 
   const values = [];
@@ -356,6 +356,7 @@ function protectTextForTranslation(text) {
 
   return {
     text: protectedText,
+    protectedValues: values,
     restore: (value) => {
       let restored = value || '';
       values.forEach((original, index) => {
@@ -365,6 +366,16 @@ function protectTextForTranslation(text) {
       return restored;
     }
   };
+}
+
+function isOnlyProtectedPlaceholders(text) {
+  return text.replace(/__I18N_KEEP_\d+__/g, '').trim() === '';
+}
+
+function cachedValueKeepsProtectedTerms(value, protectedValues) {
+  if (!Array.isArray(protectedValues) || protectedValues.length === 0) return true;
+  if (typeof value !== 'string') return false;
+  return protectedValues.every(original => value.includes(original));
 }
 
 function prepareProtectedBatch(texts) {
@@ -646,13 +657,30 @@ function getTranslation(text) {
   const t = text.trim();
   if (!t || t.length < 2) return null;
   if (isFileNameLike(t)) return null;
+  const protectedInfo = protectTextForTranslation(t);
+  const hasProtectedValues = protectedInfo.protectedValues.length > 0;
+
+  if (hasProtectedValues && isOnlyProtectedPlaceholders(protectedInfo.text)) {
+    if (CACHE[t]) {
+      delete CACHE[t];
+      scheduleCachePersist();
+    }
+    return null;
+  }
 
   if (FEATURES.enableDictionary) {
       const direct = FEATURES.enableNestedDict ? findInNestedDict(I18N_TERMS, t) : I18N_TERMS[t];
       if (direct) return direct;
   }
 
-  if (CACHE[t]) return CACHE[t];
+  if (CACHE[t]) {
+    if (!cachedValueKeepsProtectedTerms(CACHE[t], protectedInfo.protectedValues)) {
+      delete CACHE[t];
+      scheduleCachePersist();
+    } else {
+      return CACHE[t];
+    }
+  }
 
   if (FEATURES.enableRegex) {
       for (const rule of REGEX_RULES) {

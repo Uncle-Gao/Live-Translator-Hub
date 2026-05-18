@@ -16,6 +16,13 @@ function activeSkipItems(rule = {}, field) {
     return values.filter(item => !disabled.has(item));
 }
 
+function mergeDefaultList(saved, defaults) {
+    return Array.from(new Set([
+        ...(Array.isArray(saved) ? saved : []),
+        ...defaults
+    ]));
+}
+
 function compareVersions(a = '', b = '') {
     if (a === 'unknown' && b !== 'unknown') return -1;
     if (b === 'unknown' && a !== 'unknown') return 1;
@@ -332,8 +339,8 @@ class CursorPatcher {
             deepl: apiType === 'deepl' ? activeEngine : null,
             skip: { ...cursorSkip, selectors: skipSelectors },
             protection: {
-                terms: Array.isArray(config.protection?.terms) ? config.protection.terms : protectionDefaults.terms,
-                patterns: Array.isArray(config.protection?.patterns) ? config.protection.patterns : protectionDefaults.patterns,
+                terms: mergeDefaultList(config.protection?.terms, protectionDefaults.terms),
+                patterns: mergeDefaultList(config.protection?.patterns, protectionDefaults.patterns),
                 disabledTerms: Array.isArray(config.protection?.disabledTerms) ? config.protection.disabledTerms : [],
                 disabledPatterns: Array.isArray(config.protection?.disabledPatterns) ? config.protection.disabledPatterns : []
             },
