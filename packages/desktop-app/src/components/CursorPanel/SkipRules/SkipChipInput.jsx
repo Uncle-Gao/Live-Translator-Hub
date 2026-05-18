@@ -27,10 +27,21 @@ function parseInput(raw, type) {
   });
 }
 
-const SkipChipInput = ({ items = [], onChange, placeholder, type = 'selectors' }) => {
+const SkipChipInput = ({
+  items = [],
+  onChange,
+  placeholder,
+  type = 'selectors',
+  addOnBlur = true,
+  addOnComma = true,
+  addOnPaste = true,
+  disabledItems,
+  onDisabledItemsChange
+}) => {
   const [input, setInput] = useState('');
-  const [disabled, setDisabled] = useState(new Set());
+  const [localDisabled, setLocalDisabled] = useState(new Set());
   const inputRef = useRef(null);
+  const disabled = disabledItems ? new Set(disabledItems) : localDisabled;
 
   const addItems = (raw) => {
     const parsed = parseInput(raw, type);
@@ -42,9 +53,14 @@ const SkipChipInput = ({ items = [], onChange, placeholder, type = 'selectors' }
   };
 
   const removeItem = (idx) => {
+    const removed = items[idx];
     onChange(items.filter((_, i) => i !== idx));
     // Clean up disabled index if this item was disabled
-    setDisabled(prev => {
+    if (onDisabledItemsChange) {
+      onDisabledItemsChange((disabledItems || []).filter(item => item !== removed));
+      return;
+    }
+    setLocalDisabled(prev => {
       const next = new Set(prev);
       next.delete(idx);
       // Shift indices above idx down by 1
@@ -57,7 +73,16 @@ const SkipChipInput = ({ items = [], onChange, placeholder, type = 'selectors' }
   };
 
   const toggleItem = (idx) => {
-    setDisabled(prev => {
+    if (onDisabledItemsChange) {
+      const item = items[idx];
+      if (!item) return;
+      const next = new Set(disabledItems || []);
+      if (next.has(item)) next.delete(item);
+      else next.add(item);
+      onDisabledItemsChange(Array.from(next));
+      return;
+    }
+    setLocalDisabled(prev => {
       const next = new Set(prev);
       if (next.has(idx)) {
         next.delete(idx);
@@ -70,13 +95,18 @@ const SkipChipInput = ({ items = [], onChange, placeholder, type = 'selectors' }
 
   const removeDisabled = () => {
     if (disabled.size === 0) return;
+    if (onDisabledItemsChange) {
+      onChange(items.filter(item => !disabled.has(item)));
+      onDisabledItemsChange([]);
+      return;
+    }
     const indices = new Set(disabled);
     onChange(items.filter((_, i) => !indices.has(i)));
-    setDisabled(new Set());
+    setLocalDisabled(new Set());
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' || e.key === ',') {
+    if (e.key === 'Enter' || (addOnComma && e.key === ',')) {
       e.preventDefault();
       addItems(input);
     } else if (e.key === 'Delete' && !input) {
@@ -88,6 +118,7 @@ const SkipChipInput = ({ items = [], onChange, placeholder, type = 'selectors' }
   };
 
   const handlePaste = (e) => {
+    if (!addOnPaste) return;
     const pasted = e.clipboardData.getData('text');
     if (pasted.includes(',') || pasted.includes('\n') || (type === 'selectors' && pasted.includes('<'))) {
       e.preventDefault();
@@ -96,7 +127,7 @@ const SkipChipInput = ({ items = [], onChange, placeholder, type = 'selectors' }
   };
 
   const handleBlur = () => {
-    if (input.trim()) addItems(input);
+    if (addOnBlur && input.trim()) addItems(input);
   };
 
   return (
@@ -105,7 +136,7 @@ const SkipChipInput = ({ items = [], onChange, placeholder, type = 'selectors' }
       onClick={() => inputRef.current?.focus()}
     >
       {items.map((item, i) => {
-        const isDisabled = disabled.has(i);
+        const isDisabled = disabledItems ? disabled.has(item) : disabled.has(i);
         return (
           <span
             key={`${item}-${i}`}

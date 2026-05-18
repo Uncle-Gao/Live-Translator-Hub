@@ -2,12 +2,19 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const crypto = require('crypto');
+const protectionDefaults = require('@live-translator/core/src/protection-defaults.json');
 
 const DEFAULT_SKIPS = [
     ".monaco-breadcrumbs", ".view-lines.monaco-mouse-cursor-text", ".monaco-list-row",
     ".pane-header.expanded", ".xterm-link-layer", ".conversations",
     ".aislash-editor-input", ".composer-file-list-item", ".agent-sidebar-cell-content-wrapper"
 ];
+
+function activeSkipItems(rule = {}, field) {
+    const values = Array.isArray(rule[field]) ? rule[field] : [];
+    const disabled = new Set(Array.isArray(rule[`disabled${field[0].toUpperCase()}${field.slice(1)}`]) ? rule[`disabled${field[0].toUpperCase()}${field.slice(1)}`] : []);
+    return values.filter(item => !disabled.has(item));
+}
 
 function compareVersions(a = '', b = '') {
     if (a === 'unknown' && b !== 'unknown') return -1;
@@ -309,8 +316,10 @@ class CursorPatcher {
 
         const { languageName, languageCode } = require('@live-translator/core/src/language-names');
 
-        const customSkips = config.skip?._cursor_?.selectors || [];
-        const skipSelectors = Array.from(new Set([...DEFAULT_SKIPS, ...customSkips]));
+        const cursorSkip = config.skip?._cursor_ || {};
+        const customSkips = activeSkipItems(cursorSkip, 'selectors');
+        const disabledCursorSkips = new Set(Array.isArray(cursorSkip.disabledSelectors) ? cursorSkip.disabledSelectors : []);
+        const skipSelectors = Array.from(new Set([...DEFAULT_SKIPS, ...customSkips])).filter(item => !disabledCursorSkips.has(item));
 
         const engineConfig = {
             apiType,
@@ -321,9 +330,15 @@ class CursorPatcher {
             anthropic: apiType === 'anthropic' ? activeEngine : null,
             gemini: apiType === 'gemini' ? activeEngine : null,
             deepl: apiType === 'deepl' ? activeEngine : null,
-            skip: { ...(config.skip?._cursor_ || {}), selectors: skipSelectors },
+            skip: { ...cursorSkip, selectors: skipSelectors },
+            protection: {
+                terms: Array.isArray(config.protection?.terms) ? config.protection.terms : protectionDefaults.terms,
+                patterns: Array.isArray(config.protection?.patterns) ? config.protection.patterns : protectionDefaults.patterns,
+                disabledTerms: Array.isArray(config.protection?.disabledTerms) ? config.protection.disabledTerms : [],
+                disabledPatterns: Array.isArray(config.protection?.disabledPatterns) ? config.protection.disabledPatterns : []
+            },
             cacheVersion: config.cacheVersion || 0,
-            features: Object.assign({ enableDictionary: true, enableNestedDict: true, enableRegex: true, enableTranslationBridge: true, enableLoadingAnimation: true }, config.features || {})
+            features: Object.assign({ enableDictionary: true, enableNestedDict: true, enableRegex: true, enableTranslationBridge: true, enableLoadingAnimation: true, enableFileNameGuard: true, enableProtectedTermGuard: true }, config.features || {})
         };
         const I18N_DICT = loadI18n(targetLang);
         const injectCode = `\n\n// === 安装期编译内联组装 ===\n(function(){\n` +
@@ -362,9 +377,9 @@ class CursorPatcher {
                     || (plugin.legacyIds || []).map(id => config.skipRules?.webview?.[id]).find(Boolean)
                     || {};
                 const mergedSkip = {
-                    selectors: Array.from(new Set([...(globalWebviewSkip.selectors || []), ...(pluginSkip.selectors || [])])),
-                    titles: Array.from(new Set([...(globalWebviewSkip.titles || []), ...(pluginSkip.titles || [])])),
-                    urls: Array.from(new Set([...(globalWebviewSkip.urls || []), ...(pluginSkip.urls || [])]))
+                    selectors: Array.from(new Set([...activeSkipItems(globalWebviewSkip, 'selectors'), ...activeSkipItems(pluginSkip, 'selectors')])),
+                    titles: Array.from(new Set([...activeSkipItems(globalWebviewSkip, 'titles'), ...activeSkipItems(pluginSkip, 'titles')])),
+                    urls: Array.from(new Set([...activeSkipItems(globalWebviewSkip, 'urls'), ...activeSkipItems(pluginSkip, 'urls')]))
                 };
 
                 const pluginEngineConfig = {

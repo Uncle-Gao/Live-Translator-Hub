@@ -143,6 +143,7 @@ const ClaudePanel = ({ status, setShowSudoOverlay, refreshStatus, setActiveTab }
       const deployConfig = {
         ...config.claude,
         engines: config.apiKeys.engines,
+        protection: config.protection,
         cacheVersion: config.claude.cacheVersion
       };
 

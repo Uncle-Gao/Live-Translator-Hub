@@ -35,9 +35,15 @@ const BlacklistCard = () => {
     });
   };
 
+  const updateDisabled = (field, value) => {
+    updateClaudeConfig({
+      skip: { _claude_: { ...skip, [`disabled${field[0].toUpperCase()}${field.slice(1)}`]: value } }
+    });
+  };
+
   const restoreDefaults = () => {
     updateClaudeConfig({
-      skip: { _claude_: { ...CLAUDE_DEFAULT_SKIPS } }
+      skip: { _claude_: { ...CLAUDE_DEFAULT_SKIPS, disabledSelectors: [], disabledTitles: [], disabledUrls: [] } }
     });
   };
 
@@ -54,6 +60,8 @@ const BlacklistCard = () => {
             type="selectors"
             items={Array.isArray(skip.selectors) ? skip.selectors : []}
             onChange={v => updateSkip('selectors', v)}
+            disabledItems={Array.isArray(skip.disabledSelectors) ? skip.disabledSelectors : []}
+            onDisabledItemsChange={v => updateDisabled('selectors', v)}
             placeholder={t('skipRulesPastePlaceholder')}
           />
           <div className="flex justify-end">
@@ -75,6 +83,8 @@ const BlacklistCard = () => {
               type="titles"
               items={Array.isArray(skip.titles) ? skip.titles : []}
               onChange={v => updateSkip('titles', v)}
+              disabledItems={Array.isArray(skip.disabledTitles) ? skip.disabledTitles : []}
+              onDisabledItemsChange={v => updateDisabled('titles', v)}
               placeholder="Settings, Welcome..."
             />
           </div>
@@ -84,6 +94,8 @@ const BlacklistCard = () => {
               type="urls"
               items={Array.isArray(skip.urls) ? skip.urls : []}
               onChange={v => updateSkip('urls', v)}
+              disabledItems={Array.isArray(skip.disabledUrls) ? skip.disabledUrls : []}
+              onDisabledItemsChange={v => updateDisabled('urls', v)}
               placeholder="vscode-extension://..."
             />
           </div>

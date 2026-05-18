@@ -29,8 +29,12 @@ const WorkbenchSkips = () => {
     updateCursorSkipRules('_workbench_', { [field]: value });
   };
 
+  const updateDisabled = (field, value) => {
+    updateCursorSkipRules('_workbench_', { [`disabled${field[0].toUpperCase()}${field.slice(1)}`]: value });
+  };
+
   const restoreDefaults = () => {
-    updateCursorSkipRules('_workbench_', { ...CURSOR_DEFAULT_SKIPS });
+    updateCursorSkipRules('_workbench_', { ...CURSOR_DEFAULT_SKIPS, disabledSelectors: [], disabledTitles: [], disabledUrls: [] });
   };
 
   return (
@@ -43,6 +47,8 @@ const WorkbenchSkips = () => {
           type="selectors"
           items={Array.isArray(skip.selectors) ? skip.selectors : []}
           onChange={v => update('selectors', v)}
+          disabledItems={Array.isArray(skip.disabledSelectors) ? skip.disabledSelectors : []}
+          onDisabledItemsChange={v => updateDisabled('selectors', v)}
           placeholder={t('skipRulesPastePlaceholder')}
         />
         <div className="flex justify-end">
@@ -64,6 +70,8 @@ const WorkbenchSkips = () => {
             type="titles"
             items={Array.isArray(skip.titles) ? skip.titles : []}
             onChange={v => update('titles', v)}
+            disabledItems={Array.isArray(skip.disabledTitles) ? skip.disabledTitles : []}
+            onDisabledItemsChange={v => updateDisabled('titles', v)}
             placeholder="Output, Terminal..."
           />
         </div>
@@ -73,6 +81,8 @@ const WorkbenchSkips = () => {
             type="urls"
             items={Array.isArray(skip.urls) ? skip.urls : []}
             onChange={v => update('urls', v)}
+            disabledItems={Array.isArray(skip.disabledUrls) ? skip.disabledUrls : []}
+            onDisabledItemsChange={v => updateDisabled('urls', v)}
             placeholder="vscode-extension://..."
           />
         </div>

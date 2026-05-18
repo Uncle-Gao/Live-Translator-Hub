@@ -12,7 +12,9 @@ const FEATURES = Object.assign({
   enableNestedDict: true,
   enableRegex: true,
   enableTranslationBridge: true,
-  enableLoadingAnimation: true
+  enableLoadingAnimation: true,
+  enableFileNameGuard: true,
+  enableProtectedTermGuard: true
 }, CONFIG.features || {});
 
 const SKIP_TAGS = new Set(['SCRIPT', 'STYLE', 'TEXTAREA', 'INPUT', 'CODE', 'PRE', 'KBD', 'SAMP']);
@@ -236,22 +238,177 @@ if (FEATURES.enableLoadingAnimation) {
 }
 
 const HAS_CHINESE = /[\u4e00-\u9fa5]/;
+const FILE_NAME_EXTENSIONS = new Set([
+  'c', 'cc', 'cfg', 'conf', 'cpp', 'cs', 'css', 'csv', 'cxx', 'dart', 'dockerfile',
+  'env', 'go', 'h', 'hpp', 'html', 'ini', 'java', 'js', 'json', 'jsx', 'less',
+  'lock', 'log', 'lua', 'mjs', 'md', 'mdx', 'mts', 'php', 'plist', 'properties',
+  'py', 'rb', 'rs', 'sass', 'scss', 'sh', 'sql', 'svelte', 'swift', 'toml', 'ts',
+  'tsx', 'txt', 'vue', 'xml', 'yaml', 'yml'
+]);
+const FILE_NAME_BASENAMES = new Set([
+  'dockerfile', 'makefile', 'gemfile', 'rakefile', 'procfile', 'license', 'readme',
+  'changelog', 'notice', 'copying', 'authors', 'contributors'
+]);
+function createProtectedPattern(source) {
+  if (!source || typeof source !== 'string') return null;
+  const trimmed = source.trim();
+  if (!trimmed) return null;
+  try {
+    const literal = trimmed.match(/^\/(.+)\/([a-z]*)$/i);
+    if (literal) {
+      const flags = Array.from(new Set(`${literal[2]}g`.split(''))).join('');
+      return new RegExp(literal[1], flags);
+    }
+    return new RegExp(trimmed, 'g');
+  } catch (e) {
+    console.warn('[I18N] Invalid protected pattern:', trimmed);
+    return null;
+  }
+}
+const PROTECTED_TECH_TERMS = Array.isArray(CONFIG.protection?.terms)
+  ? CONFIG.protection.terms
+  : [];
+const DISABLED_PROTECTED_TERMS = new Set(CONFIG.protection?.disabledTerms || []);
+const DISABLED_PROTECTED_PATTERNS = new Set(CONFIG.protection?.disabledPatterns || []);
+const ACTIVE_PROTECTED_TECH_TERMS = PROTECTED_TECH_TERMS.filter(term => !DISABLED_PROTECTED_TERMS.has(term));
+const PROTECTED_MODEL_PATTERNS = (Array.isArray(CONFIG.protection?.patterns)
+  ? CONFIG.protection.patterns
+  : [])
+  .filter(pattern => !DISABLED_PROTECTED_PATTERNS.has(pattern))
+  .map(createProtectedPattern)
+  .filter(Boolean);
+const PROTECTED_TECH_PATTERN = ACTIVE_PROTECTED_TECH_TERMS.length > 0
+  ? new RegExp(
+      `(^|[^A-Za-z0-9_])(${ACTIVE_PROTECTED_TECH_TERMS
+        .slice()
+        .sort((a, b) => b.length - a.length)
+        .map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+'))
+        .join('|')})(?=$|[^A-Za-z0-9_])`,
+      'g'
+    )
+  : null;
+const FILE_NAME_PATTERN = new RegExp(
+  `(^|[\\s("'\\[<{])([A-Za-z0-9_@+~%#=.-]+[\\\\/][\\w@+~%#=.-]+(?:[\\\\/][\\w@+~%#=.-]+)*(?:\\:\\d+(?:\\:\\d+)?)?|[A-Za-z0-9_@+~%#=-][\\w@+~%#=.-]*\\.(${Array.from(FILE_NAME_EXTENSIONS).join('|')})(?::\\d+(?::\\d+)?)?|\\.[A-Za-z0-9_-]+(?:\\.[A-Za-z0-9_-]+)*|(?:~|\\.{1,2})?[\\\\/][\\w@+~%#=.-]+(?:[\\\\/][\\w@+~%#=.-]+)+(?:\\:\\d+(?:\\:\\d+)?)?)(?=$|[\\s)"'\\]}>.,;:])`,
+  'gi'
+);
+
+function isFileNameLike(text) {
+  if (!FEATURES.enableFileNameGuard) return false;
+  if (!text || text.length > 260 || /[\r\n]/.test(text)) return false;
+
+  let value = text.trim();
+  if (!value || /\s{2,}/.test(value)) return false;
+
+  value = value
+    .replace(/^[`'"]|[`'"]$/g, '')
+    .replace(/[),\]}]+$/g, '')
+    .replace(/:\d+(?::\d+)?$/g, '')
+    .replace(/[?#].*$/g, '');
+
+  if (!value || value.includes('...') || value.includes('…')) return false;
+  if (/[^\w\s./\\@:+~%#=-]/.test(value)) return false;
+
+  const hasPathSeparator = /[\\/]/.test(value);
+  const parts = value.split(/[\\/]/).filter(Boolean);
+  const name = parts[parts.length - 1] || value;
+  if (!name || name === '.' || name === '..') return false;
+
+  const lowerName = name.toLowerCase();
+  if (FILE_NAME_BASENAMES.has(lowerName)) return true;
+  if (/^\.[a-z0-9_-]+(?:\.[a-z0-9_-]+)*$/i.test(name)) return true;
+
+  const match = name.match(/^(.+)\.([a-z0-9][a-z0-9_-]{0,15})$/i);
+  if (!match) return false;
+
+  const basename = match[1];
+  const ext = match[2].toLowerCase();
+  if (!/[a-z]/i.test(basename)) return false;
+  if (FILE_NAME_EXTENSIONS.has(ext)) return true;
+
+  return hasPathSeparator && /[a-z]/i.test(ext) && ext.length <= 8;
+}
+
+function protectTextForTranslation(text) {
+  if (!FEATURES.enableProtectedTermGuard || !text || text.length < 2) {
+    return { text, restore: value => value };
+  }
+
+  const values = [];
+  const tokenFor = (value) => {
+    const existing = values.indexOf(value);
+    const index = existing >= 0 ? existing : values.push(value) - 1;
+    return `__I18N_KEEP_${index}__`;
+  };
+
+  let protectedText = text.replace(FILE_NAME_PATTERN, (match, prefix, value) => {
+    return `${prefix}${tokenFor(value)}`;
+  });
+
+  for (const pattern of PROTECTED_MODEL_PATTERNS) {
+    protectedText = protectedText.replace(pattern, value => tokenFor(value));
+  }
+
+  if (PROTECTED_TECH_PATTERN) {
+    protectedText = protectedText.replace(PROTECTED_TECH_PATTERN, (match, prefix, value) => {
+      return `${prefix}${tokenFor(value)}`;
+    });
+  }
+
+  return {
+    text: protectedText,
+    restore: (value) => {
+      let restored = value || '';
+      values.forEach((original, index) => {
+        const token = `__I18N_KEEP_${index}__`;
+        restored = restored.split(token).join(original);
+      });
+      return restored;
+    }
+  };
+}
+
+function prepareProtectedBatch(texts) {
+  return texts.map(original => ({
+    original,
+    ...protectTextForTranslation(original)
+  }));
+}
+
+function restoreObjectTranslations(result, batch) {
+  const restored = {};
+  batch.forEach(item => {
+    const value = result[item.text] ?? result[item.original];
+    if (typeof value === 'string') restored[item.original] = item.restore(value);
+  });
+  return restored;
+}
+
+function restoreArrayTranslations(translations, batch) {
+  const restored = {};
+  batch.forEach((item, index) => {
+    if (typeof translations[index] === 'string') restored[item.original] = item.restore(translations[index]);
+  });
+  return restored;
+}
 
 async function callOnlineAPI(texts) {
   if (CONFIG.apiType === 'none') return;
   const engine = CONFIG[CONFIG.apiType];
   if (!engine?.apiKey) return;
+  const batch = prepareProtectedBatch(texts);
 
-  if (CONFIG.apiType === 'openai')    await callOpenAI(texts);
-  else if (CONFIG.apiType === 'anthropic') await callAnthropic(texts);
-  else if (CONFIG.apiType === 'gemini')    await callGemini(texts);
-  else if (CONFIG.apiType === 'deepl')     await callDeepL(texts);
+  if (CONFIG.apiType === 'openai')    await callOpenAI(batch);
+  else if (CONFIG.apiType === 'anthropic') await callAnthropic(batch);
+  else if (CONFIG.apiType === 'gemini')    await callGemini(batch);
+  else if (CONFIG.apiType === 'deepl')     await callDeepL(batch);
 }
 
-async function callOpenAI(texts) {
+async function callOpenAI(batch) {
+  const texts = batch.map(item => item.text);
   const langName = CONFIG.targetLanguage || 'Simplified Chinese';
   const prompt = `Translate software UI strings to ${langName} (Faithful, Expressive, Elegant).
 Return JSON ONLY with keys as original strings and values as translated strings.
+Preserve placeholders like __I18N_KEEP_0__ exactly.
 Strings: ${JSON.stringify(texts)}`;
 
   const baseURL = CONFIG.openai.baseURL || 'https://api.openai.com/v1';
@@ -278,16 +435,18 @@ Strings: ${JSON.stringify(texts)}`;
     const content = data.choices?.[0]?.message?.content;
     if (!content) throw new Error('Empty AI response');
     const result = JSON.parse(content);
-    applyTranslations(result);
+    applyTranslations(restoreObjectTranslations(result, batch));
   } catch (err) {
     console.error('[I18N] OpenAI Error:', err.message || err);
   }
 }
 
-async function callAnthropic(texts) {
+async function callAnthropic(batch) {
+  const texts = batch.map(item => item.text);
   const langName = CONFIG.targetLanguage || 'Simplified Chinese';
   const prompt = `Translate software UI strings to ${langName} (Faithful, Expressive, Elegant).
 Return JSON ONLY: {"translations": ["t1", "t2", ...]} with exactly ${texts.length} items.
+Preserve placeholders like __I18N_KEEP_0__ exactly.
 Strings: ${JSON.stringify(texts)}`;
 
   const baseURL = CONFIG.anthropic.baseURL || 'https://api.anthropic.com';
@@ -316,15 +475,14 @@ Strings: ${JSON.stringify(texts)}`;
     const parsed = JSON.parse(cleaned);
     const translations = parsed.translations;
     if (!Array.isArray(translations)) throw new Error('Missing translations array');
-    const result = {};
-    texts.forEach((t, i) => { result[t] = translations[i]; });
-    applyTranslations(result);
+    applyTranslations(restoreArrayTranslations(translations, batch));
   } catch (err) {
     console.error('[I18N] Anthropic Error:', err.message || err);
   }
 }
 
-async function callGemini(texts) {
+async function callGemini(batch) {
+  const texts = batch.map(item => item.text);
   const langName = CONFIG.targetLanguage || 'Simplified Chinese';
   const prompt = `You are a professional software UI translator. Translate these ${texts.length} UI strings to ${langName}.
 
@@ -332,7 +490,8 @@ CRITICAL RULES:
 1. Return ONLY a valid JSON object: {"translations": ["t1", "t2", ...]}
 2. The array length MUST exactly match the number of input strings (${texts.length}).
 3. Preserve ALL placeholders: $1, $2, {name}, {{count}}, %s, %d, etc.
-4. Do NOT add explanations or comments.
+4. Preserve protected placeholders like __I18N_KEEP_0__ exactly.
+5. Do NOT add explanations or comments.
 
 Input strings:
 ${texts.map((t, i) => `${i + 1}. ${JSON.stringify(t)}`).join('\n')}`;
@@ -358,15 +517,14 @@ ${texts.map((t, i) => `${i + 1}. ${JSON.stringify(t)}`).join('\n')}`;
     const parsed = JSON.parse(cleaned);
     const translations = parsed.translations;
     if (!Array.isArray(translations)) throw new Error('Missing translations array');
-    const result = {};
-    texts.forEach((t, i) => { result[t] = translations[i]; });
-    applyTranslations(result);
+    applyTranslations(restoreArrayTranslations(translations, batch));
   } catch (err) {
     console.error('[I18N] Gemini Error:', err.message || err);
   }
 }
 
-async function callDeepL(texts) {
+async function callDeepL(batch) {
+  const texts = batch.map(item => item.text);
   const apiKey = CONFIG.deepl.apiKey;
   const baseURL = CONFIG.deepl.baseURL || (apiKey.endsWith(':fx') ? 'https://api-free.deepl.com/v2/translate' : 'https://api.deepl.com/v2/translate');
   const targetLangCode = CONFIG.targetLanguageCode || 'ZH';
@@ -388,7 +546,9 @@ async function callDeepL(texts) {
     const data = await response.json();
     const results = {};
     if (data.translations) {
-      data.translations.forEach((t, i) => { results[texts[i]] = t.text; });
+      data.translations.forEach((t, i) => {
+        if (batch[i]) results[batch[i].original] = batch[i].restore(t.text);
+      });
     }
     applyTranslations(results);
   } catch (err) {
@@ -485,6 +645,7 @@ function findInNestedDict(dict, key) {
 function getTranslation(text) {
   const t = text.trim();
   if (!t || t.length < 2) return null;
+  if (isFileNameLike(t)) return null;
 
   if (FEATURES.enableDictionary) {
       const direct = FEATURES.enableNestedDict ? findInNestedDict(I18N_TERMS, t) : I18N_TERMS[t];

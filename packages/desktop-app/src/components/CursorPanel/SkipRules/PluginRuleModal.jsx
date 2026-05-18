@@ -8,12 +8,18 @@ const PluginRuleModal = ({ plugin, rule, onSave, onClose }) => {
   const [selectors, setSelectors] = useState(
     Array.isArray(rule?.selectors) ? [...rule.selectors] : []
   );
+  const [disabledSelectors, setDisabledSelectors] = useState(
+    Array.isArray(rule?.disabledSelectors) ? [...rule.disabledSelectors] : []
+  );
 
   const handleSave = () => {
     onSave({
       selectors,
+      disabledSelectors,
       titles: rule?.titles || [],
+      disabledTitles: rule?.disabledTitles || [],
       urls: rule?.urls || [],
+      disabledUrls: rule?.disabledUrls || [],
     });
     onClose();
   };
@@ -41,6 +47,8 @@ const PluginRuleModal = ({ plugin, rule, onSave, onClose }) => {
             type="selectors"
             items={selectors}
             onChange={setSelectors}
+            disabledItems={disabledSelectors}
+            onDisabledItemsChange={setDisabledSelectors}
             placeholder={t('skipRulesPastePlaceholder')}
           />
           <p className="text-[10px] text-white/20 italic">{t('skipRulesEmptyMeansAll')}</p>

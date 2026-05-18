@@ -1,4 +1,35 @@
 import { create } from 'zustand';
+import protectionDefaults from '@live-translator/core/src/protection-defaults.json';
+
+const DEFAULT_FEATURES = {
+  enableDictionary: true,
+  enableNestedDict: true,
+  enableRegex: true,
+  enableTranslationBridge: true,
+  enableLoadingAnimation: true,
+  enableFileNameGuard: true,
+  enableProtectedTermGuard: true
+};
+
+const DEFAULT_PROTECTION = {
+  terms: protectionDefaults.terms,
+  patterns: protectionDefaults.patterns,
+  disabledTerms: [],
+  disabledPatterns: []
+};
+
+let configPersistTimer = null;
+
+function scheduleConfigPersist(config) {
+  if (!window.liveTranslatorAPI?.saveConfig) return;
+  if (configPersistTimer) clearTimeout(configPersistTimer);
+  configPersistTimer = setTimeout(() => {
+    // eslint-disable-next-line no-unused-vars
+    const { apiKeys, ...configToSave } = config;
+    window.liveTranslatorAPI.saveConfig(configToSave).catch(() => {});
+    configPersistTimer = null;
+  }, 250);
+}
 
 const useConfigStore = create((set, get) => ({
   config: {
@@ -6,13 +37,7 @@ const useConfigStore = create((set, get) => ({
       appPath: '',
       targetLanguage: 'zh-CN',
       activeId: 'none',
-      features: {
-        enableDictionary: true,
-        enableNestedDict: true,
-        enableRegex: true,
-        enableTranslationBridge: true,
-        enableLoadingAnimation: true
-      },
+      features: { ...DEFAULT_FEATURES },
       skip: {
         _cursor_: {
           selectors: [
@@ -44,13 +69,7 @@ const useConfigStore = create((set, get) => ({
       appPath: '',
       targetLanguage: 'zh-CN',
       activeId: 'none',
-      features: {
-        enableDictionary: true,
-        enableNestedDict: true,
-        enableRegex: true,
-        enableTranslationBridge: true,
-        enableLoadingAnimation: true
-      },
+      features: { ...DEFAULT_FEATURES },
       skip: {
         _claude_: {
           selectors: [
@@ -75,6 +94,7 @@ const useConfigStore = create((set, get) => ({
       cacheVersion: 0,
       enableThirdPartyInferenceMode: false,
     },
+    protection: { ...DEFAULT_PROTECTION },
     apiKeys: {
       engines: {},
       activeId: 'none'
@@ -89,13 +109,30 @@ const useConfigStore = create((set, get) => ({
     try {
       const savedConfig = await window.liveTranslatorAPI.loadConfig();
       const apiKeys = await window.liveTranslatorAPI.loadApiKeys();
+      const savedCursor = { ...(savedConfig.cursor || {}) };
+      const savedClaude = { ...(savedConfig.claude || {}) };
+      const savedProtection = savedConfig.protection
+        || savedConfig.cursor?.protection
+        || savedConfig.claude?.protection
+        || {};
+      delete savedCursor.protection;
+      delete savedClaude.protection;
       
       set(state => ({
         config: {
           ...state.config,
           ...savedConfig,
-          cursor: { ...state.config.cursor, ...(savedConfig.cursor || {}) },
-          claude: { ...state.config.claude, ...(savedConfig.claude || {}) },
+          protection: { ...DEFAULT_PROTECTION, ...savedProtection },
+          cursor: {
+            ...state.config.cursor,
+            ...savedCursor,
+            features: { ...DEFAULT_FEATURES, ...(savedCursor.features || {}) }
+          },
+          claude: {
+            ...state.config.claude,
+            ...savedClaude,
+            features: { ...DEFAULT_FEATURES, ...(savedClaude.features || {}) }
+          },
           apiKeys: {
             ...state.config.apiKeys,
             ...apiKeys
@@ -130,48 +167,67 @@ const useConfigStore = create((set, get) => ({
   },
 
   updateCursorConfig: (updates) => {
+    let nextConfig;
     set(state => ({
-      config: {
+      config: (nextConfig = {
         ...state.config,
         cursor: { ...state.config.cursor, ...updates }
-      }
+      })
     }));
+    scheduleConfigPersist(nextConfig);
   },
 
   updateCursorSkipRules: (path, value) => {
+    let nextConfig;
     set(state => {
       const webview = { ...state.config.cursor.skipRules?.webview };
       if (path === '_workbench_') {
-        return {
-          config: {
-            ...state.config,
-            cursor: {
-              ...state.config.cursor,
-              skip: { _cursor_: { ...state.config.cursor.skip._cursor_, ...value } }
-            }
-          }
-        };
-      }
-      webview[path] = { ...webview[path], ...value };
-      return {
-        config: {
+        nextConfig = {
           ...state.config,
           cursor: {
             ...state.config.cursor,
-            skipRules: { webview }
+            skip: { _cursor_: { ...state.config.cursor.skip._cursor_, ...value } }
           }
+        };
+        return {
+          config: nextConfig
+        };
+      }
+      webview[path] = { ...webview[path], ...value };
+      nextConfig = {
+        ...state.config,
+        cursor: {
+          ...state.config.cursor,
+          skipRules: { webview }
         }
       };
+      return {
+        config: nextConfig
+      };
     });
+    scheduleConfigPersist(nextConfig);
   },
 
   updateClaudeConfig: (updates) => {
+    let nextConfig;
     set(state => ({
-      config: {
+      config: (nextConfig = {
         ...state.config,
         claude: { ...state.config.claude, ...updates }
-      }
+      })
     }));
+    scheduleConfigPersist(nextConfig);
+  },
+
+  updateProtectionConfig: (updates) => {
+    let nextConfig;
+    set(state => ({
+      config: (nextConfig = {
+        ...state.config,
+        protection: { ...state.config.protection, ...updates }
+      })
+    }));
+    scheduleConfigPersist(nextConfig);
   },
 
   updateApiKeys: async (keys) => {

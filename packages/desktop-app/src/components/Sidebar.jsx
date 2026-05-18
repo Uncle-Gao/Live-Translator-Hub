@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Key,
   RefreshCw,
+  Settings2,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -138,6 +139,27 @@ const Sidebar = ({ activeTab, setActiveTab, cursorStatus, claudeStatus, onCheckU
           </div>
           <span className="text-sm font-medium">{t('navApiKeys')}</span>
           {activeTab === 'apikeys' && (
+            <div className="absolute left-0 top-2 bottom-2 w-0.5 bg-blue-500 rounded-full" />
+          )}
+        </button>
+
+        <button
+          onClick={() => setActiveTab('advanced')}
+          className={cn(
+            "group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative",
+            activeTab === 'advanced'
+              ? "bg-white/5 text-white shadow-sm"
+              : "text-white/60 hover:text-white/80 hover:bg-white/[0.02]"
+          )}
+        >
+          <div className={cn(
+            "w-8 h-8 rounded-lg flex items-center justify-center transition-colors",
+            activeTab === 'advanced' ? "bg-blue-500/10" : "bg-transparent group-hover:bg-white/5"
+          )}>
+            <Settings2 className={cn("w-4 h-4", activeTab === 'advanced' ? "text-blue-400" : "text-white/60")} />
+          </div>
+          <span className="text-sm font-medium">{t('navAdvancedSettings', '高级设置')}</span>
+          {activeTab === 'advanced' && (
             <div className="absolute left-0 top-2 bottom-2 w-0.5 bg-blue-500 rounded-full" />
           )}
         </button>

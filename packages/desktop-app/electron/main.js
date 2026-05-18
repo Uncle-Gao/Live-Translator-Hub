@@ -94,6 +94,8 @@ function migrateFromLegacy() {
     enableRegex: true,
     enableTranslationBridge: true,
     enableLoadingAnimation: true,
+    enableFileNameGuard: true,
+    enableProtectedTermGuard: true,
   };
 
   if (oldCursor) {

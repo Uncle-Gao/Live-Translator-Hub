@@ -32,7 +32,7 @@ const PluginRuleList = ({ extensions, selectedIds }) => {
   };
 
   const handleDelete = (pluginId) => {
-    updateCursorSkipRules(pluginId, { selectors: [], titles: [], urls: [] });
+    updateCursorSkipRules(pluginId, { selectors: [], titles: [], urls: [], disabledSelectors: [], disabledTitles: [], disabledUrls: [] });
   };
 
   return (

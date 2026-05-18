@@ -6,10 +6,17 @@ const crypto = require('crypto');
 const sudo = require('sudo-prompt');
 const asar = require('@electron/asar');
 const { patchExtractedClaudeCsp } = require('./csp-patcher');
+const protectionDefaults = require('@live-translator/core/src/protection-defaults.json');
 
 const TEMP_DIR = path.join(os.tmpdir(), 'claude-unified-workspace');
 const NEW_ASAR = path.join(os.tmpdir(), 'app.asar.new');
 const NEW_UNPACKED = NEW_ASAR + '.unpacked';
+
+function activeSkipItems(rule = {}, field) {
+    const values = Array.isArray(rule[field]) ? rule[field] : [];
+    const disabled = new Set(Array.isArray(rule[`disabled${field[0].toUpperCase()}${field.slice(1)}`]) ? rule[`disabled${field[0].toUpperCase()}${field.slice(1)}`] : []);
+    return values.filter(item => !disabled.has(item));
+}
 
 // 执行脚本：先直接运行；若被 macOS TCC 拦截则调 onTCCBlocked 并每 3 秒自动重试
 async function _execScript(scriptPath, platform, _sudoOptions, hooks) {
@@ -374,9 +381,15 @@ class ClaudePatcher {
             gemini: apiType === 'gemini' ? activeEngine : null,
             deepl: apiType === 'deepl' ? activeEngine : null,
             skip: {
-                selectors: config.skip?._claude_?.selectors || [],
-                titles: config.skip?._claude_?.titles || [],
-                urls: config.skip?._claude_?.urls || []
+                selectors: activeSkipItems(config.skip?._claude_, 'selectors'),
+                titles: activeSkipItems(config.skip?._claude_, 'titles'),
+                urls: activeSkipItems(config.skip?._claude_, 'urls')
+            },
+            protection: {
+                terms: Array.isArray(config.protection?.terms) ? config.protection.terms : protectionDefaults.terms,
+                patterns: Array.isArray(config.protection?.patterns) ? config.protection.patterns : protectionDefaults.patterns,
+                disabledTerms: Array.isArray(config.protection?.disabledTerms) ? config.protection.disabledTerms : [],
+                disabledPatterns: Array.isArray(config.protection?.disabledPatterns) ? config.protection.disabledPatterns : []
             },
             cacheVersion: config.cacheVersion || 0,
             features: Object.assign({
@@ -384,7 +397,9 @@ class ClaudePatcher {
                 enableNestedDict: true,
                 enableRegex: true,
                 enableTranslationBridge: true,
-                enableLoadingAnimation: true
+                enableLoadingAnimation: true,
+                enableFileNameGuard: true,
+                enableProtectedTermGuard: true
             }, config.features || {})
         };
 

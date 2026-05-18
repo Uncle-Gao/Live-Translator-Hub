@@ -204,6 +204,7 @@ const CursorPanel = ({ status, setShowSudoOverlay, refreshStatus, setActiveTab }
       const deployConfig = {
         ...config.cursor,
         engines: config.apiKeys.engines,
+        protection: config.protection,
         skipRules: config.cursor.skipRules,
         cacheVersion: config.cursor.cacheVersion
       };

@@ -11,6 +11,10 @@ const WebviewGlobalSkips = () => {
     updateCursorSkipRules('_global_', { [field]: value });
   };
 
+  const updateDisabled = (field, value) => {
+    updateCursorSkipRules('_global_', { [`disabled${field[0].toUpperCase()}${field.slice(1)}`]: value });
+  };
+
   const toArray = (v) => (Array.isArray(v) ? v : typeof v === 'string' ? v.split(',').map(s => s.trim()).filter(Boolean) : []);
 
   return (
@@ -23,6 +27,8 @@ const WebviewGlobalSkips = () => {
           type="selectors"
           items={toArray(globalSkip.selectors)}
           onChange={v => update('selectors', v)}
+          disabledItems={toArray(globalSkip.disabledSelectors)}
+          onDisabledItemsChange={v => updateDisabled('selectors', v)}
           placeholder={t('skipRulesPastePlaceholder')}
         />
       </div>
@@ -34,6 +40,8 @@ const WebviewGlobalSkips = () => {
             type="titles"
             items={toArray(globalSkip.titles)}
             onChange={v => update('titles', v)}
+            disabledItems={toArray(globalSkip.disabledTitles)}
+            onDisabledItemsChange={v => updateDisabled('titles', v)}
             placeholder="Output, Terminal..."
           />
         </div>
@@ -43,6 +51,8 @@ const WebviewGlobalSkips = () => {
             type="urls"
             items={toArray(globalSkip.urls)}
             onChange={v => update('urls', v)}
+            disabledItems={toArray(globalSkip.disabledUrls)}
+            onDisabledItemsChange={v => updateDisabled('urls', v)}
             placeholder="vscode-extension://..."
           />
         </div>

@@ -7,6 +7,7 @@ import useOverscrollBounce from './hooks/useOverscrollBounce'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
 import ApiKeysPanel from './components/ApiKeysPanel'
+import AdvancedSettingsPanel from './components/AdvancedSettingsPanel'
 import DictGeneratorPanel from './components/DictGeneratorPanel'
 import CursorPanel from './components/CursorPanel/index'
 import ClaudePanel from './components/ClaudePanel/index'
@@ -107,6 +108,7 @@ function App() {
       case 'cursor': return t('cursorEngine');
       case 'claude': return t('claudeEngine');
       case 'apikeys': return t('navApiKeys');
+      case 'advanced': return t('navAdvancedSettings', '高级设置');
       case 'dictgen': return t('navDictGen');
       default: return t('appTitle');
     }
@@ -189,6 +191,7 @@ function App() {
               {activeTab === 'cursor' && <CursorPanel status={cursorStatus} setShowSudoOverlay={setShowSudoOverlay} refreshStatus={fetchStatus} setActiveTab={setActiveTab} />}
               {activeTab === 'claude' && <ClaudePanel status={claudeStatus} setShowSudoOverlay={setShowSudoOverlay} refreshStatus={fetchStatus} setActiveTab={setActiveTab} />}
               {activeTab === 'apikeys' && <ApiKeysPanel />}
+              {activeTab === 'advanced' && <AdvancedSettingsPanel />}
               {activeTab === 'dictgen' && <DictGeneratorPanel />}
             </motion.div>
             </motion.div>
