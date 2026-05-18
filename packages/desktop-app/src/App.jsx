@@ -177,16 +177,16 @@ function App() {
 
         <Header title={getTitle()} />
 
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-8 relative z-10 custom-scrollbar" style={{ overscrollBehaviorY: 'auto', WebkitOverflowScrolling: 'touch' }}>
-          <AnimatePresence mode="wait">
-            <motion.div style={{ y: bounceY }}>
+        <div ref={scrollRef} className="flex-1 overflow-y-auto p-8 relative z-10 custom-scrollbar transform-gpu isolate" style={{ overscrollBehaviorY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div style={{ y: bounceY }} className="transform-gpu">
             <motion.div
               key={activeTab}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="max-w-5xl mx-auto"
+              className="max-w-5xl mx-auto transform-gpu"
             >
               {activeTab === 'cursor' && <CursorPanel status={cursorStatus} setShowSudoOverlay={setShowSudoOverlay} refreshStatus={fetchStatus} setActiveTab={setActiveTab} />}
               {activeTab === 'claude' && <ClaudePanel status={claudeStatus} setShowSudoOverlay={setShowSudoOverlay} refreshStatus={fetchStatus} setActiveTab={setActiveTab} />}
