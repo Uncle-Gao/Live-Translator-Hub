@@ -1,6 +1,6 @@
 {
   "name": "@live-translator/patcher-claude",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "Claude-Live-Translator: AI-Powered Real-time Localization Engine",
   "main": "index.js",
   "keywords": [

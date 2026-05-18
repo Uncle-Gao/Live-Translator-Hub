@@ -7,6 +7,8 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev -w desktop-app"
+    "dev": "npm run dev -w desktop-app",
+    "version:bump": "node scripts/bump-workspace-version.js",
+    "version:check": "node scripts/check-workspace-versions.js"
   }
 }

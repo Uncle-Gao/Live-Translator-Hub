@@ -1,6 +1,6 @@
 {
   "name": "@live-translator/patcher-cursor",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "Cursor-Live-Translator: AI-Powered Real-time Localization Engine",
   "main": "index.js",
   "keywords": [
