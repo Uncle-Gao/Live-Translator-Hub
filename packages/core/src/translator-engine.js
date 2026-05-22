@@ -17,6 +17,8 @@ const FEATURES = Object.assign({
   enableProtectedTermGuard: true
 }, CONFIG.features || {});
 
+console.log('[I18N] Engine loaded, CONFIG.apiType:', CONFIG.apiType, 'features:', JSON.stringify(FEATURES));
+
 const SKIP_TAGS = new Set(['SCRIPT', 'STYLE', 'TEXTAREA', 'INPUT', 'CODE', 'PRE', 'KBD', 'SAMP']);
 const SKIP_TITLES = CONFIG.skip?.titles || [];
 const SKIP_URLS = CONFIG.skip?.urls || [];
@@ -277,20 +279,32 @@ const PROTECTED_MODEL_PATTERNS = (Array.isArray(CONFIG.protection?.patterns)
   .filter(pattern => !DISABLED_PROTECTED_PATTERNS.has(pattern))
   .map(createProtectedPattern)
   .filter(Boolean);
-const PROTECTED_TECH_PATTERN = ACTIVE_PROTECTED_TECH_TERMS.length > 0
-  ? new RegExp(
-      `(^|[^A-Za-z0-9_])(${ACTIVE_PROTECTED_TECH_TERMS
-        .slice()
-        .sort((a, b) => b.length - a.length)
-        .map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+'))
-        .join('|')})(?=$|[^A-Za-z0-9_])`,
-      'g'
-    )
-  : null;
-const FILE_NAME_PATTERN = new RegExp(
-  `(^|[\\s("'\\[<{])([A-Za-z0-9_@+~%#=.-]+[\\\\/][\\w@+~%#=.-]+(?:[\\\\/][\\w@+~%#=.-]+)*(?:\\:\\d+(?:\\:\\d+)?)?|[A-Za-z0-9_@+~%#=-][\\w@+~%#=.-]*\\.(${Array.from(FILE_NAME_EXTENSIONS).join('|')})(?::\\d+(?::\\d+)?)?|\\.[A-Za-z0-9_-]+(?:\\.[A-Za-z0-9_-]+)*|(?:~|\\.{1,2})?[\\\\/][\\w@+~%#=.-]+(?:[\\\\/][\\w@+~%#=.-]+)+(?:\\:\\d+(?:\\:\\d+)?)?)(?=$|[\\s)"'\\]}>.,;:])`,
-  'gi'
-);
+let PROTECTED_TECH_PATTERN = null;
+try {
+  PROTECTED_TECH_PATTERN = ACTIVE_PROTECTED_TECH_TERMS.length > 0
+    ? new RegExp(
+        `(^|[^A-Za-z0-9_])(${ACTIVE_PROTECTED_TECH_TERMS
+          .slice()
+          .sort((a, b) => b.length - a.length)
+          .map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+'))
+          .join('|')})(?=$|[^A-Za-z0-9_])`,
+        'g'
+      )
+    : null;
+} catch(e) {
+  console.error('[I18N] PROTECTED_TECH_PATTERN build failed:', e.message);
+}
+
+let FILE_NAME_PATTERN;
+try {
+  FILE_NAME_PATTERN = new RegExp(
+    `(^|[\\s("'\\[<{])([A-Za-z0-9_@+~%#=.-]+[\\\\/][\\w@+~%#=.-]+(?:[\\\\/][\\w@+~%#=.-]+)*(?:\\:\\d+(?:\\:\\d+)?)?|[A-Za-z0-9_@+~%#=-][\\w@+~%#=.-]*\\.(${Array.from(FILE_NAME_EXTENSIONS).join('|')})(?::\\d+(?::\\d+)?)?|\\.[A-Za-z0-9_-]+(?:\\.[A-Za-z0-9_-]+)*|(?:~|\\.{1,2})?[\\\\/][\\w@+~%#=.-]+(?:[\\\\/][\\w@+~%#=.-]+)+(?:\\:\\d+(?:\\:\\d+)?)?)(?=$|[\\s)"'\\]}>.,;:])`,
+    'gi'
+  );
+} catch(e) {
+  console.error('[I18N] FILE_NAME_PATTERN build failed:', e.message);
+  FILE_NAME_PATTERN = /(?!x)x/g; // never-matching regex as fallback
+}
 
 function isFileNameLike(text) {
   if (!FEATURES.enableFileNameGuard) return false;
@@ -911,10 +925,13 @@ function retranslateArea(selector) {
 }
 
 function init() {
+  try {
   if (SKIP_URLS.some(u => location.href.includes(u)) || SKIP_TITLES.some(t => document.title.includes(t))) return;
-  
+
   if (window.__LIVE_I18N_INIT_DONE__) return;
   window.__LIVE_I18N_INIT_DONE__ = true;
+
+  console.log('[I18N] init() starting...');
 
   window.addEventListener('beforeunload', () => { flushCache(); });
 
@@ -1383,8 +1400,13 @@ function init() {
   if (IS_WORKBENCH) {
      console.log(`%c[Live-Translator-Core]%c ${CONFIG.name ? `[${CONFIG.name}] ` : ''}动力系统就绪 | V3 (Eng: ${CONFIG.engineId || CONFIG.apiType})`, 'color:#8b5cf6;font-weight:bold', '');
   }
+  } catch(e) {
+    console.error('[I18N] init() crashed:', e && (e.message || e), e && e.stack);
+  }
 }
 
-if (document.body) init();
-else document.addEventListener('DOMContentLoaded', init);
+console.log('[I18N] About to call init(), document.body:', !!document.body);
+
+if (document.body) { console.log('[I18N] Calling init() immediately'); init(); }
+else { console.log('[I18N] Waiting for DOMContentLoaded'); document.addEventListener('DOMContentLoaded', init); }
 window.__LIVE_I18N_INJECTED__ = true;
