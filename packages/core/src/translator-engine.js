@@ -803,6 +803,9 @@ const observer = new MutationObserver((mutations) => {
   for (const m of mutations) {
     if (m.type === 'childList') {
       m.addedNodes.forEach(n => { mutationBuffer.push(n); hasAct = true; });
+    } else if (m.type === 'characterData') {
+      mutationBuffer.push(m.target);
+      hasAct = true;
     } else if (m.type === 'attributes' && m.attributeName === 'title') {
       mutationBuffer.push(m.target);
       hasAct = true;
@@ -948,22 +951,44 @@ function init() {
   const skipPanel = document.createElement('div');
   skipPanel.id = 'i18n-skip-panel';
   skipPanel.style.display = 'none';
-  skipPanel.innerHTML = `
-    <div id="i18n-panel-header">
-      <span>⛔ 屏蔽规则预览</span>
-      <button id="i18n-panel-close">✕</button>
-    </div>
-    <div id="i18n-panel-body">
-      <div class="i18n-panel-section">当前配置</div>
-      <ul id="i18n-panel-inherited" style="list-style:none;margin:0;padding:0"></ul>
-      <div class="i18n-panel-section" style="margin-top:4px">已拾取</div>
-      <ul id="i18n-panel-picked" style="list-style:none;margin:0;padding:0"></ul>
-    </div>
-    <div id="i18n-panel-footer">
-      <button id="i18n-panel-copy">复制已选</button>
-      <button id="i18n-panel-clear">清除已拾取</button>
-    </div>
-  `;
+
+  const panelHeader = document.createElement('div');
+  panelHeader.id = 'i18n-panel-header';
+  const panelTitle = document.createElement('span');
+  panelTitle.textContent = '⛔ 屏蔽规则预览';
+  const panelClose = document.createElement('button');
+  panelClose.id = 'i18n-panel-close';
+  panelClose.textContent = '✕';
+  panelHeader.append(panelTitle, panelClose);
+
+  const panelBody = document.createElement('div');
+  panelBody.id = 'i18n-panel-body';
+  const inheritedTitle = document.createElement('div');
+  inheritedTitle.className = 'i18n-panel-section';
+  inheritedTitle.textContent = '当前配置';
+  const inheritedList = document.createElement('ul');
+  inheritedList.id = 'i18n-panel-inherited';
+  inheritedList.style.cssText = 'list-style:none;margin:0;padding:0';
+  const pickedTitle = document.createElement('div');
+  pickedTitle.className = 'i18n-panel-section';
+  pickedTitle.style.marginTop = '4px';
+  pickedTitle.textContent = '已拾取';
+  const pickedList = document.createElement('ul');
+  pickedList.id = 'i18n-panel-picked';
+  pickedList.style.cssText = 'list-style:none;margin:0;padding:0';
+  panelBody.append(inheritedTitle, inheritedList, pickedTitle, pickedList);
+
+  const panelFooter = document.createElement('div');
+  panelFooter.id = 'i18n-panel-footer';
+  const copyButton = document.createElement('button');
+  copyButton.id = 'i18n-panel-copy';
+  copyButton.textContent = '复制已选';
+  const clearButton = document.createElement('button');
+  clearButton.id = 'i18n-panel-clear';
+  clearButton.textContent = '清除已拾取';
+  panelFooter.append(copyButton, clearButton);
+
+  skipPanel.append(panelHeader, panelBody, panelFooter);
   document.body.appendChild(skipPanel);
 
   const pickToast = document.createElement('div');
@@ -1018,7 +1043,7 @@ function init() {
   function populateInheritedRules() {
     const ul = document.getElementById('i18n-panel-inherited');
     if (!ul) return;
-    ul.innerHTML = '';
+    ul.replaceChildren();
     SKIP_SELECTORS.forEach(selector => {
       if (!selector) return;
       ul.appendChild(makePanelRuleItem(selector, 'inherited'));
@@ -1214,7 +1239,7 @@ function init() {
     chooser.style.display = 'block';
     if (chooserSelectedIndex >= chooserSelectors.length) chooserSelectedIndex = 0;
     const ancestor = getAncestorChain(activeEl);
-    chooser.innerHTML = '';
+    chooser.replaceChildren();
 
     const title = document.createElement('div');
     title.id = 'i18n-chooser-title';
@@ -1394,7 +1419,7 @@ function init() {
     });
   }
 
-  observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['title'] });
+  observer.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['title'] });
   walkAndTranslate(document.body, true);
   logCacheStatus();
   if (IS_WORKBENCH) {

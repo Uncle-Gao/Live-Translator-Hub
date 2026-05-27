@@ -42,15 +42,29 @@ function getActiveApiOrigin(config = {}) {
 
 function patchClaudeCspBundle(source, origin) {
   if (!origin) return { changed: false, content: source };
-  if (source.includes(`s==="connect-src"?["${origin}"]:[]`)) {
+  if (source.includes(`live-translator-csp: ${origin}`) || source.includes(`s==="connect-src"?["${origin}"]:[]`)) {
     return { changed: false, content: source };
   }
   const pattern = `...i.map(s=>[s,"'self'",...SRe[s],...r.get(s)])`;
-  if (!source.includes(pattern)) {
-    throw new Error('Unable to locate Claude CSP builder pattern in .vite/build/index.js');
+  if (source.includes(pattern)) {
+    const replacement = `...i.map(s=>[s,"'self'",...SRe[s],...r.get(s),...(\n/* live-translator-csp: ${origin} */\ns==="connect-src"?[${JSON.stringify(origin)}]:[])])`;
+    return { changed: true, content: source.replace(pattern, replacement) };
   }
-  const replacement = `...i.map(s=>[s,"'self'",...SRe[s],...r.get(s),...(\n/* live-translator-csp: ${origin} */\ns==="connect-src"?[${JSON.stringify(origin)}]:[])])`;
-  return { changed: true, content: source.replace(pattern, replacement) };
+
+  const flexiblePattern = /\.\.\.([A-Za-z_$][\w$]*)\.map\(([A-Za-z_$][\w$]*)=>\[\2,"'self'",\.\.\.([A-Za-z_$][\w$]*)\[\2\],\.\.\.([A-Za-z_$][\w$]*)\.get\(\2\)\]\)/;
+  const match = source.match(flexiblePattern);
+  if (match) {
+    const [, keysName, directiveName, defaultDirectivesName, dynamicDirectivesName] = match;
+    const replacement = `...${keysName}.map(${directiveName}=>[${directiveName},"'self'",...${defaultDirectivesName}[${directiveName}],...${dynamicDirectivesName}.get(${directiveName}),...(\n/* live-translator-csp: ${origin} */\n${directiveName}==="connect-src"?[${JSON.stringify(origin)}]:[])])`;
+    return { changed: true, content: source.replace(flexiblePattern, replacement) };
+  }
+
+  return {
+    changed: false,
+    content: source,
+    skipped: true,
+    reason: 'Unable to locate Claude CSP builder pattern in .vite/build/index.js',
+  };
 }
 
 function patchExtractedClaudeCsp(extractedAppDir, config = {}) {
@@ -67,7 +81,12 @@ function patchExtractedClaudeCsp(extractedAppDir, config = {}) {
   if (result.changed) {
     fs.writeFileSync(bundlePath, result.content, 'utf8');
   }
-  return { enabled: true, changed: result.changed, origin };
+  const response = { enabled: true, changed: result.changed, origin };
+  if (result.skipped) {
+    response.skipped = true;
+    response.reason = result.reason;
+  }
+  return response;
 }
 
 module.exports = { getActiveApiOrigin, patchClaudeCspBundle, patchExtractedClaudeCsp };

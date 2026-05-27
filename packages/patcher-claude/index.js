@@ -365,9 +365,13 @@ class ClaudePatcher {
 
         const cspResult = patchExtractedClaudeCsp(TEMP_DIR, config);
         if (cspResult.enabled && cspResult.origin) {
-            onProgress(cspResult.changed
-                ? `已启用第三方推理模式，允许 Claude 页面访问: ${cspResult.origin}`
-                : `第三方推理模式已存在允许项: ${cspResult.origin}`);
+            if (cspResult.skipped) {
+                onProgress(`⚠️ 第三方推理模式 CSP 追加已跳过：当前 Claude 版本的 CSP 结构未匹配。主汉化注入将继续，第三方 API 直连可能仍受 Claude CSP 限制。`);
+            } else {
+                onProgress(cspResult.changed
+                    ? `已启用第三方推理模式，允许 Claude 页面访问: ${cspResult.origin}`
+                    : `第三方推理模式已存在允许项: ${cspResult.origin}`);
+            }
         } else if (cspResult.enabled) {
             onProgress('第三方推理模式已启用，但未检测到可追加到 CSP 的安全 API 域名。');
         }

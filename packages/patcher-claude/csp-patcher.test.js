@@ -93,11 +93,22 @@ test('patchClaudeCspBundle is idempotent for the same origin', () => {
   assert.equal(twice.content, once.content);
 });
 
-test('patchClaudeCspBundle throws when Claude CSP builder pattern is missing', () => {
-  assert.throws(
-    () => patchClaudeCspBundle('const unrelated = true;', 'https://api.deepseek.com'),
-    /Unable to locate Claude CSP builder/
-  );
+test('patchClaudeCspBundle skips when Claude CSP builder pattern is missing', () => {
+  const source = 'const unrelated = true;';
+  const result = patchClaudeCspBundle(source, 'https://api.deepseek.com');
+
+  assert.equal(result.changed, false);
+  assert.equal(result.content, source);
+  assert.equal(result.skipped, true);
+  assert.match(result.reason, /Unable to locate Claude CSP builder/);
+});
+
+test('patchClaudeCspBundle handles minified CSP builders with renamed variables', () => {
+  const source = `function CBr(e,A,t=[]){const n=Object.keys(SRe),o=new Map(n.map(c=>[c,new Set]));return[...n.map(c=>[c,"'self'",...SRe[c],...o.get(c)])].map(c=>c.join(" ")).join("; ")}`;
+  const result = patchClaudeCspBundle(source, 'https://api.deepseek.com');
+
+  assert.equal(result.changed, true);
+  assert.match(result.content, /c==="connect-src"\?\["https:\/\/api\.deepseek\.com"\]:\[\]/);
 });
 
 test('patchExtractedClaudeCsp skips file changes when mode is disabled', () => {
@@ -133,5 +144,30 @@ test('patchExtractedClaudeCsp updates .vite/build/index.js under extracted app d
 
   assert.deepEqual(result, { enabled: true, changed: true, origin: 'https://api.deepseek.com' });
   assert.match(updated, /api\.deepseek\.com/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('patchExtractedClaudeCsp skips CSP changes without aborting when pattern is missing', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'claude-csp-test-'));
+  const bundlePath = path.join(dir, '.vite', 'build', 'index.js');
+  const source = 'const unrelated = true;';
+  fs.mkdirSync(path.dirname(bundlePath), { recursive: true });
+  fs.writeFileSync(bundlePath, source, 'utf8');
+
+  const result = patchExtractedClaudeCsp(dir, {
+    enableThirdPartyInferenceMode: true,
+    activeId: 'openai',
+    engines: { openai: { baseURL: 'https://api.deepseek.com/v1' } },
+  });
+  const unchanged = fs.readFileSync(bundlePath, 'utf8');
+
+  assert.deepEqual(result, {
+    enabled: true,
+    changed: false,
+    origin: 'https://api.deepseek.com',
+    skipped: true,
+    reason: 'Unable to locate Claude CSP builder pattern in .vite/build/index.js',
+  });
+  assert.equal(unchanged, source);
   fs.rmSync(dir, { recursive: true, force: true });
 });
